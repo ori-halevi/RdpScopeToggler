@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="RdpScopeToggler.Views.WaitingUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:local="clr-namespace:RdpScopeToggler.Views"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <StackPanel
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center">
+        <TextBlock Text="{Binding Message}"
+                   TextWrapping="Wrap"
+                   FlowDirection="RightToLeft"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   TextAlignment="Center"
+                   FontFamily="Bahnschrift"
+                   FontSize="20"
+                   />
+
+        <Button 
+            Content="ביטול"
+            Padding="5"
+            Margin="5 20"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            FontFamily="Bahnschrift"
+            FontSize="20"
+            Command="{Binding CancelSchedulingCommand}"
+            />
+
+        <local:AnyClockUserControl
+                DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                CountDownDay="{Binding CountDownDay}"
+                CountDownHour="{Binding CountDownHour}"
+                CountDownMinute="{Binding CountDownMinute}"
+                CountDownSecond="{Binding CountDownSecond}"
+                IsReadOnly="True" />
+    </StackPanel>
+</UserControl>

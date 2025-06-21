@@ -1,0 +1,97 @@
+﻿<UserControl x:Class="RdpScopeToggler.Views.HomeUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:viewmodels="clr-namespace:RdpScopeToggler.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:RdpScopeToggler.Views"
+             xmlns:converter="clr-namespace:RdpScopeToggler.Converters"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <UserControl.Resources>
+        <converter:StringToBoolConverter x:Key="StringToBoolConverter" />
+    </UserControl.Resources>
+
+    <Border Padding="5">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="בחר זמן:" FontSize="20" FlowDirection="RightToLeft" FontFamily="Bahnschrift" />
+
+
+
+
+
+            <local:AnyClockUserControl
+                DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                CountDownDay="{Binding CountDownDay}"
+                CountDownHour="{Binding CountDownHour}"
+                CountDownMinute="{Binding CountDownMinute}"
+                CountDownSecond="{Binding CountDownSecond}"
+                IsReadOnly="False" 
+                ShowSeconds="False"/>
+
+
+            <Button Padding="5" Margin="10"
+                          Style="{DynamicResource MaterialDesignRaisedButton}"
+                    Content="פתח גישה" Command="{Binding StartCommand}" />
+
+
+
+            <!-- Radio Buttons מעוצבים לבחירת סוג פעולה -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10" >
+                <RadioButton Content="Remote systems"
+                 GroupName="ActionsGroup"
+                 IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Remote systems}"
+                 Style="{StaticResource MaterialDesignRadioButton}"
+                 Margin="10,0" 
+                 FontFamily="Bahnschrift"
+                 FontSize="16" />
+
+                <RadioButton Content="White list"
+                 GroupName="ActionsGroup"
+                 IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=White list}"
+                 Style="{StaticResource MaterialDesignRadioButton}"
+                 Margin="10,0"
+                 FontFamily="Bahnschrift"
+                 FontSize="16" />
+            </StackPanel>
+
+
+
+
+
+            <Border BorderThickness="2" BorderBrush="#CBCBCB" CornerRadius="4">
+                <StackPanel Orientation="Horizontal" Margin="10">
+                    <xctk:DateTimePicker 
+                        Value="{Binding SelectedDateTime, Mode=TwoWay}"
+                        IsEnabled="{Binding IsDateTimeEnabled}"
+                        Format="Custom"
+                        FormatString="dd/MM/yyyy HH:mm"
+                        FontFamily="Bahnschrift"
+                        FontSize="20"
+                        Width="200"
+                        TextAlignment="Center"
+                        Padding="0 3 0 0"
+                        Margin="0 0 5 0"
+                    />
+                    
+                    <CheckBox 
+                        Style="{DynamicResource MaterialDesignSwitchToggleButton}"
+                        VerticalAlignment="Center"
+                        Margin="5 0 0 0"
+                        IsChecked="{Binding IsDateTimeEnabled, Mode=TwoWay}">
+
+                        <CheckBox.LayoutTransform>
+                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                        </CheckBox.LayoutTransform>
+                    </CheckBox>
+
+                </StackPanel>
+
+            </Border>
+
+        </StackPanel>
+    </Border>
+</UserControl>
