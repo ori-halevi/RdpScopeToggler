@@ -6,7 +6,7 @@
              prism:ViewModelLocator.AutoWireViewModel="True">
     <StackPanel
             VerticalAlignment="Center"
-            HorizontalAlignment="Center">
+            HorizontalAlignment="Center" >
         <TextBlock Text="{Binding Message}"
                    TextWrapping="Wrap"
                    FlowDirection="RightToLeft"
@@ -16,18 +16,6 @@
                    FontFamily="Bahnschrift"
                    FontSize="20"
                    />
-
-        <Button 
-            Content="ביטול"
-            Padding="5"
-            Margin="5 20"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            FontFamily="Bahnschrift"
-            FontSize="20"
-            Command="{Binding CancelSchedulingCommand}"
-            />
-
         <local:AnyClockUserControl
                 DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 CountDownDay="{Binding CountDownDay}"
@@ -35,5 +23,15 @@
                 CountDownMinute="{Binding CountDownMinute}"
                 CountDownSecond="{Binding CountDownSecond}"
                 IsReadOnly="True" />
+
+        <Button 
+            Content="ביטול"
+            Padding="5"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            FontFamily="Bahnschrift"
+            FontSize="20"
+            Command="{Binding CancelSchedulingCommand}"
+            />
     </StackPanel>
 </UserControl>

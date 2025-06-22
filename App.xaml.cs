@@ -1,8 +1,7 @@
 ﻿using System.Windows;
-using Prism.Navigation;
 using Prism.Ioc;
 using RdpScopeToggler.Views;
-using System.Windows.Navigation;
+using System.Drawing;
 using Prism.Navigation.Regions;
 using RdpScopeToggler.Stores;
 using GraphicRdpScopeToggler.Services.FilesService;
@@ -18,6 +17,7 @@ namespace RdpScopeToggler
     /// </summary>
     public partial class App
     {
+        public static System.Windows.Forms.NotifyIcon notifyIcon;
         protected override Window CreateShell()
         {
             return Container.Resolve<MainWindow>();
@@ -55,6 +55,46 @@ namespace RdpScopeToggler
             TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
 
             base.OnStartup(e);
+
+            notifyIcon = new System.Windows.Forms.NotifyIcon();
+            notifyIcon.Icon = new Icon("Assets/remote-desktop.ico");
+            notifyIcon.Visible = true;
+            notifyIcon.Text = "Rdp Scope Toggler";
+
+            var contextMenu = new System.Windows.Forms.ContextMenuStrip();
+
+            contextMenu.Items.Add("פתח חלון", null, (s, ea) => ShowMainWindow());
+            contextMenu.Items.Add("יציאה", null, (s, ea) =>
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    var confirmWindow = new ExitConfirmationWindow();
+                    confirmWindow.ShowDialog();
+
+                    if (confirmWindow.UserConfirmed)
+                    {
+                        App.notifyIcon.Visible = false;
+                        Application.Current.Shutdown();
+                    }
+                });
+            });
+
+            notifyIcon.ContextMenuStrip = contextMenu;
+
+            notifyIcon.MouseClick += (s, ea) =>
+            {
+                if (ea.Button == System.Windows.Forms.MouseButtons.Left)
+                    ShowMainWindow();
+            };
+        }
+
+        private void ShowMainWindow()
+        {
+            if (MainWindow == null)
+                return;
+
+            MainWindow.Show();
+            MainWindow.Activate();
         }
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

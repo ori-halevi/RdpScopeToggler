@@ -10,7 +10,7 @@
              
              >
 
-    <Grid Margin="20" HorizontalAlignment="Center">
+    <Grid Margin="20 10 20 20" HorizontalAlignment="Center" VerticalAlignment="Center">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="auto" />
@@ -46,7 +46,7 @@
                 Value="{Binding CountDownDay, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 FontSize="20" MinWidth="30" Minimum="0" Maximum="365" Increment="1"
                 ShowButtonSpinner="False"
-                IsReadOnly="{Binding IsReadOnly, ElementName=root}"
+                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 PreviewMouseWheel="OnMouseWheel"
                 BorderThickness="0" Background="Transparent"
                                 ValueChanged="IntegerUpDown_ValueChanged"
@@ -78,7 +78,7 @@
                 Value="{Binding CountDownHour, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 FontSize="20" MinWidth="30" Minimum="0" Maximum="23" Increment="1"
                 ShowButtonSpinner="False"
-                IsReadOnly="{Binding IsReadOnly, ElementName=root}"
+                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 PreviewMouseWheel="OnMouseWheel"
                 BorderThickness="0" Background="Transparent"
                                 ValueChanged="IntegerUpDown_ValueChanged"
@@ -109,7 +109,7 @@
                 Value="{Binding CountDownMinute, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 FontSize="20" MinWidth="30" Minimum="0" Maximum="59" Increment="1"
                 ShowButtonSpinner="False"
-                IsReadOnly="{Binding IsReadOnly, ElementName=root}"
+                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 PreviewMouseWheel="OnMouseWheel"
                 BorderThickness="0" Background="Transparent"
                                 ValueChanged="IntegerUpDown_ValueChanged"
@@ -141,7 +141,7 @@
                 Value="{Binding CountDownSecond, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 FontSize="20" MinWidth="30" Minimum="0" Maximum="59" Increment="1"
                 ShowButtonSpinner="False"
-                IsReadOnly="{Binding IsReadOnly, ElementName=root}"
+                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 PreviewMouseWheel="OnMouseWheel"
                 BorderThickness="0" Background="Transparent"
                                 ValueChanged="IntegerUpDown_ValueChanged"

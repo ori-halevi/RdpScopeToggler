@@ -2,6 +2,7 @@
 using System;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Threading;
 
 namespace RdpScopeToggler.Views
 {
@@ -26,6 +27,7 @@ namespace RdpScopeToggler.Views
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
+            this.Closing += MainWindow_Closing;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -41,6 +43,30 @@ namespace RdpScopeToggler.Views
             };
 
             DwmExtendFrameIntoClientArea(windowHelper.Handle, ref margins);
+
+
+            // יישר את הגודל לפי התוכן
+            SizeToContent = SizeToContent.WidthAndHeight;
+
+            // ברגע ש-WPF תסיים את המדידה והפריסה, נבצע החזרה למצב רגיל
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                SizeToContent = SizeToContent.Manual;
+            }), DispatcherPriority.Loaded);
+        }
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // ביטול הסגירה
+            e.Cancel = true;
+
+            // הסתרת החלון במקום סגירה
+            this.Hide();
+
+            // הצגת בועת התראה קטנה מה־NotifyIcon
+            App.notifyIcon.BalloonTipTitle = "Rdp Scope Toggler";
+            App.notifyIcon.BalloonTipText = "התוכנה עדיין פועלת ברקע";
+            App.notifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            App.notifyIcon.ShowBalloonTip(500); // משך הזמן במילישניות
         }
     }
 }

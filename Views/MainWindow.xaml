@@ -5,7 +5,8 @@
         xmlns:prism="http://prismlibrary.com/"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:local="clr-namespace:RdpScopeToggler.Views"
-                
+        WindowStartupLocation="CenterScreen"
+
         prism:ViewModelLocator.AutoWireViewModel="True"
         
         Title="{Binding Title}"
@@ -17,7 +18,6 @@
 
         WindowStyle="None"
         AllowsTransparency="False"
-        SizeToContent="WidthAndHeight"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True"
 

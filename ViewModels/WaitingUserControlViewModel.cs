@@ -132,7 +132,11 @@ namespace RdpScopeToggler.ViewModels
 
             string durationText = BuildDurationString(duration);
 
-            Message = $"פתיחת גישה עבור\r\nרשתות חיצוניות תתחיל\r\nבתאריך {formattedDate}\r\nבשעה {formattedTime}";
+            string target = "רשתות חיצוניות";
+            if (taskInfoStore.Action == ActionsEnum.WhiteList)
+                target = "רשימה לבנה";
+
+            Message = $"פתיחת גישה עבור\r\n{target} תתחיל\r\nבתאריך {formattedDate}\r\nבשעה {formattedTime}";
 
             if (!string.IsNullOrWhiteSpace(durationText))
                 Message += $"\r\nותמשך כ-\r\n{durationText}";
