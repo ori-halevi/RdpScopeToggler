@@ -19,7 +19,7 @@
                 CountDownHour="{Binding CountDownHour}"
                 CountDownMinute="{Binding CountDownMinute}"
                 CountDownSecond="{Binding CountDownSecond}"
-                IsReadOnly="False" />
+                IsReadOnly="True" />
 
             <Button 
                 Content="ניתוק מיידי"
