@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="RdpScopeToggler.Views.IndicatorsUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:converter="clr-namespace:RdpScopeToggler.Converters"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <UserControl.Resources>
+        <converter:BoolToBrushConverter x:Key="BoolToBrushConverter" />
+    </UserControl.Resources>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" >
+        <!-- Internal Network Indicator -->
+        <Ellipse Width="12" Height="12"
+                     Fill="{Binding IsInternalOpen, Converter={StaticResource BoolToBrushConverter}}"
+                     ToolTip="גישה לרשתות פנימיות"/>
+
+        <!-- External Network Indicator -->
+        <Ellipse Width="12" Height="12" Margin="10,0,0,0"
+                     Fill="{Binding IsExternalOpen, Converter={StaticResource BoolToBrushConverter}}"
+                     ToolTip="גישה לרשתות חיצוניות"/>
+    </StackPanel>
+</UserControl>

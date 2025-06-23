@@ -16,7 +16,9 @@
     </UserControl.Resources>
 
     <Border Padding="5">
+
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <local:IndicatorsUserControl />
             <TextBlock Text="בחר זמן:" FontSize="20" FlowDirection="RightToLeft" FontFamily="Bahnschrift" />
 
 

@@ -13,6 +13,9 @@
     <Compile Update="Views\HomeUserControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\IndicatorsUserControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\TaskUserControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
