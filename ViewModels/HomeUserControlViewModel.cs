@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using RdpScopeToggler.Stores;
 using System.Windows;
 using System.Diagnostics;
+using RdpScopeToggler.Views;
 
 
 namespace RdpScopeToggler.ViewModels
@@ -111,6 +112,9 @@ namespace RdpScopeToggler.ViewModels
                 }
             }
         }
+        public ICommand StartCommand { get; }
+        public ICommand OpenSettingsWindowCommand { get; }
+
 
         public ObservableCollection<string> Options { get; }
         #endregion
@@ -135,7 +139,7 @@ namespace RdpScopeToggler.ViewModels
             SelectedAction = Options[0];
 
 
-
+            OpenSettingsWindowCommand = new DelegateCommand(OpenSettingsWindow);
             StartCommand = new DelegateCommand(() =>
             {
                 if (IsDateTimeEnabled)
@@ -149,7 +153,18 @@ namespace RdpScopeToggler.ViewModels
 
         }
 
-        public ICommand StartCommand { get; }
+        private void OpenSettingsWindow()
+        {
+            var settingsWindow = new SettingsWindow();
+
+            // אפשרות לחיבור DataContext אם צריך ViewModel ייעודי
+            // settingsWindow.DataContext = new SettingsWindowViewModel();
+
+            // פתיחה כחלון מודאלי
+            settingsWindow.Owner = Application.Current.MainWindow;
+            settingsWindow.ShowDialog();
+        }
+
 
         public void OnNavigatedTo(NavigationContext navigationContext) { }
 

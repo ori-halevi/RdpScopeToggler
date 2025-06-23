@@ -1,8 +1,5 @@
-﻿using Prism.Commands;
+﻿using GraphicRdpScopeToggler.Services.RdpService;
 using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -21,7 +18,7 @@ namespace RdpScopeToggler.ViewModels
             get => _isExternalOpen;
             set => SetProperty(ref _isExternalOpen, value);
         }
-        public IndicatorsUserControlViewModel()
+        public IndicatorsUserControlViewModel(RdpService rdpService)
         {
 
         }

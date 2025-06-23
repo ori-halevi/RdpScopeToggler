@@ -18,7 +18,30 @@
     <Border Padding="5">
 
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-            <local:IndicatorsUserControl />
+
+            <!-- Settings button in the corner -->
+            <Grid Margin="0 0 0 5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+
+                <Grid.ColumnDefinitions >
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Button Grid.Column="0" Width="32" Height="32" Padding="0"
+                    ToolTip="הגדרות"
+                    Command="{Binding OpenSettingsWindowCommand}"
+                    Style="{DynamicResource MaterialDesignToolButton}">
+                    <materialDesign:PackIcon Kind="Cog" Width="20" Height="20"/>
+                </Button>
+            
+                <local:IndicatorsUserControl Grid.Column="2" />
+            
+            </Grid>
+            
             <TextBlock Text="בחר זמן:" FontSize="20" FlowDirection="RightToLeft" FontFamily="Bahnschrift" />
 
 

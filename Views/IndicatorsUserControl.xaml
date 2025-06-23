@@ -7,15 +7,15 @@
     <UserControl.Resources>
         <converter:BoolToBrushConverter x:Key="BoolToBrushConverter" />
     </UserControl.Resources>
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" >
-        <!-- Internal Network Indicator -->
-        <Ellipse Width="12" Height="12"
-                     Fill="{Binding IsInternalOpen, Converter={StaticResource BoolToBrushConverter}}"
-                     ToolTip="גישה לרשתות פנימיות"/>
-
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" >
         <!-- External Network Indicator -->
-        <Ellipse Width="12" Height="12" Margin="10,0,0,0"
+        <Ellipse Width="12" Height="12"
                      Fill="{Binding IsExternalOpen, Converter={StaticResource BoolToBrushConverter}}"
                      ToolTip="גישה לרשתות חיצוניות"/>
+
+        <!-- Internal Network Indicator -->
+        <Ellipse Width="12" Height="12" Margin="10,0,0,0"
+                     Fill="{Binding IsInternalOpen, Converter={StaticResource BoolToBrushConverter}}"
+                     ToolTip="גישה לרשתות פנימיות"/>
     </StackPanel>
 </UserControl>

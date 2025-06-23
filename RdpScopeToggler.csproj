@@ -7,10 +7,18 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\cog.ico" />
+    <None Remove="Assets\cog.png" />
     <None Remove="Assets\remote-desktop.ico" />
     <None Remove="Assets\remote-desktop.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\cog.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\cog.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\remote-desktop.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

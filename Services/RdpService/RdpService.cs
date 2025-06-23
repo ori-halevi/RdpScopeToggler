@@ -7,22 +7,33 @@ using System.Linq;
 using System.Windows;
 using GraphicRdpScopeToggler.Services.FilesService;
 using System.Collections.Generic;
+using RdpScopeToggler.Stores;
+using System.Data;
 
 namespace GraphicRdpScopeToggler.Services.RdpService
 {
     public class RdpService : IRdpService
     {
+        public int? Port { get; set; }
+
         private readonly IFilesService _filesService;
         public RdpService(IFilesService filesService)
         {
             _filesService = filesService;
+
+            Port = GetRdpPort();
+            if (Port == null)
+            {
+                throw new Exception("The port for RDP did not found!");
+            }
+
+            _ = GetRdpInfoData();
+
         }
 
 
         public void CloseRdpForAll()
         {
-            int? port = GetRdpPort();
-            if (port == null) return;
             string protocolTcp = "6"; // TCP protocol number
             bool didFound = false;
 
@@ -34,7 +45,7 @@ namespace GraphicRdpScopeToggler.Services.RdpService
                 // נוודא שזה חוק TCP עם פורט תואם
                 if (rule.Protocol.ToString() == protocolTcp &&
                     rule.LocalPorts != null &&
-                    rule.LocalPorts.Split(',').Any(p => p.Trim() == port.ToString()))
+                    rule.LocalPorts.Split(',').Any(p => p.Trim() == Port.ToString()))
                 {
                     string ruleName = rule.Name;
                     didFound = true;
@@ -48,13 +59,11 @@ namespace GraphicRdpScopeToggler.Services.RdpService
             }
 
             if (!didFound)
-                MessageBox.Show($"No firewall rule found for port {port}");
+                MessageBox.Show($"No firewall rule found for port {Port}");
         }
 
         public void OpenRdpForAll()
         {
-            int? port = GetRdpPort();
-            if (port == null) return;
             string protocolTcp = "6"; // TCP protocol number
             bool didFound = false;
 
@@ -66,7 +75,7 @@ namespace GraphicRdpScopeToggler.Services.RdpService
                 // נוודא שזה חוק TCP עם פורט תואם
                 if (rule.Protocol.ToString() == protocolTcp &&
                     rule.LocalPorts != null &&
-                    rule.LocalPorts.Split(',').Any(p => p.Trim() == port.ToString()))
+                    rule.LocalPorts.Split(',').Any(p => p.Trim() == Port.ToString()))
                 {
                     string ruleName = rule.Name;
                     didFound = true;
@@ -83,13 +92,11 @@ namespace GraphicRdpScopeToggler.Services.RdpService
             }
 
             if (!didFound)
-                MessageBox.Show($"No firewall rule found for port {port}");
+                MessageBox.Show($"No firewall rule found for port {Port}");
         }
 
         public void OpenRdpForLocalComputers()
         {
-            int? port = GetRdpPort();
-            if (port == null) return;
             string protocolTcp = "6"; // TCP protocol number
             bool didFound = false;
 
@@ -101,7 +108,7 @@ namespace GraphicRdpScopeToggler.Services.RdpService
                 // נוודא שזה חוק TCP עם פורט תואם
                 if (rule.Protocol.ToString() == protocolTcp &&
                     rule.LocalPorts != null &&
-                    rule.LocalPorts.Split(',').Any(p => p.Trim() == port.ToString()))
+                    rule.LocalPorts.Split(',').Any(p => p.Trim() == Port.ToString()))
                 {
                     string ruleName = rule.Name;
                     didFound = true;
@@ -117,7 +124,7 @@ namespace GraphicRdpScopeToggler.Services.RdpService
             }
 
             if (!didFound)
-                MessageBox.Show($"No firewall rule found for port {port}");
+                MessageBox.Show($"No firewall rule found for port {Port}");
         }
 
 
@@ -165,14 +172,14 @@ namespace GraphicRdpScopeToggler.Services.RdpService
             }
             return null;
         }
-        public bool IsRdpPortOpen(int port)
+        public bool IsRdpPortOpenForLocalhost()
         {
             // בדיקה אם הפורט פתוח על localhost
             using (TcpClient tcpClient = new TcpClient())
             {
                 try
                 {
-                    tcpClient.Connect("127.0.0.1", port);
+                    tcpClient.Connect("127.0.0.1", (int)Port);
                     Debug.WriteLine("RDP port is OPEN and accepting connections.");
                     return true;
                 }
@@ -228,8 +235,46 @@ namespace GraphicRdpScopeToggler.Services.RdpService
             if (ipList.FirstOrDefault() == null) { return; }
             string result = string.Join(",", ipList.Select(ip => $"{ip}/255.255.255.255"));
 
-            int? port = GetRdpPort();
-            if (port == null) return;
+
+            ExecuteOnMatchingFirewallRules(
+            (rule) =>
+            {
+                string ruleName = rule.Name;
+
+                rule.Enabled = true;
+
+                Debug.WriteLine($"Rule found: {ruleName}");
+                Debug.WriteLine($"Current RemoteAddresses: {rule.RemoteAddresses}");
+
+                string remoteAddresses = "192.168.0.0-192.168.255.255";
+                remoteAddresses += ",";
+                remoteAddresses += result;
+                rule.RemoteAddresses = remoteAddresses;
+
+                Debug.WriteLine("Changed to WhiteList");
+            });
+        }
+
+        public RdpInfoData GetRdpInfoData()
+        {
+            RdpInfoData data = new RdpInfoData();
+
+            if (false)
+            {
+                Debug.WriteLine("port is open!");
+            }
+            else
+            {
+                Debug.WriteLine("port is closed!");
+            }
+            return data;
+        }
+
+
+
+
+        private void ExecuteOnMatchingFirewallRules(Action<INetFwRule> action)
+        {
             string protocolTcp = "6"; // TCP protocol number
             bool didFound = false;
 
@@ -241,27 +286,16 @@ namespace GraphicRdpScopeToggler.Services.RdpService
                 // נוודא שזה חוק TCP עם פורט תואם
                 if (rule.Protocol.ToString() == protocolTcp &&
                     rule.LocalPorts != null &&
-                    rule.LocalPorts.Split(',').Any(p => p.Trim() == port.ToString()))
+                    rule.LocalPorts.Split(',').Any(p => p.Trim() == Port.ToString()))
                 {
-                    string ruleName = rule.Name;
                     didFound = true;
-
-                    rule.Enabled = true;
-
-                    Debug.WriteLine($"Rule found: {ruleName}");
-                    Debug.WriteLine($"Current RemoteAddresses: {rule.RemoteAddresses}");
-
-                    string remoteAddresses = "192.168.0.0-192.168.255.255";
-                    remoteAddresses += ",";
-                    remoteAddresses += result;
-                    rule.RemoteAddresses = remoteAddresses;
-
-                    Debug.WriteLine("Changed to WhiteList");
+                    action(rule);
                 }
             }
 
             if (!didFound)
-                MessageBox.Show($"No firewall rule found for port {port}");
+                throw new Exception($"No firewall rule found for port {Port}");
         }
+
     }
 }

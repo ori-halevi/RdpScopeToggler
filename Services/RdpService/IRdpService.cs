@@ -1,4 +1,6 @@
-﻿namespace GraphicRdpScopeToggler.Services.RdpService
+﻿using RdpScopeToggler.Stores;
+
+namespace GraphicRdpScopeToggler.Services.RdpService
 {
     public interface IRdpService
     {
@@ -8,6 +10,7 @@
         public void OpenRdpForWhiteList();
         public void OpenRdpForLocalComputersAndForWhiteList();
         public int? GetRdpPort();
-        public bool IsRdpPortOpen(int port);
+        public bool IsRdpPortOpenForLocalhost();
+        public RdpInfoData GetRdpInfoData();
     }
 }
