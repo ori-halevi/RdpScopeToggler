@@ -10,6 +10,9 @@
     <Compile Update="Views\ExitConfirmationWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\GenericDialogWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\HomeUserControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

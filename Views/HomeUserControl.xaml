@@ -7,12 +7,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:materialDesignElevation="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
+
              xmlns:local="clr-namespace:RdpScopeToggler.Views"
              xmlns:converter="clr-namespace:RdpScopeToggler.Converters"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
         <converter:StringToBoolConverter x:Key="StringToBoolConverter" />
+        <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </UserControl.Resources>
 
     <Border Padding="1">
@@ -51,77 +54,189 @@
 
 
                     <local:AnyClockUserControl
-                DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                CountDownDay="{Binding CountDownDay}"
-                CountDownHour="{Binding CountDownHour}"
-                CountDownMinute="{Binding CountDownMinute}"
-                CountDownSecond="{Binding CountDownSecond}"
-                IsReadOnly="False" 
-                ShowSeconds="False"/>
+                        DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        CountDownDay="{Binding CountDownDay}"
+                        CountDownHour="{Binding CountDownHour}"
+                        CountDownMinute="{Binding CountDownMinute}"
+                        CountDownSecond="{Binding CountDownSecond}"
+                        IsReadOnly="False" 
+                        ShowSeconds="False"
+                        />
 
 
-                    <Button Padding="5" Margin="10"
-                          Style="{DynamicResource MaterialDesignRaisedButton}"
-                    Content="פתח גישה" Command="{Binding StartCommand}" />
+                    <Button x:Name="ConnectButton" 
+                        Command="{Binding StartCommand}"
+                        Content="פתח גישה"
+                        Style="{StaticResource MaterialDesignRaisedButton}"
+                        materialDesign:ButtonAssist.CornerRadius="8"
+                        VerticalAlignment="Center"
+                        Foreground="White"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Height="45"
+                        Padding="5"
+                        Margin="10"
+                        materialDesign:RippleAssist.Feedback="{DynamicResource MaterialDesignBody}"
+                        materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                        RenderTransformOrigin="0.5,0.5">
 
+                        <!-- Background שניתן לאנימציה -->
+                        <Button.Background>
+                            <SolidColorBrush Color="#2196F3"/>
+                        </Button.Background>
 
+                        <Button.Resources>
+                            <!-- אנימציה של הכפתור -->
+                            <Storyboard x:Key="ButtonHoverAnimation">
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                           To="1.05" Duration="0:0:0.2"/>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                           To="1.05" Duration="0:0:0.2"/>
+                                <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+                          To="#1976D2" Duration="0:0:0.2"/>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.Effect).(DropShadowEffect.ShadowDepth)"
+                           To="6" Duration="0:0:0.2"/>
+                            </Storyboard>
+
+                            <Storyboard x:Key="ButtonLeaveAnimation">
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                           To="1.0" Duration="0:0:0.2"/>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                           To="1.0" Duration="0:0:0.2"/>
+                                <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+                          To="#2196F3" Duration="0:0:0.2"/>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.Effect).(DropShadowEffect.ShadowDepth)"
+                           To="3" Duration="0:0:0.2"/>
+                            </Storyboard>
+                        </Button.Resources>
+
+                        <Button.RenderTransform>
+                            <ScaleTransform/>
+                        </Button.RenderTransform>
+
+                        <Button.Effect>
+                            <DropShadowEffect Color="#2196F3" Direction="270" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
+                        </Button.Effect>
+
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="MouseEnter">
+                                <BeginStoryboard Storyboard="{StaticResource ButtonHoverAnimation}"/>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="MouseLeave">
+                                <BeginStoryboard Storyboard="{StaticResource ButtonLeaveAnimation}"/>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
 
                     <!-- Radio Buttons מעוצבים לבחירת סוג פעולה -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10" >
                         <RadioButton Content="Remote systems"
-                 GroupName="ActionsGroup"
-                 IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Remote systems}"
-                 Style="{StaticResource MaterialDesignRadioButton}"
-                 Margin="10,0" 
-                 FontFamily="Bahnschrift"
-                 FontSize="16" />
+                         GroupName="ActionsGroup"
+                         IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Remote systems}"
+                         Style="{StaticResource MaterialDesignRadioButton}"
+                         Margin="10,0" 
+                         FontFamily="Bahnschrift"
+                         FontSize="16" />
 
-                        <RadioButton Content="White list"
-                 GroupName="ActionsGroup"
-                 IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=White list}"
-                 Style="{StaticResource MaterialDesignRadioButton}"
-                 Margin="10,0"
-                 FontFamily="Bahnschrift"
-                 FontSize="16" />
+                                <RadioButton Content="White list"
+                         GroupName="ActionsGroup"
+                         IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=White list}"
+                         Style="{StaticResource MaterialDesignRadioButton}"
+                         Margin="10,0"
+                         FontFamily="Bahnschrift"
+                         FontSize="16" />
                     </StackPanel>
+                    
+                    
 
+                    <Border BorderThickness="2" BorderBrush="#CBCBCB" CornerRadius="4"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        Padding="10">
+                        <StackPanel>
+                        <!-- Date -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <xctk:DateTimePicker 
+                                    Value="{Binding SelectedDateTime, Mode=TwoWay}"
+                                    IsEnabled="{Binding IsDateTimeEnabled}"
+                                    Format="Custom"
+                                    FormatString="dd/MM/yyyy HH:mm"
+                                    FontFamily="Bahnschrift"
+                                    FontSize="20"
+                                    Width="200"
+                                    TextAlignment="Center"
+                                    Padding="0 3 0 0"
+                                    Margin="0 0 5 0" />
+                            </StackPanel>
+                            
+                            <!-- Date -->
+                            <StackPanel Orientation="Horizontal" 
+                               HorizontalAlignment="Center"
+                               Margin="10">
 
+                                <!-- תאריך -->
+                                <DatePicker x:Name="MainDatePicker"
+                                   Style="{StaticResource MaterialDesignDatePicker}"
+                                   materialDesign:HintAssist.Hint="תאריך"
+                                   Width="130"
+                                   FontSize="14"/>
 
+                                <!-- שעה -->
+                                <materialDesign:TimePicker x:Name="MainTimePicker"
+                                     Style="{StaticResource MaterialDesignTimePicker}"
+                                     materialDesign:HintAssist.Hint="שעה"
+                                     Width="90"
+                                     FontSize="14"
+                                     Is24Hours="True"
+                                     Margin="10,0,0,0"/>
 
+                                <CheckBox 
+                                    Style="{DynamicResource MaterialDesignSwitchToggleButton}"
+                                    VerticalAlignment="Center"
+                                    Margin="5 0 0 0"
+                                    IsChecked="{Binding IsDateTimeEnabled, Mode=TwoWay}">
+                                    <CheckBox.LayoutTransform>
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                    </CheckBox.LayoutTransform>
+                                </CheckBox>
+                            </StackPanel>
+                            
+                            
+                            <!-- הודעת סטטוס יפה -->
+                            <materialDesign:Card Background="#FFF3CD" 
+                                Visibility="{Binding HasDateTimeError, Converter={StaticResource BoolToVisibilityConverter}}" 
+                                BorderBrush="#FFE69C" 
+                                BorderThickness="1"
+                                Margin="10,5"
+                                HorizontalAlignment="Stretch">
 
-                    <Border BorderThickness="2" BorderBrush="#CBCBCB" CornerRadius="4">
-                        <StackPanel Orientation="Horizontal" Margin="10">
-                            <xctk:DateTimePicker 
-                        Value="{Binding SelectedDateTime, Mode=TwoWay}"
-                        IsEnabled="{Binding IsDateTimeEnabled}"
-                        Format="Custom"
-                        FormatString="dd/MM/yyyy HH:mm"
-                        FontFamily="Bahnschrift"
-                        FontSize="20"
-                        Width="200"
-                        TextAlignment="Center"
-                        Padding="0 3 0 0"
-                        Margin="0 0 5 0"
-                    />
-
-                            <CheckBox 
-                        Style="{DynamicResource MaterialDesignSwitchToggleButton}"
-                        VerticalAlignment="Center"
-                        Margin="5 0 0 0"
-                        IsChecked="{Binding IsDateTimeEnabled, Mode=TwoWay}">
-
-                                <CheckBox.LayoutTransform>
-                                    <ScaleTransform ScaleX="1" ScaleY="1" />
-                                </CheckBox.LayoutTransform>
-                            </CheckBox>
-
+                                <StackPanel Orientation="Horizontal" Margin="15,10">
+                                    <materialDesign:PackIcon Kind="LightbulbOutline" 
+                                        Foreground="#856404" 
+                                        Width="18" 
+                                        Height="18"
+                                        VerticalAlignment="Center"/>
+                                    <TextBlock 
+                                        Text="{Binding DateTimeError}"
+                                        Foreground="#856404"
+                                        FontSize="12"
+                                        Margin="8,0,0,0"
+                                        TextWrapping="Wrap"
+                                        VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </materialDesign:Card>
                         </StackPanel>
-
                     </Border>
+
+
 
                 </StackPanel>
             </Border>
-            <TextBlock Text="v0.1.0" Style="{DynamicResource MaterialDesignBody2TextBlock}" />
+            <TextBlock Text="v1.0.0"                       
+                       Style="{DynamicResource MaterialDesignButtonTextBlock}" 
+                       HorizontalAlignment="Center"
+                       Foreground="Gray"
+                       />
         </StackPanel>
     </Border>
 </UserControl>

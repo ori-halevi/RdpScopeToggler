@@ -78,6 +78,20 @@ namespace RdpScopeToggler.ViewModels
             }
         }
 
+        private string dateTimeError;
+        public string DateTimeError
+        {
+            get => dateTimeError;
+            set
+            {
+                if (SetProperty(ref dateTimeError, value))
+                    RaisePropertyChanged(nameof(HasDateTimeError)); // notify UI HasDateTimeError changed too
+            }
+        }
+
+
+        public bool HasDateTimeError => !string.IsNullOrEmpty(DateTimeError);
+
         private DateTime selectedDateTime;
         public DateTime SelectedDateTime
         {
@@ -86,14 +100,30 @@ namespace RdpScopeToggler.ViewModels
             {
                 SetProperty(ref selectedDateTime, value);
                 taskInfoStore.Date = value;
+                ValidateSelectedDateTime();
             }
         }
+
+        private void ValidateSelectedDateTime()
+        {
+            if (IsDateTimeEnabled && SelectedDateTime < DateTime.Now.AddMinutes(1))
+                DateTimeError = "בחר תאריך עתידי לפחות בדקה אחת";
+            else
+                DateTimeError = null;
+        }
+
+
         private bool _isDateTimeEnabled;
         public bool IsDateTimeEnabled
         {
             get => _isDateTimeEnabled;
-            set => SetProperty(ref _isDateTimeEnabled, value);
+            set
+            {
+                if (SetProperty(ref _isDateTimeEnabled, value))
+                    ValidateSelectedDateTime();
+            }
         }
+
 
         private string selectedAction;
         public string SelectedAction
@@ -145,6 +175,7 @@ namespace RdpScopeToggler.ViewModels
             {
                 if (IsDateTimeEnabled)
                 {
+                    // Add validation
                     regionManager.RequestNavigate("ContentRegion", "WaitingUserControl");
                     return;
                 }

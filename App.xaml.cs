@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 using System;
 using RdpScopeToggler.Services.NotificationService;
+using RdpScopeToggler.Models;
+using System.Collections.Generic;
 
 namespace RdpScopeToggler
 {
@@ -26,10 +28,17 @@ namespace RdpScopeToggler
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            string pathToTxtFile = "C:\\ProgramData\\RdpScopeToggler\\ToastMessage.txt";
+            string pathToToastMessageFile = "C:\\ProgramData\\RdpScopeToggler\\ToastMessage.txt";
+            string pathToToastSoftwareFile = "C:\\ProgramData\\RdpScopeToggler\\RdpScopeTogglerToastListener\\RdpScopeTogglerToastListener.exe";
+            string sourceBaseDirectory = "Assets\\Deployment\\RdpScopeTogglerToastListener";
 
             containerRegistry.RegisterSingleton<INotificationService>(() =>
-                new NotificationService(pathToTxtFile));
+            {
+                var notificationService = new NotificationService(pathToToastMessageFile, pathToToastSoftwareFile, sourceBaseDirectory);
+                notificationService.NotificationToolInstalled += App_NotificationToolInstalled;
+                return notificationService;
+            });
+            Container.Resolve<INotificationService>().InitializeInstallation();
 
             containerRegistry.RegisterSingleton<IRdpService, RdpService>();
             containerRegistry.RegisterSingleton<IFilesService, FilesService>();
@@ -59,6 +68,8 @@ namespace RdpScopeToggler
             AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
             DispatcherUnhandledException += OnDispatcherUnhandledException;
             TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+
+            Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             base.OnStartup(e);
 
@@ -92,6 +103,25 @@ namespace RdpScopeToggler
                 if (ea.Button == System.Windows.Forms.MouseButtons.Left)
                     ShowMainWindow();
             };
+        }
+
+
+        private void App_NotificationToolInstalled()
+        {
+            var options = new GenericDialogOptions
+            {
+                Title = "הפעלה מחדש מומלצת",
+                Message = "המערכת זיהתה הפעלה ראשונית של התוכנה,\nאם לא תפעיל מחדש את המערכת יתכן שמשתמשים אחרים לא יקבלו התראות.",
+                OnClose = () => { },
+                IsModal = true,
+                Topmost = true,
+            };
+
+            var dialog = new GenericDialogWindow(options);
+            if (options.IsModal)
+                dialog.ShowDialog();
+            else
+                dialog.Show();
         }
 
         private void ShowMainWindow()

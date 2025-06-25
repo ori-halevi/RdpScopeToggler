@@ -9,7 +9,14 @@
              Background="#2C2C2C"
              >
     <Border BorderBrush="#D0D0D0" BorderThickness=" 0 0 0 2">
-        <Grid>
+        <Grid Height="40" VerticalAlignment="Top">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#667eea" Offset="0"/>
+                    <GradientStop Color="#764ba2" Offset="0.5"/>
+                    <GradientStop Color="#667eea" Offset="1"/>
+                </LinearGradientBrush>
+            </Grid.Background>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <!-- אייקון -->
