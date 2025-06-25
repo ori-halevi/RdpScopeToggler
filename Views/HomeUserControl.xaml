@@ -15,40 +15,42 @@
         <converter:StringToBoolConverter x:Key="StringToBoolConverter" />
     </UserControl.Resources>
 
-    <Border Padding="5">
+    <Border Padding="1">
+        <StackPanel>
+            <Border Padding="5">
 
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
-            <!-- Settings button in the corner -->
-            <Grid Margin="0 0 0 5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+                    <!-- Settings button in the corner -->
+                    <Grid Margin="0 0 0 5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
 
-                <Grid.ColumnDefinitions >
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                <Button Grid.Column="0" Width="32" Height="32" Padding="0"
+                        <Button Grid.Column="0" Width="32" Height="32" Padding="0"
                     ToolTip="הגדרות"
                     Command="{Binding OpenSettingsWindowCommand}"
                     Style="{DynamicResource MaterialDesignToolButton}">
-                    <materialDesign:PackIcon Kind="Cog" Width="20" Height="20"/>
-                </Button>
-            
-                <local:IndicatorsUserControl Grid.Column="2" />
-            
-            </Grid>
-            
-            <TextBlock Text="בחר זמן:" FontSize="20" FlowDirection="RightToLeft" FontFamily="Bahnschrift" />
+                            <materialDesign:PackIcon Kind="Cog" Width="20" Height="20"/>
+                        </Button>
+
+                        <local:IndicatorsUserControl Grid.Column="2" />
+
+                    </Grid>
+
+                    <TextBlock Text="בחר זמן:" FontSize="20" FlowDirection="RightToLeft" FontFamily="Bahnschrift" />
 
 
 
 
 
-            <local:AnyClockUserControl
+                    <local:AnyClockUserControl
                 DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 CountDownDay="{Binding CountDownDay}"
                 CountDownHour="{Binding CountDownHour}"
@@ -58,15 +60,15 @@
                 ShowSeconds="False"/>
 
 
-            <Button Padding="5" Margin="10"
+                    <Button Padding="5" Margin="10"
                           Style="{DynamicResource MaterialDesignRaisedButton}"
                     Content="פתח גישה" Command="{Binding StartCommand}" />
 
 
 
-            <!-- Radio Buttons מעוצבים לבחירת סוג פעולה -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10" >
-                <RadioButton Content="Remote systems"
+                    <!-- Radio Buttons מעוצבים לבחירת סוג פעולה -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10" >
+                        <RadioButton Content="Remote systems"
                  GroupName="ActionsGroup"
                  IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Remote systems}"
                  Style="{StaticResource MaterialDesignRadioButton}"
@@ -74,22 +76,22 @@
                  FontFamily="Bahnschrift"
                  FontSize="16" />
 
-                <RadioButton Content="White list"
+                        <RadioButton Content="White list"
                  GroupName="ActionsGroup"
                  IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=White list}"
                  Style="{StaticResource MaterialDesignRadioButton}"
                  Margin="10,0"
                  FontFamily="Bahnschrift"
                  FontSize="16" />
-            </StackPanel>
+                    </StackPanel>
 
 
 
 
 
-            <Border BorderThickness="2" BorderBrush="#CBCBCB" CornerRadius="4">
-                <StackPanel Orientation="Horizontal" Margin="10">
-                    <xctk:DateTimePicker 
+                    <Border BorderThickness="2" BorderBrush="#CBCBCB" CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Margin="10">
+                            <xctk:DateTimePicker 
                         Value="{Binding SelectedDateTime, Mode=TwoWay}"
                         IsEnabled="{Binding IsDateTimeEnabled}"
                         Format="Custom"
@@ -101,22 +103,25 @@
                         Padding="0 3 0 0"
                         Margin="0 0 5 0"
                     />
-                    
-                    <CheckBox 
+
+                            <CheckBox 
                         Style="{DynamicResource MaterialDesignSwitchToggleButton}"
                         VerticalAlignment="Center"
                         Margin="5 0 0 0"
                         IsChecked="{Binding IsDateTimeEnabled, Mode=TwoWay}">
 
-                        <CheckBox.LayoutTransform>
-                            <ScaleTransform ScaleX="1" ScaleY="1" />
-                        </CheckBox.LayoutTransform>
-                    </CheckBox>
+                                <CheckBox.LayoutTransform>
+                                    <ScaleTransform ScaleX="1" ScaleY="1" />
+                                </CheckBox.LayoutTransform>
+                            </CheckBox>
+
+                        </StackPanel>
+
+                    </Border>
 
                 </StackPanel>
-
             </Border>
-
+            <TextBlock Text="v0.1.0" Style="{DynamicResource MaterialDesignBody2TextBlock}" />
         </StackPanel>
     </Border>
 </UserControl>

@@ -5,14 +5,14 @@
         public bool IsRoleActive { get; set; }
         public bool IsOpenForAll {  get; set; }
         public bool IsOpenOnlyForLocal { get; set; }
-        public bool IsOpenForWhiteList { get; set; }
+        public bool IsOpenForLocalComputersAndForWhiteList { get; set; }
 
         public RdpInfoData()
         {
             IsRoleActive = false;
             IsOpenForAll = false;
             IsOpenOnlyForLocal = false;
-            IsOpenForWhiteList = false;
+            IsOpenForLocalComputersAndForWhiteList = false;
         }
     }
 }

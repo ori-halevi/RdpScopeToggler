@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 
-namespace GraphicRdpScopeToggler.Services.FilesService
+namespace RdpScopeToggler.Services.FilesService
 {
     public class FilesService : IFilesService
     {
@@ -29,7 +29,7 @@ namespace GraphicRdpScopeToggler.Services.FilesService
         #region Private Methodes
         private void WriteToWhiteList(string ip)
         {
-            string filePath = @"C:\ProgramData\GraphicRdpScopeToggler\WhiteList.json";
+            string filePath = @"C:\ProgramData\RdpScopeToggler\WhiteList.json";
             List<string> whiteList;
 
             // אם הקובץ קיים – קרא אותו, אחרת התחל עם רשימה ריקה
@@ -66,7 +66,7 @@ namespace GraphicRdpScopeToggler.Services.FilesService
 
         private List<string> ReadWhiteList()
         {
-            string filePath = @"C:\ProgramData\GraphicRdpScopeToggler\WhiteList.json";
+            string filePath = @"C:\ProgramData\RdpScopeToggler\WhiteList.json";
 
             if (!File.Exists(filePath))
             {
@@ -90,7 +90,7 @@ namespace GraphicRdpScopeToggler.Services.FilesService
 
         private void EnsureWhiteListFileExists()
         {
-            string folderPath = @"C:\ProgramData\GraphicRdpScopeToggler";
+            string folderPath = @"C:\ProgramData\RdpScopeToggler";
             string filePath = Path.Combine(folderPath, "WhiteList.json");
 
             // Create directory if it doesn't exist

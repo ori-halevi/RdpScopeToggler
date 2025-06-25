@@ -1,5 +1,9 @@
-﻿using GraphicRdpScopeToggler.Services.RdpService;
+﻿using RdpScopeToggler.Services.RdpService;
 using Prism.Mvvm;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Threading;
+using System;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -18,9 +22,49 @@ namespace RdpScopeToggler.ViewModels
             get => _isExternalOpen;
             set => SetProperty(ref _isExternalOpen, value);
         }
-        public IndicatorsUserControlViewModel(RdpService rdpService)
-        {
 
+        private bool _isWhiteListOpen;
+        public bool IsWhiteListOpen
+        {
+            get => _isWhiteListOpen;
+            set => SetProperty(ref _isWhiteListOpen, value);
+        }
+
+
+        private readonly IRdpService rdpService;
+        public IndicatorsUserControlViewModel(IRdpService rdpService)
+        {
+            this.rdpService = rdpService;
+            rdpService.RdpDataUpdated += UpdateIndicators;
+        }
+
+        private void UpdateIndicators()
+        {
+            if (rdpService.RdpData.IsOpenForAll)
+            {
+                IsInternalOpen = true;
+                IsWhiteListOpen = true;
+                IsExternalOpen = true;
+            }
+            else if (rdpService.RdpData.IsOpenForLocalComputersAndForWhiteList)
+            {
+                IsExternalOpen = false;
+                IsWhiteListOpen = true;
+                IsInternalOpen = true;
+            }
+            else if (rdpService.RdpData.IsOpenOnlyForLocal)
+            {
+                IsInternalOpen = true;
+                IsWhiteListOpen = false;
+                IsExternalOpen = false;
+            }
+
+            if (!rdpService.RdpData.IsRoleActive)
+            {
+                IsInternalOpen = false;
+                IsWhiteListOpen = false;
+                IsExternalOpen = false;
+            }
         }
     }
 }

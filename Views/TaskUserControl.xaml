@@ -10,6 +10,21 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Border Padding="5">
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <!-- Settings button in the corner -->
+            <Grid Margin="0 0 0 5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+
+                <Grid.ColumnDefinitions >
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <local:IndicatorsUserControl Grid.Column="2" />
+
+            </Grid>
             <TextBlock Text="החיבור פתוח!" FontSize="20" FlowDirection="RightToLeft" FontFamily="Bahnschrift" TextAlignment="Center" Foreground="Red" Margin="30" FontWeight="Bold" />
             <TextBlock Text="החיבור יסגר בעוד:" FontSize="20" FlowDirection="RightToLeft" FontFamily="Bahnschrift" TextAlignment="Center" />
 

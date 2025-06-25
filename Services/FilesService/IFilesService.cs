@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Documents;
+﻿using System.Collections.Generic;
 
-namespace GraphicRdpScopeToggler.Services.FilesService
+namespace RdpScopeToggler.Services.FilesService
 {
     public interface IFilesService
     {

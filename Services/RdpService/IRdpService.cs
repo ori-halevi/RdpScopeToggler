@@ -1,9 +1,12 @@
 ﻿using RdpScopeToggler.Stores;
+using System;
 
-namespace GraphicRdpScopeToggler.Services.RdpService
+namespace RdpScopeToggler.Services.RdpService
 {
     public interface IRdpService
     {
+        public event Action RdpDataUpdated;
+        public RdpInfoData RdpData { get; }
         public void OpenRdpForAll();
         public void CloseRdpForAll();
         public void OpenRdpForLocalComputers();
@@ -11,6 +14,6 @@ namespace GraphicRdpScopeToggler.Services.RdpService
         public void OpenRdpForLocalComputersAndForWhiteList();
         public int? GetRdpPort();
         public bool IsRdpPortOpenForLocalhost();
-        public RdpInfoData GetRdpInfoData();
+        public void RefreshRdpData();
     }
 }

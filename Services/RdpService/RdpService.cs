@@ -4,137 +4,130 @@ using System;
 using System.Diagnostics;
 using NetFwTypeLib;
 using System.Linq;
-using System.Windows;
-using GraphicRdpScopeToggler.Services.FilesService;
 using System.Collections.Generic;
+using RdpScopeToggler.Services.FilesService;
 using RdpScopeToggler.Stores;
 using System.Data;
 
-namespace GraphicRdpScopeToggler.Services.RdpService
+namespace RdpScopeToggler.Services.RdpService
 {
     public class RdpService : IRdpService
     {
+        public event Action RdpDataUpdated;
+        public RdpInfoData RdpData { get; set; }
         public int? Port { get; set; }
 
         private readonly IFilesService _filesService;
         public RdpService(IFilesService filesService)
         {
             _filesService = filesService;
+            RdpData = new RdpInfoData();
 
             Port = GetRdpPort();
             if (Port == null)
             {
                 throw new Exception("The port for RDP did not found!");
             }
-
-            _ = GetRdpInfoData();
-
         }
 
-
+        #region Public methodes
         public void CloseRdpForAll()
         {
-            string protocolTcp = "6"; // TCP protocol number
-            bool didFound = false;
-
-            var fwPolicy2 = (INetFwPolicy2)Activator.CreateInstance(
-                Type.GetTypeFromProgID("HNetCfg.FwPolicy2"));
-
-            foreach (INetFwRule rule in fwPolicy2.Rules)
+            ExecuteOnMatchingFirewallRules(
+            (rule) =>
             {
-                // נוודא שזה חוק TCP עם פורט תואם
-                if (rule.Protocol.ToString() == protocolTcp &&
-                    rule.LocalPorts != null &&
-                    rule.LocalPorts.Split(',').Any(p => p.Trim() == Port.ToString()))
-                {
-                    string ruleName = rule.Name;
-                    didFound = true;
+                string ruleName = rule.Name;
 
-                    Debug.WriteLine($"Rule found: {ruleName}");
+                Debug.WriteLine($"Rule found: {ruleName}");
 
-                    rule.Enabled = false;
+                rule.Enabled = false;
 
-                    Debug.WriteLine("Rule Disabled");
-                }
-            }
-
-            if (!didFound)
-                MessageBox.Show($"No firewall rule found for port {Port}");
+                Debug.WriteLine("Rule Disabled");
+            });
         }
 
         public void OpenRdpForAll()
         {
-            string protocolTcp = "6"; // TCP protocol number
-            bool didFound = false;
-
-            var fwPolicy2 = (INetFwPolicy2)Activator.CreateInstance(
-                Type.GetTypeFromProgID("HNetCfg.FwPolicy2"));
-
-            foreach (INetFwRule rule in fwPolicy2.Rules)
+            ExecuteOnMatchingFirewallRules(
+            (rule) =>
             {
-                // נוודא שזה חוק TCP עם פורט תואם
-                if (rule.Protocol.ToString() == protocolTcp &&
-                    rule.LocalPorts != null &&
-                    rule.LocalPorts.Split(',').Any(p => p.Trim() == Port.ToString()))
-                {
-                    string ruleName = rule.Name;
-                    didFound = true;
+                string ruleName = rule.Name;
 
-                    rule.Enabled = true;
+                rule.Enabled = true;
 
-                    Debug.WriteLine($"Rule found: {ruleName}");
-                    Debug.WriteLine($"Current RemoteAddresses: {rule.RemoteAddresses}");
+                Debug.WriteLine($"Rule found: {ruleName}");
+                Debug.WriteLine($"Current RemoteAddresses: {rule.RemoteAddresses}");
 
-                    rule.RemoteAddresses = "*";
+                rule.RemoteAddresses = "*";
 
-                    Debug.WriteLine("Changed to: * (Any)");
-                }
-            }
-
-            if (!didFound)
-                MessageBox.Show($"No firewall rule found for port {Port}");
+                Debug.WriteLine("Changed to: * (Any)");
+            });
         }
 
         public void OpenRdpForLocalComputers()
         {
-            string protocolTcp = "6"; // TCP protocol number
-            bool didFound = false;
-
-            var fwPolicy2 = (INetFwPolicy2)Activator.CreateInstance(
-                Type.GetTypeFromProgID("HNetCfg.FwPolicy2"));
-
-            foreach (INetFwRule rule in fwPolicy2.Rules)
+            ExecuteOnMatchingFirewallRules(
+            (rule) =>
             {
-                // נוודא שזה חוק TCP עם פורט תואם
-                if (rule.Protocol.ToString() == protocolTcp &&
-                    rule.LocalPorts != null &&
-                    rule.LocalPorts.Split(',').Any(p => p.Trim() == Port.ToString()))
-                {
-                    string ruleName = rule.Name;
-                    didFound = true;
+                string ruleName = rule.Name;
 
-                    rule.Enabled = true;
+                rule.Enabled = true;
 
-                    Debug.WriteLine($"Rule found: {ruleName}");
-                    Debug.WriteLine($"Current RemoteAddresses: {rule.RemoteAddresses}");
+                Debug.WriteLine($"Rule found: {ruleName}");
+                Debug.WriteLine($"Current RemoteAddresses: {rule.RemoteAddresses}");
 
-                    rule.RemoteAddresses = "192.168.0.0-192.168.255.255";
-                    Debug.WriteLine("Changed to: 192.168.0.0-192.168.255.255");
-                }
-            }
-
-            if (!didFound)
-                MessageBox.Show($"No firewall rule found for port {Port}");
+                rule.RemoteAddresses = "192.168.0.0-192.168.255.255";
+                Debug.WriteLine("Changed to: 192.168.0.0-192.168.255.255");
+            });
         }
 
 
 
 
+        public void OpenRdpForWhiteList()
+        {
+            List<string> ipList = _filesService.GetWhiteList();
+            if (ipList.FirstOrDefault() == null) { return; }
+            string result = string.Join(",", ipList.Select(ip => $"{ip}/255.255.255.255"));
+
+            ExecuteOnMatchingFirewallRules(
+            (rule) =>
+            {
+                string ruleName = rule.Name;
+
+                rule.Enabled = true;
+
+                Debug.WriteLine($"Rule found: {ruleName}");
+                Debug.WriteLine($"Current RemoteAddresses: {rule.RemoteAddresses}");
+
+                rule.RemoteAddresses = result;
+                Debug.WriteLine("Changed to WhiteList");
+            });
+        }
+
+        public void OpenRdpForLocalComputersAndForWhiteList()
+        {
+            var ipList = _filesService.GetWhiteList();
+            if (ipList.FirstOrDefault() == null) return;
+
+            string remoteAddresses = "192.168.0.0-192.168.255.255," +
+                                     string.Join(",", ipList.Select(ip => $"{ip}/255.255.255.255"));
+
+            ExecuteOnMatchingFirewallRules(rule =>
+            {
+                rule.Enabled = true;
+                rule.RemoteAddresses = remoteAddresses;
+
+                Debug.WriteLine($"Rule found: {rule.Name}");
+                Debug.WriteLine($"Changed to WhiteList: {remoteAddresses}");
+            });
+        }
 
 
-
-
-
+        public void RefreshRdpData()
+        {
+            ExecuteOnMatchingFirewallRules((rule) => { });
+        }
 
         public int? GetRdpPort()
         {
@@ -190,91 +183,43 @@ namespace GraphicRdpScopeToggler.Services.RdpService
                 }
             }
         }
+        #endregion
 
-        public void OpenRdpForWhiteList()
+
+
+        private void UpdateRdpData(INetFwRule rule)
         {
-            List<string> ipList = _filesService.GetWhiteList();
-            if (ipList.FirstOrDefault() == null) { return; }
-            string result = string.Join(",", ipList.Select(ip => $"{ip}/255.255.255.255"));
+            if (rule.Enabled)
+                RdpData.IsRoleActive = true;
+            if (rule.RemoteAddresses == "192.168.0.0-192.168.255.255")
+                RdpData.IsOpenOnlyForLocal = true;
+            if (rule.RemoteAddresses == "*")
+                RdpData.IsOpenForAll = true;
 
-            int? port = GetRdpPort();
-            if (port == null) return;
-            string protocolTcp = "6"; // TCP protocol number
-            bool didFound = false;
-
-            var fwPolicy2 = (INetFwPolicy2)Activator.CreateInstance(
-                Type.GetTypeFromProgID("HNetCfg.FwPolicy2"));
-
-            foreach (INetFwRule rule in fwPolicy2.Rules)
+            var ipList = _filesService.GetWhiteList();
+            if (ipList.FirstOrDefault() != null)
             {
-                // נוודא שזה חוק TCP עם פורט תואם
-                if (rule.Protocol.ToString() == protocolTcp &&
-                    rule.LocalPorts != null &&
-                    rule.LocalPorts.Split(',').Any(p => p.Trim() == port.ToString()))
-                {
-                    string ruleName = rule.Name;
-                    didFound = true;
+                string expected = "192.168.0.0-192.168.255.255," +
+                                  string.Join(",", ipList.Select(ip => $"{ip}/255.255.255.255"));
 
-                    rule.Enabled = true;
+                var listA = rule.RemoteAddresses.Split(',').Select(x => x.Trim()).OrderBy(x => x).ToList();
+                var listB = expected.Split(',').Select(x => x.Trim()).OrderBy(x => x).ToList();
 
-                    Debug.WriteLine($"Rule found: {ruleName}");
-                    Debug.WriteLine($"Current RemoteAddresses: {rule.RemoteAddresses}");
+                if (listA.SequenceEqual(listB))
+                    RdpData.IsOpenForLocalComputersAndForWhiteList = true;
 
-                    rule.RemoteAddresses = result;
-                    Debug.WriteLine("Changed to WhiteList");
-                }
             }
-
-            if (!didFound)
-                MessageBox.Show($"No firewall rule found for port {port}");
         }
-
-        public void OpenRdpForLocalComputersAndForWhiteList()
-        {
-            List<string> ipList = _filesService.GetWhiteList();
-            if (ipList.FirstOrDefault() == null) { return; }
-            string result = string.Join(",", ipList.Select(ip => $"{ip}/255.255.255.255"));
-
-
-            ExecuteOnMatchingFirewallRules(
-            (rule) =>
-            {
-                string ruleName = rule.Name;
-
-                rule.Enabled = true;
-
-                Debug.WriteLine($"Rule found: {ruleName}");
-                Debug.WriteLine($"Current RemoteAddresses: {rule.RemoteAddresses}");
-
-                string remoteAddresses = "192.168.0.0-192.168.255.255";
-                remoteAddresses += ",";
-                remoteAddresses += result;
-                rule.RemoteAddresses = remoteAddresses;
-
-                Debug.WriteLine("Changed to WhiteList");
-            });
-        }
-
-        public RdpInfoData GetRdpInfoData()
-        {
-            RdpInfoData data = new RdpInfoData();
-
-            if (false)
-            {
-                Debug.WriteLine("port is open!");
-            }
-            else
-            {
-                Debug.WriteLine("port is closed!");
-            }
-            return data;
-        }
-
 
 
 
         private void ExecuteOnMatchingFirewallRules(Action<INetFwRule> action)
         {
+            RdpData.IsRoleActive = false;
+            RdpData.IsOpenOnlyForLocal = false;
+            RdpData.IsOpenForAll = false;
+            RdpData.IsOpenForLocalComputersAndForWhiteList = false;
+
             string protocolTcp = "6"; // TCP protocol number
             bool didFound = false;
 
@@ -290,12 +235,13 @@ namespace GraphicRdpScopeToggler.Services.RdpService
                 {
                     didFound = true;
                     action(rule);
+                    UpdateRdpData(rule);
                 }
             }
 
             if (!didFound)
                 throw new Exception($"No firewall rule found for port {Port}");
+            RdpDataUpdated?.Invoke();
         }
-
     }
 }

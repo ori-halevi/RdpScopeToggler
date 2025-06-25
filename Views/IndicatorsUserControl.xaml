@@ -13,6 +13,11 @@
                      Fill="{Binding IsExternalOpen, Converter={StaticResource BoolToBrushConverter}}"
                      ToolTip="גישה לרשתות חיצוניות"/>
 
+        <!-- White List Network Indicator -->
+        <Ellipse Width="12" Height="12" Margin="10,0,0,0"
+                     Fill="{Binding IsWhiteListOpen, Converter={StaticResource BoolToBrushConverter}}"
+                     ToolTip="גישה לרשימה לבנה"/>
+
         <!-- Internal Network Indicator -->
         <Ellipse Width="12" Height="12" Margin="10,0,0,0"
                      Fill="{Binding IsInternalOpen, Converter={StaticResource BoolToBrushConverter}}"

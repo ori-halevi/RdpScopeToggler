@@ -34,10 +34,9 @@
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="בחר שפה:" FontSize="16" Margin="10 0 10 20" VerticalAlignment="Center" TextAlignment="Center" />
                 <ComboBox SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}" 
+                          ItemsSource="{Binding LanguagesOptions}"
                           FontSize="16" Height="30" VerticalAlignment="Center"
                           Style="{StaticResource MaterialDesignDataGridComboBox}">
-                    <ComboBoxItem Content="עברית" />
-                    <ComboBoxItem Content="English"/>
                 </ComboBox>
             </StackPanel>
 

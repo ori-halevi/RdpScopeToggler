@@ -8,6 +8,7 @@ using RdpScopeToggler.Stores;
 using System.Windows;
 using System.Diagnostics;
 using RdpScopeToggler.Views;
+using RdpScopeToggler.Services.NotificationService;
 
 
 namespace RdpScopeToggler.ViewModels

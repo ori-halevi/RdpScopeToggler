@@ -1,14 +1,15 @@
 ﻿using System.Windows;
 using Prism.Ioc;
-using RdpScopeToggler.Views;
 using System.Drawing;
 using Prism.Navigation.Regions;
+using RdpScopeToggler.Views;
 using RdpScopeToggler.Stores;
-using GraphicRdpScopeToggler.Services.FilesService;
-using GraphicRdpScopeToggler.Services.RdpService;
+using RdpScopeToggler.Services.FilesService;
+using RdpScopeToggler.Services.RdpService;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using System;
+using RdpScopeToggler.Services.NotificationService;
 
 namespace RdpScopeToggler
 {
@@ -25,15 +26,20 @@ namespace RdpScopeToggler
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            string pathToTxtFile = "C:\\ProgramData\\RdpScopeToggler\\ToastMessage.txt";
+
+            containerRegistry.RegisterSingleton<INotificationService>(() =>
+                new NotificationService(pathToTxtFile));
+
             containerRegistry.RegisterSingleton<IRdpService, RdpService>();
             containerRegistry.RegisterSingleton<IFilesService, FilesService>();
-
             containerRegistry.RegisterSingleton<TaskInfoStore>();
 
             containerRegistry.RegisterForNavigation<HomeUserControl>();
             containerRegistry.RegisterForNavigation<WaitingUserControl>();
             containerRegistry.RegisterForNavigation<TaskUserControl>();
         }
+
 
         protected override void OnInitialized()
         {

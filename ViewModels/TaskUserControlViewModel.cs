@@ -1,15 +1,13 @@
-﻿using GraphicRdpScopeToggler.Services.RdpService;
+﻿using RdpScopeToggler.Services.RdpService;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Navigation.Regions;
 using RdpScopeToggler.Stores;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using RdpScopeToggler.Services.NotificationService;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -47,15 +45,17 @@ namespace RdpScopeToggler.ViewModels
         #endregion
 
         private CancellationTokenSource _cts;
-        private readonly IRegionManager _regionManager;
+        private readonly IRegionManager regionManager;
         private readonly IRdpService rdpService;
         private readonly TaskInfoStore taskInfoStore;
+        private readonly INotificationService notificationService;
 
-        public TaskUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore, IRdpService rdpService)
+        public TaskUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore, IRdpService rdpService, INotificationService notificationService)
         {
             this.rdpService = rdpService;
             this.taskInfoStore = taskInfoStore;
-            _regionManager = regionManager;
+            this.notificationService = notificationService;
+            this.regionManager = regionManager;
 
             DisconnectCommand = new DelegateCommand(Disconnect);
         }
@@ -92,6 +92,9 @@ namespace RdpScopeToggler.ViewModels
                     CountDownHour = remaining.Hours;
                     CountDownMinute = remaining.Minutes;
                     CountDownSecond = remaining.Seconds;
+
+                    if (remaining.TotalSeconds == 60 * 5)
+                        notificationService.SendPreDisconnectAlert();
                 }
             }
             catch (TaskCanceledException)
@@ -115,7 +118,7 @@ namespace RdpScopeToggler.ViewModels
         private void CloseConnection()
         {
             rdpService.OpenRdpForLocalComputers();
-            _regionManager.RequestNavigate("ContentRegion", "HomeUserControl");
+            regionManager.RequestNavigate("ContentRegion", "HomeUserControl");
         }
 
         private void OpenConnection()
