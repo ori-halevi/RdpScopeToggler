@@ -14,7 +14,7 @@
         Icon="pack://siteoforigin:,,,/Assets/remote-desktop.ico"
         
         materialDesign:ColorZoneAssist.Mode="Dark"
-        Background="#EBEBEB"
+        Background="#FFFFFF"
 
         WindowStyle="None"
         AllowsTransparency="False"

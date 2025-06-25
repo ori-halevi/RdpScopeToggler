@@ -19,8 +19,8 @@
     </UserControl.Resources>
 
     <Border Padding="1">
-        <StackPanel>
-            <Border Padding="5">
+        <DockPanel>
+            <Border Padding="5" DockPanel.Dock="Top">
 
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
@@ -47,9 +47,6 @@
 
                     </Grid>
 
-                    <TextBlock Text="בחר זמן:" FontSize="20" FlowDirection="RightToLeft" FontFamily="Bahnschrift" />
-
-
 
 
 
@@ -61,10 +58,13 @@
                         CountDownSecond="{Binding CountDownSecond}"
                         IsReadOnly="False" 
                         ShowSeconds="False"
+                        TimeTitle="הגדר טיימר:"
+                        TimeTitleVisibility="Visible"
                         />
 
 
-                    <Button x:Name="ConnectButton" 
+                    <Button x:Name="ConnectButton"
+                        IsEnabled="{Binding IsDateValid}"
                         Command="{Binding StartCommand}"
                         Content="פתח גישה"
                         Style="{StaticResource MaterialDesignRaisedButton}"
@@ -82,7 +82,7 @@
 
                         <!-- Background שניתן לאנימציה -->
                         <Button.Background>
-                            <SolidColorBrush Color="#2196F3"/>
+                            <SolidColorBrush Color="#0079FB"/>
                         </Button.Background>
 
                         <Button.Resources>
@@ -128,72 +128,94 @@
                         </Button.Triggers>
                     </Button>
 
-                    <!-- Radio Buttons מעוצבים לבחירת סוג פעולה -->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10" >
-                        <RadioButton Content="Remote systems"
-                         GroupName="ActionsGroup"
-                         IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Remote systems}"
-                         Style="{StaticResource MaterialDesignRadioButton}"
-                         Margin="10,0" 
-                         FontFamily="Bahnschrift"
-                         FontSize="16" />
+                    <Grid Margin="10">
+                        <!-- Radio Buttons -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10"
+                Panel.ZIndex="0">
+                            <RadioButton Content="Remote systems"
+                     GroupName="ActionsGroup"
+                     IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Remote systems}"
+                     Style="{StaticResource MaterialDesignRadioButton}"
+                     Margin="10,0"
+                     FontFamily="Bahnschrift"
+                     FontSize="16" />
 
-                                <RadioButton Content="White list"
-                         GroupName="ActionsGroup"
-                         IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=White list}"
-                         Style="{StaticResource MaterialDesignRadioButton}"
-                         Margin="10,0"
-                         FontFamily="Bahnschrift"
-                         FontSize="16" />
-                    </StackPanel>
-                    
-                    
+                            <RadioButton Content="White list"
+                     GroupName="ActionsGroup"
+                     IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=White list}"
+                     Style="{StaticResource MaterialDesignRadioButton}"
+                     Margin="10,0"
+                     FontFamily="Bahnschrift"
+                     FontSize="16" />
+                        </StackPanel>
+
+                        <!-- הודעת שגיאה שתסתיר את הרדיו באטנים -->
+                        <materialDesign:Card Background="#FFF3CD"
+                         Visibility="{Binding HasDateTimeError, Converter={StaticResource BoolToVisibilityConverter}}"
+                         BorderBrush="#FFE69C"
+                         BorderThickness="1"
+                         HorizontalAlignment="Stretch"
+                         VerticalAlignment="Center"
+                         Panel.ZIndex="1">
+                            <StackPanel Orientation="Horizontal" Margin="15,10">
+                                <materialDesign:PackIcon Kind="LightbulbOutline"
+                                     Foreground="#856404"
+                                     Width="18"
+                                     Height="18"
+                                     VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding DateTimeError}"
+                       Foreground="#856404"
+                       FontSize="12"
+                       Margin="8,0,0,0"
+                       TextWrapping="Wrap"
+                       VerticalAlignment="Center" />
+                            </StackPanel>
+                        </materialDesign:Card>
+                    </Grid>
+
+
+
 
                     <Border BorderThickness="2" BorderBrush="#CBCBCB" CornerRadius="4"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top"
                         Padding="10">
                         <StackPanel>
-                        <!-- Date -->
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <xctk:DateTimePicker 
-                                    Value="{Binding SelectedDateTime, Mode=TwoWay}"
-                                    IsEnabled="{Binding IsDateTimeEnabled}"
-                                    Format="Custom"
-                                    FormatString="dd/MM/yyyy HH:mm"
-                                    FontFamily="Bahnschrift"
-                                    FontSize="20"
-                                    Width="200"
-                                    TextAlignment="Center"
-                                    Padding="0 3 0 0"
-                                    Margin="0 0 5 0" />
-                            </StackPanel>
-                            
+
                             <!-- Date -->
                             <StackPanel Orientation="Horizontal" 
                                HorizontalAlignment="Center"
-                               Margin="10">
+                               Margin="0">
 
-                                <!-- תאריך -->
-                                <DatePicker x:Name="MainDatePicker"
-                                   Style="{StaticResource MaterialDesignDatePicker}"
-                                   materialDesign:HintAssist.Hint="תאריך"
-                                   Width="130"
-                                   FontSize="14"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                                    <!-- תאריך -->
+                                    <DatePicker x:Name="MainDatePicker"
+                                        PreviewMouseWheel="DatePicker_MouseWheel"
+                                        SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Style="{StaticResource MaterialDesignDatePicker}"
+                                        materialDesign:HintAssist.Hint="תאריך"
+                                        Width="130"
+                                        FontSize="14"
+                                        IsEnabled="{Binding IsDateTimeEnabled}"/>
 
-                                <!-- שעה -->
-                                <materialDesign:TimePicker x:Name="MainTimePicker"
-                                     Style="{StaticResource MaterialDesignTimePicker}"
-                                     materialDesign:HintAssist.Hint="שעה"
-                                     Width="90"
-                                     FontSize="14"
-                                     Is24Hours="True"
-                                     Margin="10,0,0,0"/>
+                                    <!-- שעה -->
+                                    <materialDesign:TimePicker x:Name="MainTimePicker"
+                                        PreviewMouseWheel="TimePicker_MouseWheel"
+                                        SelectedTime="{Binding SelectedTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Style="{StaticResource MaterialDesignTimePicker}"
+                                        materialDesign:HintAssist.Hint="שעה"
+                                        Width="90"
+                                        FontSize="14"
+                                        Is24Hours="True"
+                                        Margin="10,0,0,0"
+                                        IsEnabled="{Binding IsDateTimeEnabled}"/>
+                                </StackPanel>
+
 
                                 <CheckBox 
                                     Style="{DynamicResource MaterialDesignSwitchToggleButton}"
                                     VerticalAlignment="Center"
-                                    Margin="5 0 0 0"
+                                    Margin="10 5 5 5"
                                     IsChecked="{Binding IsDateTimeEnabled, Mode=TwoWay}">
                                     <CheckBox.LayoutTransform>
                                         <ScaleTransform ScaleX="1" ScaleY="1" />
@@ -202,29 +224,7 @@
                             </StackPanel>
                             
                             
-                            <!-- הודעת סטטוס יפה -->
-                            <materialDesign:Card Background="#FFF3CD" 
-                                Visibility="{Binding HasDateTimeError, Converter={StaticResource BoolToVisibilityConverter}}" 
-                                BorderBrush="#FFE69C" 
-                                BorderThickness="1"
-                                Margin="10,5"
-                                HorizontalAlignment="Stretch">
 
-                                <StackPanel Orientation="Horizontal" Margin="15,10">
-                                    <materialDesign:PackIcon Kind="LightbulbOutline" 
-                                        Foreground="#856404" 
-                                        Width="18" 
-                                        Height="18"
-                                        VerticalAlignment="Center"/>
-                                    <TextBlock 
-                                        Text="{Binding DateTimeError}"
-                                        Foreground="#856404"
-                                        FontSize="12"
-                                        Margin="8,0,0,0"
-                                        TextWrapping="Wrap"
-                                        VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </materialDesign:Card>
                         </StackPanel>
                     </Border>
 
@@ -232,11 +232,14 @@
 
                 </StackPanel>
             </Border>
+            
+            
             <TextBlock Text="v1.0.0"                       
                        Style="{DynamicResource MaterialDesignButtonTextBlock}" 
                        HorizontalAlignment="Center"
+                       VerticalAlignment="Bottom"
                        Foreground="Gray"
                        />
-        </StackPanel>
+        </DockPanel>
     </Border>
 </UserControl>

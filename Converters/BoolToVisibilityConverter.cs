@@ -20,7 +20,7 @@ namespace RdpScopeToggler.Converters
             if (boolValue)
                 return Visibility.Visible;
 
-            return CollapseInsteadOfHide ? Visibility.Collapsed : Visibility.Collapsed;
+            return CollapseInsteadOfHide ? Visibility.Collapsed : Visibility.Hidden;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -8,7 +8,6 @@ using RdpScopeToggler.Stores;
 using System.Windows;
 using System.Diagnostics;
 using RdpScopeToggler.Views;
-using RdpScopeToggler.Services.NotificationService;
 
 
 namespace RdpScopeToggler.ViewModels
@@ -92,11 +91,34 @@ namespace RdpScopeToggler.ViewModels
 
         public bool HasDateTimeError => !string.IsNullOrEmpty(DateTimeError);
 
+
+        private DateTime? selectedDate;
+        public DateTime? SelectedDate
+        {
+            get => selectedDate;
+            set
+            {
+                SetProperty(ref selectedDate, value);
+                UpdateCombinedDateTime();
+            }
+        }
+
+        private DateTime? selectedTime;
+        public DateTime? SelectedTime
+        {
+            get => selectedTime;
+            set
+            {
+                SetProperty(ref selectedTime, value);
+                UpdateCombinedDateTime();
+            }
+        }
+
         private DateTime selectedDateTime;
         public DateTime SelectedDateTime
         {
             get => selectedDateTime;
-            set
+            private set
             {
                 SetProperty(ref selectedDateTime, value);
                 taskInfoStore.Date = value;
@@ -104,12 +126,12 @@ namespace RdpScopeToggler.ViewModels
             }
         }
 
-        private void ValidateSelectedDateTime()
+
+        private bool isDateValid = false;
+        public bool IsDateValid
         {
-            if (IsDateTimeEnabled && SelectedDateTime < DateTime.Now.AddMinutes(1))
-                DateTimeError = "בחר תאריך עתידי לפחות בדקה אחת";
-            else
-                DateTimeError = null;
+            get { return isDateValid; }
+            set { SetProperty(ref isDateValid, value); }
         }
 
 
@@ -121,6 +143,8 @@ namespace RdpScopeToggler.ViewModels
             {
                 if (SetProperty(ref _isDateTimeEnabled, value))
                     ValidateSelectedDateTime();
+                if (!value)
+                    IsDateValid = true;
             }
         }
 
@@ -143,6 +167,7 @@ namespace RdpScopeToggler.ViewModels
                 }
             }
         }
+
         public ICommand StartCommand { get; }
         public ICommand OpenSettingsWindowCommand { get; }
 
@@ -156,11 +181,16 @@ namespace RdpScopeToggler.ViewModels
         {
             this.taskInfoStore = taskInfoStore;
 
-            CountDownDay = 00;
-            CountDownHour = 00;
-            CountDownMinute = 00;
-            CountDownSecond = 00;
-            SelectedDateTime = DateTime.Now;
+            CountDownDay = 0;
+            CountDownHour = 0;
+            CountDownMinute = 1;
+            CountDownSecond = 0; 
+            var now = DateTime.Now;
+            SelectedDateTime = now;
+            SelectedDate = now.Date;
+            SelectedTime = DateTime.Now;
+
+            IsDateValid = false;
             IsDateTimeEnabled = false;
             Options = new ObservableCollection<string>
             {
@@ -175,7 +205,8 @@ namespace RdpScopeToggler.ViewModels
             {
                 if (IsDateTimeEnabled)
                 {
-                    // Add validation
+                    ValidateSelectedDateTime();
+                    if (IsDateTimeEnabled && SelectedDateTime < DateTime.Now.AddMinutes(1)) return;
                     regionManager.RequestNavigate("ContentRegion", "WaitingUserControl");
                     return;
                 }
@@ -184,6 +215,29 @@ namespace RdpScopeToggler.ViewModels
 
 
         }
+
+        private void ValidateSelectedDateTime()
+        {
+            IsDateValid = false;
+            if (IsDateTimeEnabled && SelectedDateTime < DateTime.Now.AddMinutes(1))
+            {
+                DateTimeError = "בחר תאריך עתידי לפחות בדקה אחת";
+            }
+            else
+            {
+                DateTimeError = null;
+                IsDateValid = true;
+            }
+        }
+
+        private void UpdateCombinedDateTime()
+        {
+            if (SelectedDate is DateTime date && SelectedTime is DateTime time)
+            {
+                SelectedDateTime = date.Date + time.TimeOfDay;
+            }
+        }
+
 
         private void OpenSettingsWindow()
         {

@@ -16,6 +16,33 @@ namespace RdpScopeToggler.Views
             InitializeComponent();
             Loaded += (s, e) => UpdateSecondsVisibility();
         }
+        // --- TimeTitle ---
+        public static readonly DependencyProperty TimeTitleProperty =
+            DependencyProperty.Register(
+                nameof(TimeTitle),
+                typeof(string),
+                typeof(AnyClockUserControl),
+                new FrameworkPropertyMetadata("Temp"));
+
+        public string TimeTitle
+        {
+            get => (string)GetValue(TimeTitleProperty);
+            set => SetValue(TimeTitleProperty, value);
+        }
+
+        // --- TimeTitleVisibility ---
+        public static readonly DependencyProperty TimeTitleVisibilityProperty =
+            DependencyProperty.Register(
+                nameof(TimeTitleVisibility),
+                typeof(Visibility),
+                typeof(AnyClockUserControl),
+                new PropertyMetadata(Visibility.Collapsed));
+
+        public Visibility TimeTitleVisibility
+        {
+            get => (Visibility)GetValue(TimeTitleVisibilityProperty);
+            set => SetValue(TimeTitleVisibilityProperty, value);
+        }
 
 
         // --- DAYS (0..365) ---

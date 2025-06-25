@@ -3,111 +3,150 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"             
              prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
              
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:local="clr-namespace:RdpScopeToggler"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"            
              
              >
+    <Grid>
+        <Border BorderThickness="1" BorderBrush="#dee2e6" CornerRadius="8" Margin="10" >
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#e9ecef" Offset="1" />
+                    <GradientStop Color="#e9ecef" Offset="0.2" />
+                    <GradientStop Color="#f8f9fa" Offset="0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <StackPanel>
+                <TextBlock Text="{Binding TimeTitle, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                           Visibility="{Binding TimeTitleVisibility, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                           d:Text="בחר זמן:"
+                           TextAlignment="Center"
+                           FontSize="20" FlowDirection="RightToLeft" FontFamily="Bahnschrift"
+                           Margin="0 15 0 0"
+                           />
+                <Grid Margin="20 15 20 15" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
 
-    <Grid Margin="20 10 20 20" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="auto" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="1*" />
-            <RowDefinition Height="1*" />
-        </Grid.RowDefinitions>
+                    <!-- Days -->
+                    <TextBlock x:Name="TextBlockDay" Text="D" FontWeight="Bold" Padding="0 5 0 0" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="1"
+                               Foreground="{DynamicResource MaterialDesignToolTipBackground}"
+                               >
+                        <!-- Visable when mouse enter
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Opacity" Value="0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsMouseOver, ElementName=IntUpDownDay}" Value="True">
+                                        <Setter Property="Opacity" Value="1" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        -->
+                    </TextBlock>
+                    <Border Margin="3 0" Padding="4" CornerRadius="4" BorderThickness="2" Grid.Column="0" Grid.Row="0"
+                            BorderBrush="#dee2e6"
+                            Background="{DynamicResource MaterialDesignPaper}">
+                        <xctk:IntegerUpDown x:Name="IntUpDownDay"
+                            TextAlignment="Center"
+                            Value="{Binding CountDownDay, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            FontSize="20" MinHeight="40" MinWidth="30" Minimum="0" Maximum="365" Increment="1"
+                            ShowButtonSpinner="False"
+                            IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            PreviewMouseWheel="OnMouseWheel"
+                            BorderThickness="0" Background="Transparent"
+                                            ValueChanged="IntegerUpDown_ValueChanged"
+                                            PreviewTextInput="IntegerUpDown_PreviewTextInput"
+                                            PreviewKeyDown="IntegerUpDown_PreviewKeyDown"
+                            Foreground="#343A40" />
+                    </Border>
+                    <TextBlock Grid.Column="1" Grid.Row="0"
+                           Text=":" 
+                           FontWeight="Bold"
+                           FontSize="20" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MaterialDesignToolTipBackground}" />
 
-        <!-- Days -->
-        <TextBlock x:Name="TextBlockDay" Text="D" FontWeight="Bold" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="0" >
-            <TextBlock.Style>
-                <Style TargetType="TextBlock">
-                    <Setter Property="Opacity" Value="0" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=IntUpDownDay}" Value="True">
-                            <Setter Property="Opacity" Value="1" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
-        <Border Margin="3 0" Padding="4" CornerRadius="4" BorderThickness="1" Grid.Column="0" Grid.Row="1"
-            BorderBrush="{DynamicResource MaterialDesignOutlineBorderBrush}"
+                    <!-- Hours -->
+                    <TextBlock x:Name="TextBlockHour" Text="H" FontWeight="Bold" Padding="0 5 0 0" HorizontalAlignment="Center" Grid.Column="2" Grid.Row="1"
+                               Foreground="{DynamicResource MaterialDesignToolTipBackground}"
+                               >
+                        <!-- Visable when mouse enter
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Opacity" Value="0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsMouseOver, ElementName=IntUpDownDay}" Value="True">
+                                        <Setter Property="Opacity" Value="1" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        -->
+                    </TextBlock>
+                    <Border Margin="3 0" Padding="4" CornerRadius="4" BorderThickness="2" Grid.Column="2" Grid.Row="0"
+                        BorderBrush="#dee2e6"
+                        Background="{DynamicResource MaterialDesignPaper}">
+                        <xctk:IntegerUpDown x:Name="IntUpDownHour"
+                                LostFocus="OnIntegerUpDownLostFocus"
+                                TextAlignment="Center"
+                                Value="{Binding CountDownHour, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                FontSize="20" MinHeight="40" MinWidth="30" Minimum="0" Maximum="23" Increment="1"
+                                ShowButtonSpinner="False"
+                                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                PreviewMouseWheel="OnMouseWheel"
+                                BorderThickness="0" Background="Transparent"
+                                            ValueChanged="IntegerUpDown_ValueChanged"
+                                            PreviewTextInput="IntegerUpDown_PreviewTextInput"
+                                            PreviewKeyDown="IntegerUpDown_PreviewKeyDown"
+                Foreground="#343A40" />
+                    </Border>
+                    <TextBlock Grid.Column="3" Grid.Row="0"
+                           Text=":" 
+                           FontWeight="Bold"
+                           FontSize="20" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MaterialDesignToolTipBackground}" />
+
+                    <!-- Minutes -->
+                    <TextBlock x:Name="TextBlockMinute" Text="M" FontWeight="Bold" Padding="0 5 0 0" HorizontalAlignment="Center" Grid.Column="4" Grid.Row="1"
+                               Foreground="{DynamicResource MaterialDesignToolTipBackground}"
+                               >
+                        <!-- Visable when mouse enter
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Opacity" Value="0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsMouseOver, ElementName=IntUpDownDay}" Value="True">
+                                        <Setter Property="Opacity" Value="1" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        -->
+                    </TextBlock>
+                    <Border Margin="3 0" Padding="4" CornerRadius="4" BorderThickness="2" Grid.Column="4" Grid.Row="0"
+                        BorderBrush="#dee2e6"
             Background="{DynamicResource MaterialDesignPaper}">
-            <xctk:IntegerUpDown x:Name="IntUpDownDay"
-                TextAlignment="Center"
-                Value="{Binding CountDownDay, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                FontSize="20" MinWidth="30" Minimum="0" Maximum="365" Increment="1"
-                ShowButtonSpinner="False"
-                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                PreviewMouseWheel="OnMouseWheel"
-                BorderThickness="0" Background="Transparent"
-                                ValueChanged="IntegerUpDown_ValueChanged"
-                                PreviewTextInput="IntegerUpDown_PreviewTextInput"
-                                PreviewKeyDown="IntegerUpDown_PreviewKeyDown"
-                Foreground="{DynamicResource MaterialDesignBody}" />
-        </Border>
-        <TextBlock Text=":" FontSize="20" VerticalAlignment="Center"  Grid.Column="1" Grid.Row="1" />
-
-        <!-- Hours -->
-        <TextBlock x:Name="TextBlockHour" Text="H" FontWeight="Bold" HorizontalAlignment="Center" Grid.Column="2" Grid.Row="0" >
-            <TextBlock.Style>
-                <Style TargetType="TextBlock">
-                    <Setter Property="Opacity" Value="0" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=IntUpDownHour}" Value="True">
-                            <Setter Property="Opacity" Value="1" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
-        <Border Margin="3 0" Padding="4" CornerRadius="4" BorderThickness="1" Grid.Column="2" Grid.Row="1"
-            BorderBrush="{DynamicResource MaterialDesignOutlineBorderBrush}"
-            Background="{DynamicResource MaterialDesignPaper}">
-            <xctk:IntegerUpDown x:Name="IntUpDownHour"
-                LostFocus="OnIntegerUpDownLostFocus"
-                TextAlignment="Center"
-                Value="{Binding CountDownHour, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                FontSize="20" MinWidth="30" Minimum="0" Maximum="23" Increment="1"
-                ShowButtonSpinner="False"
-                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                PreviewMouseWheel="OnMouseWheel"
-                BorderThickness="0" Background="Transparent"
-                                ValueChanged="IntegerUpDown_ValueChanged"
-                                PreviewTextInput="IntegerUpDown_PreviewTextInput"
-                                PreviewKeyDown="IntegerUpDown_PreviewKeyDown"
-                Foreground="{DynamicResource MaterialDesignBody}" />
-        </Border>
-        <TextBlock Text=":" FontSize="20" VerticalAlignment="Center"  Grid.Column="3" Grid.Row="1" />
-
-        <!-- Minutes -->
-        <TextBlock x:Name="TextBlockMinute" Text="M" FontWeight="Bold" HorizontalAlignment="Center" Grid.Column="4" Grid.Row="0" >
-            <TextBlock.Style>
-                <Style TargetType="TextBlock">
-                    <Setter Property="Opacity" Value="0" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=IntUpDownMinute}" Value="True">
-                            <Setter Property="Opacity" Value="1" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
-        <Border Margin="3 0" Padding="4" CornerRadius="4" BorderThickness="1" Grid.Column="4" Grid.Row="1"
-            BorderBrush="{DynamicResource MaterialDesignOutlineBorderBrush}"
-            Background="{DynamicResource MaterialDesignPaper}">
-            <xctk:IntegerUpDown x:Name="IntUpDownMinute"
+                        <xctk:IntegerUpDown x:Name="IntUpDownMinute"
                 TextAlignment="Center"
                 Value="{Binding CountDownMinute, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                FontSize="20" MinWidth="30" Minimum="0" Maximum="59" Increment="1"
+                FontSize="20" MinHeight="40" MinWidth="30" Minimum="0" Maximum="59" Increment="1"
                 ShowButtonSpinner="False"
                 IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 PreviewMouseWheel="OnMouseWheel"
@@ -116,40 +155,53 @@
                                 PreviewTextInput="IntegerUpDown_PreviewTextInput"
                                 PreviewKeyDown="IntegerUpDown_PreviewKeyDown"
                 LostFocus="OnIntegerUpDownLostFocus"
-                Foreground="{DynamicResource MaterialDesignBody}" />
-        </Border>
-        <TextBlock x:Name="TextBlockColonBeforeSeconds" Text=":" FontSize="20" VerticalAlignment="Center"  Grid.Column="5" Grid.Row="1" />
+                Foreground="#343A40" />
+                    </Border>
+                    <TextBlock Grid.Column="5" Grid.Row="0"
+                           x:Name="TextBlockColonBeforeSeconds"
+                           Text=":" 
+                           FontWeight="Bold"
+                           FontSize="20" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MaterialDesignToolTipBackground}" />
 
-        <!-- Seconds -->
-        <TextBlock x:Name="TextBlockSecond" Text="S" FontWeight="Bold" HorizontalAlignment="Center" Grid.Column="6" Grid.Row="0" >
-            <TextBlock.Style>
-                <Style TargetType="TextBlock">
-                    <Setter Property="Opacity" Value="0" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=IntUpDownSecond}" Value="True">
-                            <Setter Property="Opacity" Value="1" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
-        <Border x:Name="BorderSeconds" Margin="3 0" Padding="4" CornerRadius="4" BorderThickness="1" Grid.Column="6" Grid.Row="1"
-            BorderBrush="{DynamicResource MaterialDesignOutlineBorderBrush}"
+                    <!-- Seconds -->
+                    <TextBlock x:Name="TextBlockSecond" Text="S" FontWeight="Bold" Padding="0 5 0 0" HorizontalAlignment="Center" Grid.Column="6" Grid.Row="1"
+                               Foreground="{DynamicResource MaterialDesignToolTipBackground}"
+                               >
+                        <!-- Visable when mouse enter
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Opacity" Value="0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsMouseOver, ElementName=IntUpDownDay}" Value="True">
+                                        <Setter Property="Opacity" Value="1" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        -->
+                    </TextBlock>
+                    <Border x:Name="BorderSeconds" Margin="3 0" Padding="4" CornerRadius="4" BorderThickness="2" Grid.Column="6" Grid.Row="0"
+                        BorderBrush="#dee2e6"
             Background="{DynamicResource MaterialDesignPaper}">
-            <xctk:IntegerUpDown x:Name="IntUpDownSecond"
-                TextAlignment="Center"
-                Value="{Binding CountDownSecond, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                FontSize="20" MinWidth="30" Minimum="0" Maximum="59" Increment="1"
-                ShowButtonSpinner="False"
-                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                PreviewMouseWheel="OnMouseWheel"
-                BorderThickness="0" Background="Transparent"
+                        <xctk:IntegerUpDown x:Name="IntUpDownSecond"
+                                TextAlignment="Center"
+                                Value="{Binding CountDownSecond, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                FontSize="20" MinHeight="40" MinWidth="30" Minimum="0" Maximum="59" Increment="1"
+                                ShowButtonSpinner="False"
+                                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                PreviewMouseWheel="OnMouseWheel"
+                                BorderThickness="0" Background="Transparent"
                                 ValueChanged="IntegerUpDown_ValueChanged"
                                 PreviewTextInput="IntegerUpDown_PreviewTextInput"
                                 PreviewKeyDown="IntegerUpDown_PreviewKeyDown"
-                LostFocus="OnIntegerUpDownLostFocus"
-                Foreground="{DynamicResource MaterialDesignBody}" />
+                                LostFocus="OnIntegerUpDownLostFocus"
+                                Foreground="#343A40" />
+                    </Border>
+                </Grid>
+            </StackPanel>
         </Border>
     </Grid>
+
 
 </UserControl>
