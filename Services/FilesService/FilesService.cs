@@ -1,59 +1,79 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Windows.Documents;
+using RdpScopeToggler.Stores;
 
 namespace RdpScopeToggler.Services.FilesService
 {
     public class FilesService : IFilesService
     {
-        public List<string> GetWhiteList()
+        public List<WhiteListClient> GetWhiteList()
         {
             EnsureWhiteListFileExists();
-            List<string> list = ReadWhiteList();
-            return list;
+            return ReadWhiteList();
         }
 
-        public void AddToWhiteList(string ip)
+
+        public void AddToWhiteList(string ip, string name = "Unnamed")
         {
             EnsureWhiteListFileExists();
-            WriteToWhiteList(ip);
+            WriteToWhiteList(ip, name);
         }
 
+
+        public void CleanWhiteList()
+        {
+            const string filePath = @"C:\ProgramData\RdpScopeToggler\WhiteList.json";
+            List<string> whiteList = new List<string>();
+            string updatedJson = JsonSerializer.Serialize(whiteList, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            File.WriteAllText(filePath, updatedJson);
+        }
 
 
         #region Private Methodes
-        private void WriteToWhiteList(string ip)
+        private void WriteToWhiteList(string ip, string name)
         {
+            name = name.Trim();
+            ip = ip.Trim();
             string filePath = @"C:\ProgramData\RdpScopeToggler\WhiteList.json";
-            List<string> whiteList;
+            List<WhiteListClient> whiteList;
 
-            // אם הקובץ קיים – קרא אותו, אחרת התחל עם רשימה ריקה
             if (File.Exists(filePath))
             {
                 string json = File.ReadAllText(filePath);
                 try
                 {
-                    whiteList = JsonSerializer.Deserialize<List<string>>(json) ?? new List<string>();
+                    whiteList = JsonSerializer.Deserialize<List<WhiteListClient>>(json) ?? new List<WhiteListClient>();
                 }
                 catch
                 {
-                    whiteList = new List<string>();
+                    whiteList = new List<WhiteListClient>();
                 }
             }
             else
             {
-                whiteList = new List<string>();
+                whiteList = new List<WhiteListClient>();
             }
 
-            // אם ה-IP לא קיים – נוסיף אותו
-            if (!whiteList.Contains(ip))
+            if (whiteList.Any(entry => entry.Address == ip && !entry.Name.Equals(name, System.StringComparison.InvariantCultureIgnoreCase)))
             {
-                whiteList.Add(ip);
+                var entryToUpdate = whiteList.First(e => e.Address == ip);
+                entryToUpdate.Name = name;
+
+                string updatedJson = JsonSerializer.Serialize(whiteList, new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+
+                File.WriteAllText(filePath, updatedJson);
+            }
+            else if (!whiteList.Any(entry => entry.Address == ip && entry.Name.Equals(name, System.StringComparison.InvariantCultureIgnoreCase)))
+            {
+                whiteList.Add(new WhiteListClient { Address = ip, Name = name });
 
                 string updatedJson = JsonSerializer.Serialize(whiteList, new JsonSerializerOptions
                 {
@@ -64,7 +84,8 @@ namespace RdpScopeToggler.Services.FilesService
             }
         }
 
-        private List<string> ReadWhiteList()
+
+        private List<WhiteListClient> ReadWhiteList()
         {
             string filePath = @"C:\ProgramData\RdpScopeToggler\WhiteList.json";
 
@@ -77,15 +98,15 @@ namespace RdpScopeToggler.Services.FilesService
 
             try
             {
-                var list = JsonSerializer.Deserialize<List<string>>(jsonContent);
-                return list ?? new List<string>();
+                var list = JsonSerializer.Deserialize<List<WhiteListClient>>(jsonContent);
+                return list ?? new List<WhiteListClient>();
             }
             catch (JsonException)
             {
-                // אם יש טעות בפורמט הקובץ – נחזיר רשימה ריקה
-                return new List<string>();
+                return new List<WhiteListClient>();
             }
         }
+
 
 
         private void EnsureWhiteListFileExists()
@@ -93,16 +114,14 @@ namespace RdpScopeToggler.Services.FilesService
             string folderPath = @"C:\ProgramData\RdpScopeToggler";
             string filePath = Path.Combine(folderPath, "WhiteList.json");
 
-            // Create directory if it doesn't exist
             if (!Directory.Exists(folderPath))
             {
                 Directory.CreateDirectory(folderPath);
             }
 
-            // Create file if it doesn't exist
             if (!File.Exists(filePath))
             {
-                var defaultList = new List<string>{};
+                var defaultList = new List<WhiteListClient>();
 
                 string json = JsonSerializer.Serialize(defaultList, new JsonSerializerOptions
                 {
@@ -112,6 +131,7 @@ namespace RdpScopeToggler.Services.FilesService
                 File.WriteAllText(filePath, json);
             }
         }
+
 
         #endregion
     }

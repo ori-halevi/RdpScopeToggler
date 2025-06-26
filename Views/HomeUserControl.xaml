@@ -19,7 +19,18 @@
     </UserControl.Resources>
 
     <Border Padding="1">
-        <DockPanel>
+        <StackPanel>
+
+            <materialDesign:ColorZone Mode="PrimaryMid">
+                <StackPanel Orientation="Horizontal" Margin="2">
+                    <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}" Content="Tab 1" IsChecked="True"/>
+                    <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}" Content="Tab 2"/>
+                </StackPanel>
+            </materialDesign:ColorZone>
+            <Border>
+                <!-- תוכן שמתגלו לפי ה־RadioButton שנבחר -->
+            </Border>
+            <DockPanel>
             <Border Padding="5" DockPanel.Dock="Top">
 
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -29,6 +40,7 @@
 
                         <Grid.ColumnDefinitions >
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="1*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
@@ -37,10 +49,17 @@
                         </Grid.RowDefinitions>
 
                         <Button Grid.Column="0" Width="32" Height="32" Padding="0"
-                    ToolTip="הגדרות"
-                    Command="{Binding OpenSettingsWindowCommand}"
-                    Style="{DynamicResource MaterialDesignToolButton}">
+                            ToolTip="הגדרות"
+                            Command="{Binding NavigateToSettingsCommand}"
+                            Style="{DynamicResource MaterialDesignFloatingActionMiniLightButton}">
                             <materialDesign:PackIcon Kind="Cog" Width="20" Height="20"/>
+                        </Button>
+                        
+                        <Button Grid.Column="1" Width="32" Height="32" Padding="0" Margin="10 0"
+                            ToolTip="רשימה לבנה"
+                            Command="{Binding NavigateToWhiteListCommand}"
+                            Style="{DynamicResource MaterialDesignFloatingActionButton}">
+                            <materialDesign:PackIcon Kind="ClipboardListOutline" Width="20" Height="20"/>
                         </Button>
 
                         <local:IndicatorsUserControl Grid.Column="2" />
@@ -61,6 +80,12 @@
                         TimeTitle="הגדר טיימר:"
                         TimeTitleVisibility="Visible"
                         />
+
+                    
+
+
+
+
 
 
                     <Button x:Name="ConnectButton"
@@ -180,21 +205,42 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top"
                         Padding="10">
-                        <StackPanel>
+                        <StackPanel
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center">
 
                             <!-- Date -->
                             <StackPanel Orientation="Horizontal" 
                                HorizontalAlignment="Center"
-                               Margin="0">
+                               VerticalAlignment="Center">
 
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                                <Button Command="{Binding UpdateDateCommand}"
+                                        ToolTip="עדכון תאריך"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Style="{DynamicResource MaterialDesignFloatingActionMiniDarkButton}"
+                                        IsEnabled="{Binding IsDateTimeEnabled}"
+                                        Margin="10 0 10 0"
+                                        RenderTransformOrigin="0.5,0.5"
+                                        >
+                                    <Button.RenderTransform>
+                                        <ScaleTransform ScaleX="0.8" ScaleY="0.8" />
+                                    </Button.RenderTransform>
+                                    <materialDesign:PackIcon Kind="CalendarRefreshOutline" Width="20" Height="20"/>
+                                </Button>
+
+
+                                <StackPanel Orientation="Horizontal" 
+                                            VerticalAlignment="Center" HorizontalAlignment="Center"
+                                            Margin="10 0 10 0"
+                                            >
                                     <!-- תאריך -->
                                     <DatePicker x:Name="MainDatePicker"
                                         PreviewMouseWheel="DatePicker_MouseWheel"
                                         SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         Style="{StaticResource MaterialDesignDatePicker}"
                                         materialDesign:HintAssist.Hint="תאריך"
-                                        Width="130"
+                                        MinWidth="100"
                                         FontSize="14"
                                         IsEnabled="{Binding IsDateTimeEnabled}"/>
 
@@ -204,7 +250,7 @@
                                         SelectedTime="{Binding SelectedTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         Style="{StaticResource MaterialDesignTimePicker}"
                                         materialDesign:HintAssist.Hint="שעה"
-                                        Width="90"
+                                        MinWidth="60"
                                         FontSize="14"
                                         Is24Hours="True"
                                         Margin="10,0,0,0"
@@ -214,16 +260,17 @@
 
                                 <CheckBox 
                                     Style="{DynamicResource MaterialDesignSwitchToggleButton}"
+                                    HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    Margin="10 5 5 5"
+                                    Margin="10 0 10 0"
                                     IsChecked="{Binding IsDateTimeEnabled, Mode=TwoWay}">
                                     <CheckBox.LayoutTransform>
                                         <ScaleTransform ScaleX="1" ScaleY="1" />
                                     </CheckBox.LayoutTransform>
                                 </CheckBox>
                             </StackPanel>
-                            
-                            
+
+
 
                         </StackPanel>
                     </Border>
@@ -232,8 +279,8 @@
 
                 </StackPanel>
             </Border>
-            
-            
+
+
             <TextBlock Text="v1.0.0"                       
                        Style="{DynamicResource MaterialDesignButtonTextBlock}" 
                        HorizontalAlignment="Center"
@@ -241,5 +288,6 @@
                        Foreground="Gray"
                        />
         </DockPanel>
+        </StackPanel>
     </Border>
 </UserControl>

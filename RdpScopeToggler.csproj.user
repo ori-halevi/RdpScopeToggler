@@ -13,13 +13,13 @@
     <Compile Update="Views\GenericDialogWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\HomeUserControl.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Update="Views\IndicatorsUserControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\SettingsWindow.xaml.cs">
+    <Compile Update="Views\MainUserControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\SettingsUserControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\TaskUserControl.xaml.cs">
@@ -29,6 +29,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\WaitingUserControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\WhiteListUserControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

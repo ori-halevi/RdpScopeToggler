@@ -169,26 +169,31 @@ namespace RdpScopeToggler.ViewModels
         }
 
         public ICommand StartCommand { get; }
-        public ICommand OpenSettingsWindowCommand { get; }
+        public ICommand UpdateDateCommand { get; }
+        public ICommand NavigateToSettingsCommand { get; }
+        public ICommand NavigateToWhiteListCommand { get; }
 
 
         public ObservableCollection<string> Options { get; }
         #endregion
 
         private TaskInfoStore taskInfoStore;
+        private IRegionManager regionManager;
 
         public HomeUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore)
         {
+            this.regionManager = regionManager;
             this.taskInfoStore = taskInfoStore;
 
             CountDownDay = 0;
             CountDownHour = 0;
             CountDownMinute = 1;
-            CountDownSecond = 0; 
+            CountDownSecond = 0;
             var now = DateTime.Now;
+            now.AddMinutes(2);
             SelectedDateTime = now;
             SelectedDate = now.Date;
-            SelectedTime = DateTime.Now;
+            SelectedTime = DateTime.Now.AddMinutes(2);
 
             IsDateValid = false;
             IsDateTimeEnabled = false;
@@ -200,7 +205,8 @@ namespace RdpScopeToggler.ViewModels
             SelectedAction = Options[0];
 
 
-            OpenSettingsWindowCommand = new DelegateCommand(OpenSettingsWindow);
+            NavigateToSettingsCommand = new DelegateCommand(NavigateToSettings);
+            NavigateToWhiteListCommand = new DelegateCommand(NavigateToWhiteList);
             StartCommand = new DelegateCommand(() =>
             {
                 if (IsDateTimeEnabled)
@@ -213,6 +219,14 @@ namespace RdpScopeToggler.ViewModels
                 regionManager.RequestNavigate("ContentRegion", "TaskUserControl");
             });
 
+            UpdateDateCommand = new DelegateCommand(() =>
+            {
+                var now = DateTime.Now;
+                now.AddMinutes(2);
+                SelectedDateTime = now;
+                SelectedDate = now.Date;
+                SelectedTime = DateTime.Now.AddMinutes(2);
+            });
 
         }
 
@@ -239,16 +253,13 @@ namespace RdpScopeToggler.ViewModels
         }
 
 
-        private void OpenSettingsWindow()
+        private void NavigateToSettings()
         {
-            var settingsWindow = new SettingsWindow();
-
-            // אפשרות לחיבור DataContext אם צריך ViewModel ייעודי
-            // settingsWindow.DataContext = new SettingsWindowViewModel();
-
-            // פתיחה כחלון מודאלי
-            settingsWindow.Owner = Application.Current.MainWindow;
-            settingsWindow.ShowDialog();
+            regionManager.RequestNavigate("ContentRegion", "SettingsUserControl");
+        }
+        private void NavigateToWhiteList()
+        {
+            regionManager.RequestNavigate("ContentRegion", "WhiteListUserControl");
         }
 
 

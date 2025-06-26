@@ -1,0 +1,124 @@
+﻿<UserControl x:Class="RdpScopeToggler.Views.WhiteListUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:prism="http://prismlibrary.com/" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             d:DesignHeight="600" d:DesignWidth="400"
+             >
+    <Grid>
+        <DockPanel LastChildFill="True">
+            <DockPanel Margin="0 5" HorizontalAlignment="Stretch" FlowDirection="RightToLeft"
+                                                VerticalAlignment="Center"
+                                                >
+
+            </DockPanel>
+            <!-- Back Button -->
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                <Button 
+                Style="{DynamicResource MaterialDesignFloatingActionAccentButton}"
+                RenderTransformOrigin="0.5,0.5"
+                Command="{Binding NavigateToHomeCommand}">
+                    <Button.RenderTransform>
+                        <ScaleTransform ScaleX="0.5" ScaleY="0.5" />
+                    </Button.RenderTransform>
+                    <materialDesign:PackIcon Kind="ArrowBack" Width="35" Height="35"/>
+                </Button>
+            </StackPanel>
+
+            <!-- Main Content Grid -->
+            <Grid DockPanel.Dock="Top" Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <!-- Title -->
+                    <RowDefinition Height="*" />
+                    <!-- Scrollable list -->
+                    <RowDefinition Height="Auto" />
+                    <!-- Buttons -->
+                </Grid.RowDefinitions>
+
+                <!-- Title -->
+                <TextBlock Text="רשתות ברשימה לבנה"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Margin="0 0 0 10"
+                       HorizontalAlignment="Right"
+                       Grid.Row="0"/>
+
+                <!-- Scrollable list -->
+                <Border Grid.Row="1"
+                    Style="{DynamicResource MaterialDesignToolBarMainPanelBorderStyle}">
+                    <ScrollViewer
+                              Margin="0 0 0 10"
+                              Padding="10 0 10 0"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              VerticalScrollBarVisibility="Visible"
+                              Style="{DynamicResource MaterialDesignScrollViewer}">
+                        <ScrollViewer.Resources>
+                            <Style TargetType="ScrollBar" BasedOn="{StaticResource MaterialDesignScrollBarMinimal}" />
+                        </ScrollViewer.Resources>
+                        <ItemsControl ItemsSource="{Binding WhiteListItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel Margin="0 5" HorizontalAlignment="Stretch" FlowDirection="RightToLeft"
+                                                VerticalAlignment="Center"
+                                                >
+
+                                        <!-- Delete button -->
+                                        <Button 
+                                                Command="{Binding DataContext.RemoveItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                Style="{DynamicResource MaterialDesignFloatingActionMiniLightButton}"
+                                                CommandParameter="{Binding}"
+                                                 HorizontalAlignment="Stretch"
+                                                 VerticalAlignment="Center"
+                                                 VerticalContentAlignment="Center"
+                                                Margin="5 0" Padding="0"
+                                                RenderTransformOrigin="0.5,0.5"
+                                                Width="30" Height="30"
+                                            >
+                                            <Button.RenderTransform>
+                                                <ScaleTransform ScaleX="0.8" ScaleY="0.8" />
+                                            </Button.RenderTransform>
+                                            <materialDesign:PackIcon Kind="DeleteForeverOutline" Width="20" Height="20" />
+                                        </Button>
+
+                                        <!-- Address -->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="5" Margin="5 0" Width="130">
+                                            <TextBox Text="{Binding Address, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             HorizontalAlignment="Stretch"
+                                             VerticalAlignment="Center"
+                                             TextAlignment="Center"
+                                             VerticalContentAlignment="Center"
+                                             FontSize="15"/>
+                                        </Border>
+                                        <!-- Name -->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="5" Margin="5 0">
+                                        <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             HorizontalAlignment="Stretch"
+                                             VerticalAlignment="Center"
+                                             TextAlignment="Center"
+                                             VerticalContentAlignment="Center"
+                                             FontSize="15"/>
+                                        </Border>
+
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- Action Buttons -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Button Content="הוסף" Command="{Binding AddItemCommand}" Margin="5" Width="150" />
+                    <Button Content="שמור" Command="{Binding SaveCommand}" Margin="5" Width="150" />
+                </StackPanel>
+            </Grid>
+        </DockPanel>
+    </Grid>
+
+</UserControl>

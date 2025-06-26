@@ -86,9 +86,9 @@ namespace RdpScopeToggler.Services.RdpService
 
         public void OpenRdpForWhiteList()
         {
-            List<string> ipList = _filesService.GetWhiteList();
+            List<WhiteListClient> ipList = _filesService.GetWhiteList();
             if (ipList.FirstOrDefault() == null) { return; }
-            string result = string.Join(",", ipList.Select(ip => $"{ip}/255.255.255.255"));
+            string result = string.Join(",", ipList.Select(ip => $"{ip.Address}/255.255.255.255"));
 
             ExecuteOnMatchingFirewallRules(
             (rule) =>
@@ -107,11 +107,11 @@ namespace RdpScopeToggler.Services.RdpService
 
         public void OpenRdpForLocalComputersAndForWhiteList()
         {
-            var ipList = _filesService.GetWhiteList();
+            List<WhiteListClient> ipList = _filesService.GetWhiteList();
             if (ipList.FirstOrDefault() == null) return;
 
             string remoteAddresses = "192.168.0.0-192.168.255.255," +
-                                     string.Join(",", ipList.Select(ip => $"{ip}/255.255.255.255"));
+                                     string.Join(",", ipList.Select(client => $"{client.Address}/255.255.255.255"));
 
             ExecuteOnMatchingFirewallRules(rule =>
             {
@@ -196,11 +196,11 @@ namespace RdpScopeToggler.Services.RdpService
             if (rule.RemoteAddresses == "*")
                 RdpData.IsOpenForAll = true;
 
-            var ipList = _filesService.GetWhiteList();
+            List<WhiteListClient> ipList = _filesService.GetWhiteList();
             if (ipList.FirstOrDefault() != null)
             {
                 string expected = "192.168.0.0-192.168.255.255," +
-                                  string.Join(",", ipList.Select(ip => $"{ip}/255.255.255.255"));
+                                  string.Join(",", ipList.Select(client => $"{client.Address}/255.255.255.255"));
 
                 var listA = rule.RemoteAddresses.Split(',').Select(x => x.Trim()).OrderBy(x => x).ToList();
                 var listB = expected.Split(',').Select(x => x.Trim()).OrderBy(x => x).ToList();

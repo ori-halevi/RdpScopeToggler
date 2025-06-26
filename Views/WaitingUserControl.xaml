@@ -22,7 +22,10 @@
                 CountDownHour="{Binding CountDownHour}"
                 CountDownMinute="{Binding CountDownMinute}"
                 CountDownSecond="{Binding CountDownSecond}"
-                IsReadOnly="True" />
+                IsReadOnly="True" 
+                TimeTitle="הפתיחה תחל בעוד:"
+                TimeTitleVisibility="Visible"
+            />
 
         <Button 
             Content="ביטול"

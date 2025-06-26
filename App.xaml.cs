@@ -47,6 +47,8 @@ namespace RdpScopeToggler
             containerRegistry.RegisterForNavigation<HomeUserControl>();
             containerRegistry.RegisterForNavigation<WaitingUserControl>();
             containerRegistry.RegisterForNavigation<TaskUserControl>();
+            containerRegistry.RegisterForNavigation<SettingsUserControl>();
+            containerRegistry.RegisterForNavigation<WhiteListUserControl>();
         }
 
 
