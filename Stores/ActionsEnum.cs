@@ -3,7 +3,9 @@
     public enum ActionsEnum
     {
         RemoteSystems,
-        WhiteList
+        WhiteList,
+        LocalComputersAndWhiteList,
+        LocalComputers
     }
 
 }

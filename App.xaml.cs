@@ -49,6 +49,8 @@ namespace RdpScopeToggler
             containerRegistry.RegisterForNavigation<TaskUserControl>();
             containerRegistry.RegisterForNavigation<SettingsUserControl>();
             containerRegistry.RegisterForNavigation<WhiteListUserControl>();
+            containerRegistry.RegisterForNavigation<MainUserControl>();
+            containerRegistry.RegisterForNavigation<LocalAddressesUserControl>();
         }
 
 
@@ -57,7 +59,8 @@ namespace RdpScopeToggler
             base.OnInitialized();
 
             var regionManager = Container.Resolve<IRegionManager>();
-            regionManager.RequestNavigate("ContentRegion", "HomeUserControl");
+            regionManager.RequestNavigate("ContentRegion", "MainUserControl");
+            regionManager.RequestNavigate("CardsRegion", "HomeUserControl");
         }
 
 

@@ -3,22 +3,20 @@ using Prism.Mvvm;
 using System.Windows;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using RdpScopeToggler.Services.FilesService;
 using System.Text.RegularExpressions;
 using Prism.Navigation.Regions;
 using RdpScopeToggler.Stores;
-using System.Xml.Linq;
 
 namespace RdpScopeToggler.ViewModels
 {
     public class WhiteListEntry : BindableBase
     {
-        private string _address;
+        private string address;
         public string Address
         {
-            get => _address;
-            set => SetProperty(ref _address, value);
+            get => address;
+            set => SetProperty(ref address, value);
         }
 
         private string name;
@@ -42,14 +40,14 @@ namespace RdpScopeToggler.ViewModels
         public WhiteListUserControlViewModel(IRegionManager regionManager ,IFilesService filesService)
         {
             this.filesService = filesService;
-            List<WhiteListClient> whiteList = filesService.GetWhiteList();
+            List<Client> whiteList = filesService.GetWhiteList();
 
             foreach (var ip in whiteList)
             {
-                WhiteListEntry asd = new();
-                asd.Address = ip.Address;
-                asd.Name = ip.Name;
-                WhiteListItems.Add(asd);
+                WhiteListEntry client = new();
+                client.Address = ip.Address;
+                client.Name = ip.Name;
+                WhiteListItems.Add(client);
             }
             AddItemCommand = new DelegateCommand(AddItem);
 
@@ -59,7 +57,7 @@ namespace RdpScopeToggler.ViewModels
 
             NavigateToHomeCommand = new DelegateCommand(() =>
             {
-                regionManager.RequestNavigate("ContentRegion", "HomeUserControl");
+                regionManager.RequestNavigate("ContentRegion", "MainUserControl");
             });
         }
         private void RemoveItem(WhiteListEntry item)
@@ -100,7 +98,7 @@ namespace RdpScopeToggler.ViewModels
             }
 
 
-            List<WhiteListClient> whiteList = filesService.GetWhiteList();
+            List<Client> whiteList = filesService.GetWhiteList();
             WhiteListItems.Clear();
             foreach (var ip in whiteList)
             {

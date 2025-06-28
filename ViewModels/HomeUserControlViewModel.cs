@@ -163,7 +163,7 @@ namespace RdpScopeToggler.ViewModels
                 }
                 else
                 {
-                    taskInfoStore.Action = ActionsEnum.WhiteList;
+                    taskInfoStore.Action = ActionsEnum.LocalComputersAndWhiteList;
                 }
             }
         }
@@ -171,7 +171,6 @@ namespace RdpScopeToggler.ViewModels
         public ICommand StartCommand { get; }
         public ICommand UpdateDateCommand { get; }
         public ICommand NavigateToSettingsCommand { get; }
-        public ICommand NavigateToWhiteListCommand { get; }
 
 
         public ObservableCollection<string> Options { get; }
@@ -206,7 +205,6 @@ namespace RdpScopeToggler.ViewModels
 
 
             NavigateToSettingsCommand = new DelegateCommand(NavigateToSettings);
-            NavigateToWhiteListCommand = new DelegateCommand(NavigateToWhiteList);
             StartCommand = new DelegateCommand(() =>
             {
                 if (IsDateTimeEnabled)
@@ -257,11 +255,6 @@ namespace RdpScopeToggler.ViewModels
         {
             regionManager.RequestNavigate("ContentRegion", "SettingsUserControl");
         }
-        private void NavigateToWhiteList()
-        {
-            regionManager.RequestNavigate("ContentRegion", "WhiteListUserControl");
-        }
-
 
         public void OnNavigatedTo(NavigationContext navigationContext) { }
 

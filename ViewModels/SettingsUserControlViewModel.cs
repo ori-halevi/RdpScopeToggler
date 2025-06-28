@@ -28,7 +28,7 @@ namespace RdpScopeToggler.ViewModels
 
             CloseCommand = new DelegateCommand(() =>
             {
-                regionManager.RequestNavigate("ContentRegion", "HomeUserControl");
+                regionManager.RequestNavigate("ContentRegion", "MainUserControl");
             });
         }
 

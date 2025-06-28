@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using RdpScopeToggler.Services.FilesService;
 using RdpScopeToggler.Stores;
 using System.Data;
+using LiveCharts.Maps;
 
 namespace RdpScopeToggler.Services.RdpService
 {
@@ -15,6 +16,9 @@ namespace RdpScopeToggler.Services.RdpService
     {
         public event Action RdpDataUpdated;
         public RdpInfoData RdpData { get; set; }
+
+        public ActionsEnum LastAction { get; set; }
+
         public int? Port { get; set; }
 
         private readonly IFilesService _filesService;
@@ -22,6 +26,7 @@ namespace RdpScopeToggler.Services.RdpService
         {
             _filesService = filesService;
             RdpData = new RdpInfoData();
+            LastAction = ActionsEnum.LocalComputersAndWhiteList;
 
             Port = GetRdpPort();
             if (Port == null)
@@ -31,7 +36,7 @@ namespace RdpScopeToggler.Services.RdpService
         }
 
         #region Public methodes
-        public void CloseRdpForAll()
+        public void CloseRdpForAllIncludingAlwaysOnList()
         {
             ExecuteOnMatchingFirewallRules(
             (rule) =>
@@ -46,8 +51,42 @@ namespace RdpScopeToggler.Services.RdpService
             });
         }
 
+        public void CloseRdpForAll()
+        {
+
+            List<Client> alwaysOnList = _filesService
+                .GetAlwaysOnList()
+                .Where(client => client.IsOpen)
+                .ToList();
+
+            if (alwaysOnList.FirstOrDefault() == null)
+            {
+                CloseRdpForAllIncludingAlwaysOnList();
+                return;
+            }
+
+            string result = string.Join(",", alwaysOnList
+                .Select(client => $"{client.Address}/255.255.255.255"));
+
+
+            ExecuteOnMatchingFirewallRules(
+            (rule) =>
+            {
+                string ruleName = rule.Name;
+
+                rule.Enabled = true;
+
+                Debug.WriteLine($"Rule found: {ruleName}");
+                Debug.WriteLine($"Current RemoteAddresses: {rule.RemoteAddresses}");
+
+                rule.RemoteAddresses = result;
+                Debug.WriteLine("Open for AlwaysOnList only!");
+            });
+        }
+
         public void OpenRdpForAll()
         {
+            LastAction = ActionsEnum.RemoteSystems;
             ExecuteOnMatchingFirewallRules(
             (rule) =>
             {
@@ -66,6 +105,19 @@ namespace RdpScopeToggler.Services.RdpService
 
         public void OpenRdpForLocalComputers()
         {
+            LastAction = ActionsEnum.LocalComputers;
+            List<Client> alwaysOnList = _filesService
+                .GetAlwaysOnList()
+                .Where(client => client.IsOpen)
+                .ToList();
+
+
+            string result = string.Join(",", alwaysOnList
+                .Select(client => $"{client.Address}/255.255.255.255"));
+
+            string remoteAddresses = "192.168.0.0-192.168.255.255," + result;
+
+
             ExecuteOnMatchingFirewallRules(
             (rule) =>
             {
@@ -76,7 +128,7 @@ namespace RdpScopeToggler.Services.RdpService
                 Debug.WriteLine($"Rule found: {ruleName}");
                 Debug.WriteLine($"Current RemoteAddresses: {rule.RemoteAddresses}");
 
-                rule.RemoteAddresses = "192.168.0.0-192.168.255.255";
+                rule.RemoteAddresses = remoteAddresses;
                 Debug.WriteLine("Changed to: 192.168.0.0-192.168.255.255");
             });
         }
@@ -86,9 +138,26 @@ namespace RdpScopeToggler.Services.RdpService
 
         public void OpenRdpForWhiteList()
         {
-            List<WhiteListClient> ipList = _filesService.GetWhiteList();
-            if (ipList.FirstOrDefault() == null) { return; }
-            string result = string.Join(",", ipList.Select(ip => $"{ip.Address}/255.255.255.255"));
+            LastAction = ActionsEnum.WhiteList;
+            List<Client> whiteList = _filesService.GetWhiteList();
+            List<Client> alwaysOnList = _filesService
+                .GetAlwaysOnList()
+                .Where(client => client.IsOpen)
+                .ToList();
+
+
+            List<Client> combinedList = whiteList.Concat(alwaysOnList).ToList();
+
+            if (combinedList.FirstOrDefault() == null)
+            {
+                CloseRdpForAllIncludingAlwaysOnList();
+                LastAction = ActionsEnum.WhiteList;
+                return;
+            }
+
+            string result = string.Join(",", combinedList
+                .Select(client => $"{client.Address}/255.255.255.255"));
+
 
             ExecuteOnMatchingFirewallRules(
             (rule) =>
@@ -105,13 +174,24 @@ namespace RdpScopeToggler.Services.RdpService
             });
         }
 
+
         public void OpenRdpForLocalComputersAndForWhiteList()
         {
-            List<WhiteListClient> ipList = _filesService.GetWhiteList();
-            if (ipList.FirstOrDefault() == null) return;
+            LastAction = ActionsEnum.LocalComputersAndWhiteList;
+            List<Client> whiteList = _filesService.GetWhiteList();
+            List<Client> alwaysOnList = _filesService
+                .GetAlwaysOnList()
+                .Where(client => client.IsOpen)
+                .ToList();
 
-            string remoteAddresses = "192.168.0.0-192.168.255.255," +
-                                     string.Join(",", ipList.Select(client => $"{client.Address}/255.255.255.255"));
+
+            List<Client> combinedList = whiteList.Concat(alwaysOnList).ToList();
+
+            string result = string.Join(",", combinedList
+                .Select(client => $"{client.Address}/255.255.255.255"));
+
+
+            string remoteAddresses = "192.168.0.0-192.168.255.255," + result;
 
             ExecuteOnMatchingFirewallRules(rule =>
             {
@@ -119,9 +199,14 @@ namespace RdpScopeToggler.Services.RdpService
                 rule.RemoteAddresses = remoteAddresses;
 
                 Debug.WriteLine($"Rule found: {rule.Name}");
-                Debug.WriteLine($"Changed to WhiteList: {remoteAddresses}");
+                Debug.WriteLine($"Changed to: {remoteAddresses}");
             });
         }
+
+
+
+
+
 
 
         public void RefreshRdpData()
@@ -186,37 +271,59 @@ namespace RdpScopeToggler.Services.RdpService
         #endregion
 
 
-
-        private void UpdateRdpData(INetFwRule rule)
+        private void UpdateRdpInfoData(INetFwRule rule)
         {
+            List<Client> whiteList = _filesService.GetWhiteList();
+            List<Client> alwaysOnList = _filesService.GetAlwaysOnList().Where(c => c.IsOpen).ToList();
+
             if (rule.Enabled)
                 RdpData.IsRoleActive = true;
-            if (rule.RemoteAddresses == "192.168.0.0-192.168.255.255")
-                RdpData.IsOpenOnlyForLocal = true;
-            if (rule.RemoteAddresses == "*")
-                RdpData.IsOpenForAll = true;
 
-            List<WhiteListClient> ipList = _filesService.GetWhiteList();
-            if (ipList.FirstOrDefault() != null)
+            RdpData.IsOpenForLocalComputers = rule.RemoteAddresses == "*" || rule.RemoteAddresses.Contains("192.168.0.0-192.168.255.255");
+
+            RdpData.IsOpenForAll = rule.RemoteAddresses == "*";
+
+
+            if (whiteList.Any())
             {
-                string expected = "192.168.0.0-192.168.255.255," +
-                                  string.Join(",", ipList.Select(client => $"{client.Address}/255.255.255.255"));
+                string result = string.Join(",", whiteList.Select(c => $"{c.Address}/255.255.255.255"));
+                string expected = $"192.168.0.0-192.168.255.255,{result}";
 
-                var listA = rule.RemoteAddresses.Split(',').Select(x => x.Trim()).OrderBy(x => x).ToList();
-                var listB = expected.Split(',').Select(x => x.Trim()).OrderBy(x => x).ToList();
+                var remoteAddressesList = SplitAndOrder(rule.RemoteAddresses);
+                var whiteListAfter = SplitAndOrder(expected);
+                
+                RdpData.IsOpenForLocalComputersAndForWhiteList = (whiteListAfter.All(item => remoteAddressesList.Contains(item)) || rule.RemoteAddresses == "*");
+            }
 
-                if (listA.SequenceEqual(listB))
-                    RdpData.IsOpenForLocalComputersAndForWhiteList = true;
-
+            if (alwaysOnList.Any())
+            {
+                var remoteAddressesList = SplitAndOrder(rule.RemoteAddresses);
+                string result = string.Join(",", alwaysOnList.Select(c => $"{c.Address}/255.255.255.255"));
+                var remoteAddressesAfter = SplitAndOrder(result);
+                RdpData.IsOpenForAlwaysOnList = (remoteAddressesAfter.All(c => remoteAddressesList.Contains(c)) || rule.RemoteAddresses == "*");
             }
         }
+
+        // Helper method to split, trim and order addresses
+        private List<string> SplitAndOrder(string addresses)
+        {
+            return addresses
+                .Split(',')
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .OrderBy(x => x)
+                .ToList();
+        }
+
+
 
 
 
         private void ExecuteOnMatchingFirewallRules(Action<INetFwRule> action)
         {
             RdpData.IsRoleActive = false;
-            RdpData.IsOpenOnlyForLocal = false;
+            RdpData.IsOpenForAlwaysOnList = false;
+            RdpData.IsOpenForLocalComputers = false;
             RdpData.IsOpenForAll = false;
             RdpData.IsOpenForLocalComputersAndForWhiteList = false;
 
@@ -235,7 +342,7 @@ namespace RdpScopeToggler.Services.RdpService
                 {
                     didFound = true;
                     action(rule);
-                    UpdateRdpData(rule);
+                    UpdateRdpInfoData(rule);
                 }
             }
 

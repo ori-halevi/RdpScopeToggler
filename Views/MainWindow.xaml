@@ -20,6 +20,11 @@
         AllowsTransparency="False"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True"
+        
+        SizeToContent="WidthAndHeight"
+        MinWidth="400"
+        MaxWidth="550"
+        MinHeight="510"
 
         shell:WindowChrome.WindowChrome="{DynamicResource WindowChrome}"
         >
@@ -34,9 +39,15 @@
 
     <DockPanel>
         <local:TitleBarUserControl DockPanel.Dock="Top" />
-        <Grid Margin="0">
+        <Grid Margin="0" DockPanel.Dock="Top">
             <ContentControl prism:RegionManager.RegionName="ContentRegion" />
         </Grid>
+        <TextBlock Text="v1.0.0" DockPanel.Dock="Bottom"                     
+                       Style="{DynamicResource MaterialDesignButtonTextBlock}" 
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Bottom"
+                       Foreground="Gray"
+                       />
     </DockPanel>
 </Window>
 

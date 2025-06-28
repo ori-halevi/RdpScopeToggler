@@ -119,7 +119,7 @@ namespace RdpScopeToggler.ViewModels
                 _cts.Dispose();    // משחרר משאבים
                 _cts = null;       // מוחק את ההתייחסות
             }
-            regionManager.RequestNavigate("ContentRegion", "HomeUserControl");
+            regionManager.RequestNavigate("ContentRegion", "MainUserControl");
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
@@ -133,7 +133,7 @@ namespace RdpScopeToggler.ViewModels
             string durationText = BuildDurationString(duration);
 
             string target = "רשתות חיצוניות";
-            if (taskInfoStore.Action == ActionsEnum.WhiteList)
+            if (taskInfoStore.Action == ActionsEnum.LocalComputersAndWhiteList)
                 target = "רשימה לבנה";
 
             Message = $"פתיחת גישה עבור\r\n{target} תתחיל\r\nבתאריך {formattedDate}\r\nבשעה {formattedTime}";

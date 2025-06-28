@@ -26,7 +26,7 @@ namespace RdpScopeToggler.Views
         public MainWindow()
         {
             InitializeComponent();
-            Loaded += MainWindow_Loaded;
+            //Loaded += MainWindow_Loaded;
             this.Closing += MainWindow_Closing;
         }
 

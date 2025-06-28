@@ -1,33 +1,38 @@
 ﻿using RdpScopeToggler.Services.RdpService;
 using Prism.Mvvm;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Threading;
-using System;
 
 namespace RdpScopeToggler.ViewModels
 {
     public class IndicatorsUserControlViewModel : BindableBase
     {
-        private bool _isInternalOpen = true;
+        private bool isInternalOpen = true;
         public bool IsInternalOpen
         {
-            get => _isInternalOpen;
-            set => SetProperty(ref _isInternalOpen, value);
+            get => isInternalOpen;
+            set => SetProperty(ref isInternalOpen, value);
         }
 
-        private bool _isExternalOpen;
+        private bool isExternalOpen;
         public bool IsExternalOpen
         {
-            get => _isExternalOpen;
-            set => SetProperty(ref _isExternalOpen, value);
+            get => isExternalOpen;
+            set => SetProperty(ref isExternalOpen, value);
         }
 
-        private bool _isWhiteListOpen;
+        private bool isWhiteListOpen;
         public bool IsWhiteListOpen
         {
-            get => _isWhiteListOpen;
-            set => SetProperty(ref _isWhiteListOpen, value);
+            get => isWhiteListOpen;
+            set => SetProperty(ref isWhiteListOpen, value);
+        }
+        
+
+        private bool isAlwaysOnOpen;
+        public bool IsAlwaysOnOpen
+        {
+            get => isAlwaysOnOpen;
+            set => SetProperty(ref isAlwaysOnOpen, value);
         }
 
 
@@ -36,12 +41,21 @@ namespace RdpScopeToggler.ViewModels
         {
             this.rdpService = rdpService;
             rdpService.RdpDataUpdated += UpdateIndicators;
+            rdpService.RefreshRdpData();
         }
 
         private void UpdateIndicators()
         {
+            Debug.WriteLine(rdpService.RdpData.IsRoleActive);
+            Debug.WriteLine(rdpService.RdpData.IsOpenForAll);
+            Debug.WriteLine(rdpService.RdpData.IsOpenForAlwaysOnList);
+            Debug.WriteLine(rdpService.RdpData.IsOpenForLocalComputers);
+            Debug.WriteLine(rdpService.RdpData.IsOpenForLocalComputersAndForWhiteList);
+
+
             if (rdpService.RdpData.IsOpenForAll)
             {
+                IsAlwaysOnOpen = true;
                 IsInternalOpen = true;
                 IsWhiteListOpen = true;
                 IsExternalOpen = true;
@@ -52,19 +66,30 @@ namespace RdpScopeToggler.ViewModels
                 IsWhiteListOpen = true;
                 IsInternalOpen = true;
             }
-            else if (rdpService.RdpData.IsOpenOnlyForLocal)
+            else if (rdpService.RdpData.IsOpenForLocalComputers)
             {
+                IsAlwaysOnOpen = true;
                 IsInternalOpen = true;
                 IsWhiteListOpen = false;
                 IsExternalOpen = false;
             }
 
+            if (rdpService.RdpData.IsOpenForAlwaysOnList)
+            {
+                IsAlwaysOnOpen = true;
+            }
+
             if (!rdpService.RdpData.IsRoleActive)
             {
+                IsAlwaysOnOpen = false;
                 IsInternalOpen = false;
                 IsWhiteListOpen = false;
                 IsExternalOpen = false;
             }
+                IsAlwaysOnOpen = rdpService.RdpData.IsOpenForAlwaysOnList;
+                IsInternalOpen = rdpService.RdpData.IsOpenForLocalComputers;
+                IsWhiteListOpen = rdpService.RdpData.IsOpenForLocalComputersAndForWhiteList;
+                IsExternalOpen = rdpService.RdpData.IsOpenForAll;
         }
     }
 }

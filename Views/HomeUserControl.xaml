@@ -18,28 +18,18 @@
         <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </UserControl.Resources>
 
-    <Border Padding="1">
-        <StackPanel>
+    <Border Padding="1" BorderThickness="0" BorderBrush="Red">
 
-            <materialDesign:ColorZone Mode="PrimaryMid">
-                <StackPanel Orientation="Horizontal" Margin="2">
-                    <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}" Content="Tab 1" IsChecked="True"/>
-                    <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}" Content="Tab 2"/>
-                </StackPanel>
-            </materialDesign:ColorZone>
-            <Border>
-                <!-- תוכן שמתגלו לפי ה־RadioButton שנבחר -->
-            </Border>
-            <DockPanel>
-            <Border Padding="5" DockPanel.Dock="Top">
+        <DockPanel>
+                <Border Padding="5" DockPanel.Dock="Top"  BorderThickness="0" BorderBrush="Red">
 
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
+            <Border Padding="1" BorderThickness="0" BorderBrush="Red">
                     <!-- Settings button in the corner -->
                     <Grid Margin="0 0 0 5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
 
                         <Grid.ColumnDefinitions >
-                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="1*" />
                             <ColumnDefinition Width="Auto" />
@@ -54,22 +44,17 @@
                             Style="{DynamicResource MaterialDesignFloatingActionMiniLightButton}">
                             <materialDesign:PackIcon Kind="Cog" Width="20" Height="20"/>
                         </Button>
-                        
-                        <Button Grid.Column="1" Width="32" Height="32" Padding="0" Margin="10 0"
-                            ToolTip="רשימה לבנה"
-                            Command="{Binding NavigateToWhiteListCommand}"
-                            Style="{DynamicResource MaterialDesignFloatingActionButton}">
-                            <materialDesign:PackIcon Kind="ClipboardListOutline" Width="20" Height="20"/>
-                        </Button>
 
                         <local:IndicatorsUserControl Grid.Column="2" />
 
                     </Grid>
 
+                    </Border>
 
 
+                    <Border Padding="1" BorderThickness="0" BorderBrush="Red">
 
-                    <local:AnyClockUserControl
+                        <local:AnyClockUserControl
                         DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         CountDownDay="{Binding CountDownDay}"
                         CountDownHour="{Binding CountDownHour}"
@@ -81,10 +66,13 @@
                         TimeTitleVisibility="Visible"
                         />
 
-                    
+
+                    </Border>
 
 
 
+
+                    <Border Padding="1" BorderThickness="0" BorderBrush="Red">
 
 
 
@@ -152,11 +140,16 @@
                             </EventTrigger>
                         </Button.Triggers>
                     </Button>
+                    </Border>
 
-                    <Grid Margin="10">
+
+                    <Border Padding="1" BorderThickness="0" BorderBrush="Red">
+
+
+                    <Grid Margin="10" >
                         <!-- Radio Buttons -->
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10"
-                Panel.ZIndex="0">
+                            Panel.ZIndex="0">
                             <RadioButton Content="Remote systems"
                      GroupName="ActionsGroup"
                      IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Remote systems}"
@@ -198,6 +191,7 @@
                         </materialDesign:Card>
                     </Grid>
 
+                    </Border>
 
 
 
@@ -278,16 +272,9 @@
 
 
                 </StackPanel>
-            </Border>
+        </Border>
 
 
-            <TextBlock Text="v1.0.0"                       
-                       Style="{DynamicResource MaterialDesignButtonTextBlock}" 
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Bottom"
-                       Foreground="Gray"
-                       />
         </DockPanel>
-        </StackPanel>
     </Border>
 </UserControl>
