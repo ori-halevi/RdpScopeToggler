@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -136,10 +137,12 @@ namespace RdpScopeToggler.ViewModels
             if (taskInfoStore.Action == ActionsEnum.LocalComputersAndWhiteList)
                 target = "רשימה לבנה";
 
-            Message = $"פתיחת גישה עבור\r\n{target} תתחיל\r\nבתאריך {formattedDate}\r\nבשעה {formattedTime}";
+            string targetMsg = $"מטרה: {target}.\r\n";
+            string dateMsg = $"תאריך: {formattedDate} {formattedTime}.\r\n";
+            Message = targetMsg + dateMsg;
 
             if (!string.IsNullOrWhiteSpace(durationText))
-                Message += $"\r\nותמשך כ-\r\n{durationText}";
+                Message += $"משך: {durationText}.";
 
             StartCountingDown();
         }

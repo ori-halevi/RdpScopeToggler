@@ -37,17 +37,26 @@
                             UseAeroCaptionButtons="False" />
     </Window.Resources>
 
-    <DockPanel>
-        <local:TitleBarUserControl DockPanel.Dock="Top" />
-        <Grid Margin="0" DockPanel.Dock="Top">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <local:TitleBarUserControl Grid.Row="0" />
+        
+        <Grid Grid.Row="1" Margin="0" Background="Aqua" VerticalAlignment="Stretch">
             <ContentControl prism:RegionManager.RegionName="ContentRegion" />
         </Grid>
-        <TextBlock Text="v1.0.0" DockPanel.Dock="Bottom"                     
+        
+        <TextBlock Grid.Row="2"
+            Text="v1.0.0"
                        Style="{DynamicResource MaterialDesignButtonTextBlock}" 
                        HorizontalAlignment="Center"
                        VerticalAlignment="Bottom"
                        Foreground="Gray"
                        />
-    </DockPanel>
+    </Grid>
 </Window>
 

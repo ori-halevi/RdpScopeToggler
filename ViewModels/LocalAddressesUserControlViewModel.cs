@@ -5,16 +5,12 @@ using RdpScopeToggler.Services.FilesService;
 using RdpScopeToggler.Stores;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows;
 using System.Text.RegularExpressions;
 using RdpScopeToggler.Services.RdpService;
-using System;
 using System.Threading.Tasks;
-
 using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
-using Xceed.Wpf.Toolkit;
 using MessageBox = System.Windows.MessageBox;
 using System.Linq;
 using RdpScopeToggler.Models;
@@ -45,8 +41,22 @@ namespace RdpScopeToggler.ViewModels
             set { SetProperty(ref isOpen, value); }
         }
     }
-    public class LocalAddressesUserControlViewModel
+    public class LocalAddressesUserControlViewModel : BindableBase, INavigationAware
     {
+        private bool isLoading;
+        public bool IsLoading
+        {
+            get => isLoading;
+            set => SetProperty(ref isLoading, value);
+        }
+
+        private bool isNotSaved;
+        public bool IsNotSaved
+        {
+            get { return isNotSaved; }
+            set { SetProperty(ref isNotSaved, value); }
+        }
+
         public ObservableCollection<AlwaysOnListEntry> AlwaysOnListItems { get; } = new();
 
         public DelegateCommand<AlwaysOnListEntry> RemoveItemCommand { get; }
@@ -62,16 +72,9 @@ namespace RdpScopeToggler.ViewModels
         {
             this.filesService = filesService;
             this.rdpService = rdpService;
-            List<Client> alwaysOnList = filesService.GetAlwaysOnList();
 
-            foreach (var ip in alwaysOnList)
-            {
-                AlwaysOnListEntry client = new();
-                client.Address = ip.Address;
-                client.Name = ip.Name;
-                client.IsOpen = ip.IsOpen;
-                AlwaysOnListItems.Add(client);
-            }
+            // Subscribe to collection changes
+            AlwaysOnListItems.CollectionChanged += AlwaysOnListItems_CollectionChanged;
 
             LoadLocalDevicesCommand = new DelegateCommand(LoadLocalDevices);
 
@@ -82,47 +85,75 @@ namespace RdpScopeToggler.ViewModels
             SaveCommand = new DelegateCommand(Save);
         }
 
-        private async void LoadLocalDevices()
+
+        private void AlwaysOnListItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            var clients = await ScanNetworkAsync("192.168.1.");
-            foreach (var client in clients)
+            if (e.NewItems != null)
             {
-                Debug.WriteLine($"IP: {client.Address}, Name: {client.Name}, IsOpen: {client.IsOpen}");
-                if (!AlwaysOnListItems.Any(item => item.Address == client.Address))
-                    AlwaysOnListItems.Add(new AlwaysOnListEntry { Address = client.Address, Name = client.Name, IsOpen = client.IsOpen });
+                foreach (AlwaysOnListEntry newItem in e.NewItems)
+                {
+                    newItem.PropertyChanged += AlwaysOnEntry_PropertyChanged;
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (AlwaysOnListEntry oldItem in e.OldItems)
+                {
+                    oldItem.PropertyChanged -= AlwaysOnEntry_PropertyChanged;
+                }
             }
         }
+
+        private void AlwaysOnEntry_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            // When any property changes, mark as not saved
+            IsNotSaved = true;
+        }
+
+
+
+        private async void LoadLocalDevices()
+        {
+            IsLoading = true;
+            try
+            {
+                var clients = await ScanNetworkAsync("192.168.1.");
+                foreach (var client in clients)
+                {
+                    Debug.WriteLine($"IP: {client.Address}, Name: {client.Name}, IsOpen: {client.IsOpen}");
+                    if (!AlwaysOnListItems.Any(item => item.Address == client.Address))
+                        AlwaysOnListItems.Add(new AlwaysOnListEntry { Address = client.Address, Name = client.Name, IsOpen = client.IsOpen });
+                }
+                IsNotSaved = true;
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
 
         private void RemoveItem(AlwaysOnListEntry item)
         {
             if (AlwaysOnListItems.Contains(item))
                 AlwaysOnListItems.Remove(item);
 
-
-            filesService.CleanAlwaysOnList();
-
-            foreach (var item1 in AlwaysOnListItems)
-            {
-                if (!IsValidIPv4(item1.Address))
-                {
-                    MessageBox.Show("Not Valid " + item1.Address);
-                    return;
-                }
-                filesService.AddToAlwaysOnList(item1.Address, item.IsOpen, item.Name);
-            }
+            IsNotSaved = true;
         }
 
         private void AddItem()
         {
             AlwaysOnListItems.Add(new AlwaysOnListEntry { Address = string.Empty, Name = string.Empty });
+            IsNotSaved = true;
         }
 
-        private void ShowWarrning()
+        private void ShowWarrning(string ipAddress)
         {
             var options = new GenericDialogOptions
             {
                 Title = "Ip address error",
-                Message = "כתובת ip לא הגיונית.",
+                Message = $"כתובת ip לא הגיונית.\n{ipAddress}",
                 OnClose = () => { },
                 IsModal = true,
                 Topmost = true,
@@ -138,16 +169,19 @@ namespace RdpScopeToggler.ViewModels
         private void Save()
         {
             filesService.CleanAlwaysOnList();
+            bool vaild = true;
             foreach (var client in AlwaysOnListItems)
             {
                 if (client.Address == "" && client.Name == "") continue;
                 if (!IsValidIPv4(client.Address))
                 {
-                    ShowWarrning();
-                    return;
+                    ShowWarrning(client.Address);
+                    vaild = false;
+                    continue;
                 }
                 filesService.AddToAlwaysOnList(client.Address, client.IsOpen, client.Name);
             }
+            if (!vaild) return;
 
 
             List<Client> alwaysOnList = filesService.GetAlwaysOnList();
@@ -174,6 +208,7 @@ namespace RdpScopeToggler.ViewModels
                 rdpService.CloseRdpForAll();
             }
 
+            IsNotSaved = false;
         }
 
         bool IsValidIPv4(string ipString)
@@ -233,5 +268,23 @@ namespace RdpScopeToggler.ViewModels
             return clients;
         }
 
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            List<Client> alwaysOnList = filesService.GetAlwaysOnList();
+
+            AlwaysOnListItems.Clear();
+            foreach (var ip in alwaysOnList)
+            {
+                AlwaysOnListEntry client = new();
+                client.Address = ip.Address;
+                client.Name = ip.Name;
+                client.IsOpen = ip.IsOpen;
+                AlwaysOnListItems.Add(client);
+            }
+            IsNotSaved = false;
+        }
+        public bool IsNavigationTarget(NavigationContext navigationContext) => true;
+
+        public void OnNavigatedFrom(NavigationContext navigationContext) { }
     }
 }
