@@ -8,8 +8,15 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Border Padding="5">
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+    <Grid
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Center" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
             <!-- Settings button in the corner -->
             <Grid Margin="0 0 0 5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
 
@@ -48,5 +55,5 @@
             />
 
         </StackPanel>
-    </Border>
+    </Grid>
 </UserControl>

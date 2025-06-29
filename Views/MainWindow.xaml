@@ -46,7 +46,7 @@
         
         <local:TitleBarUserControl Grid.Row="0" />
         
-        <Grid Grid.Row="1" Margin="0" Background="Aqua" VerticalAlignment="Stretch">
+        <Grid Grid.Row="1" Margin="0" VerticalAlignment="Stretch">
             <ContentControl prism:RegionManager.RegionName="ContentRegion" />
         </Grid>
         

@@ -4,7 +4,7 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:local="clr-namespace:RdpScopeToggler.Views"
              prism:ViewModelLocator.AutoWireViewModel="True">
-    <Grid Background="Red"
+    <Grid
             VerticalAlignment="Stretch"
             HorizontalAlignment="Center" >
         <Grid.RowDefinitions>
