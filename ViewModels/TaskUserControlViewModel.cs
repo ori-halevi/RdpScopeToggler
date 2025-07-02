@@ -117,14 +117,14 @@ namespace RdpScopeToggler.ViewModels
 
         private void CloseConnection()
         {
-            rdpService.OpenRdpForLocalComputers();
+            rdpService.CloseRdpForAll();
             regionManager.RequestNavigate("ContentRegion", "MainUserControl");
         }
 
         private void OpenConnection()
         {
             if (taskInfoStore.Action == ActionsEnum.LocalComputersAndWhiteList)
-                rdpService.OpenRdpForLocalComputersAndForWhiteList();
+                rdpService.OpenRdpForWhiteList();
             if (taskInfoStore.Action == ActionsEnum.RemoteSystems)
                 rdpService.OpenRdpForAll();
         }

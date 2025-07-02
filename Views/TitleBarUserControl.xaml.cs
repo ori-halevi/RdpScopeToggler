@@ -21,7 +21,7 @@ namespace RdpScopeToggler.Views
             GetWindow().WindowState = WindowState.Minimized;
         }
 
-        private void MaximizeRestore_Click(object sender, RoutedEventArgs e)
+        /*private void MaximizeRestore_Click(object sender, RoutedEventArgs e)
         {
             var window = GetWindow();
             if (window.WindowState == WindowState.Maximized)
@@ -36,7 +36,7 @@ namespace RdpScopeToggler.Views
                 MaximizeIcon.Visibility = Visibility.Collapsed;
                 RestoreIcon.Visibility = Visibility.Visible;
             }
-        }
+        }*/
 
         private void Close_Click(object sender, RoutedEventArgs e)
         {

@@ -29,7 +29,7 @@ namespace RdpScopeToggler.ViewModels
         }
     }
 
-    public class WhiteListUserControlViewModel : BindableBase, INavigationAware
+    public class WhiteListUserControlViewModel : BindableBase
     {
         private bool isNotSaved;
         public bool IsNotSaved
@@ -48,6 +48,17 @@ namespace RdpScopeToggler.ViewModels
         public WhiteListUserControlViewModel(IRegionManager regionManager, IFilesService filesService)
         {
             this.filesService = filesService;
+
+            List<Client> whiteList = filesService.GetWhiteList();
+
+            WhiteListItems.Clear();
+            foreach (var ip in whiteList)
+            {
+                WhiteListEntry client = new();
+                client.Address = ip.Address;
+                client.Name = ip.Name;
+                WhiteListItems.Add(client);
+            }
 
             // Subscribe to collection changes
             WhiteListItems.CollectionChanged += WhiteListItems_CollectionChanged;
@@ -170,21 +181,5 @@ namespace RdpScopeToggler.ViewModels
             return Regex.IsMatch(ipString, @"^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.|$)){4}$");
         }
 
-        public void OnNavigatedTo(NavigationContext navigationContext)
-        {
-            List<Client> whiteList = filesService.GetWhiteList();
-
-            WhiteListItems.Clear();
-            foreach (var ip in whiteList)
-            {
-                WhiteListEntry client = new();
-                client.Address = ip.Address;
-                client.Name = ip.Name;
-                WhiteListItems.Add(client);
-            }
-        }
-        public bool IsNavigationTarget(NavigationContext navigationContext) => true;
-
-        public void OnNavigatedFrom(NavigationContext navigationContext) { }
-    }
+}
 }

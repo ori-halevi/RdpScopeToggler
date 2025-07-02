@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
-using MessageBox = System.Windows.MessageBox;
 using System.Linq;
 using RdpScopeToggler.Models;
 using RdpScopeToggler.Views;
@@ -41,7 +40,7 @@ namespace RdpScopeToggler.ViewModels
             set { SetProperty(ref isOpen, value); }
         }
     }
-    public class LocalAddressesUserControlViewModel : BindableBase, INavigationAware
+    public class LocalAddressesUserControlViewModel : BindableBase
     {
         private bool isLoading;
         public bool IsLoading
@@ -70,8 +69,22 @@ namespace RdpScopeToggler.ViewModels
 
         public LocalAddressesUserControlViewModel(IRegionManager regionManager, IFilesService filesService, IRdpService rdpService)
         {
+            isLoading = false;
             this.filesService = filesService;
             this.rdpService = rdpService;
+
+            List<Client> alwaysOnList = filesService.GetAlwaysOnList();
+
+            AlwaysOnListItems.Clear();
+            foreach (var ip in alwaysOnList)
+            {
+                AlwaysOnListEntry client = new();
+                client.Address = ip.Address;
+                client.Name = ip.Name;
+                client.IsOpen = ip.IsOpen;
+                AlwaysOnListItems.Add(client);
+            }
+            IsNotSaved = false;
 
             // Subscribe to collection changes
             AlwaysOnListItems.CollectionChanged += AlwaysOnListItems_CollectionChanged;
@@ -267,24 +280,5 @@ namespace RdpScopeToggler.ViewModels
 
             return clients;
         }
-
-        public void OnNavigatedTo(NavigationContext navigationContext)
-        {
-            List<Client> alwaysOnList = filesService.GetAlwaysOnList();
-
-            AlwaysOnListItems.Clear();
-            foreach (var ip in alwaysOnList)
-            {
-                AlwaysOnListEntry client = new();
-                client.Address = ip.Address;
-                client.Name = ip.Name;
-                client.IsOpen = ip.IsOpen;
-                AlwaysOnListItems.Add(client);
-            }
-            IsNotSaved = false;
-        }
-        public bool IsNavigationTarget(NavigationContext navigationContext) => true;
-
-        public void OnNavigatedFrom(NavigationContext navigationContext) { }
     }
 }

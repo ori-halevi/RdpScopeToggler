@@ -7,6 +7,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:materialDesignElevation="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
              
+             xmlns:local="clr-namespace:RdpScopeToggler.Views"
              xmlns:converter="clr-namespace:RdpScopeToggler.Converters"
              xmlns:prism="http://prismlibrary.com/"             
              prism:ViewModelLocator.AutoWireViewModel="True">
@@ -17,46 +18,147 @@
         <StackPanel>
 
             <!-- Tabs -->
-            <materialDesign:ColorZone Mode="PrimaryDark">
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+            <TabControl Margin="0"
+                Background="White"
+                BorderBrush="#1976D2"
+                BorderThickness="2"
+                Padding="0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center">
 
-                    <RadioButton Content="ראשי"
-                     Grid.Column="0"
-                     HorizontalAlignment="Stretch"
-                     HorizontalContentAlignment="Center"
-                     GroupName="Tabs"
-                     Style="{StaticResource MaterialDesignTabRadioButton}"
-                     IsChecked="{Binding SelectedTab, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Home}" />
+                <TabControl.Resources>
 
-                    <RadioButton Content="רשימה לבנה"
-                     Grid.Column="1"
-                     HorizontalAlignment="Stretch"
-                     HorizontalContentAlignment="Center"
-                     GroupName="Tabs"
-                     Style="{StaticResource MaterialDesignTabRadioButton}"
-                     IsChecked="{Binding SelectedTab, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=WhiteList}" />
+                    <!-- TabItem style -->
+                    <Style TargetType="TabItem">
+                        <Setter Property="Padding" Value="15,8"/>
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="Background" Value="#F5F5F5"/>
+                        <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                        <Setter Property="BorderThickness" Value="1,1,1,0"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Border x:Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8,8,0,0"
+                                    Padding="{TemplateBinding Padding}"
+                                    Margin="{TemplateBinding Margin}">
+                                        <Border.Effect>
+                                            <DropShadowEffect Color="Black"
+                                                      Direction="270"
+                                                      ShadowDepth="1"
+                                                      BlurRadius="3"
+                                                      Opacity="0.1"/>
+                                        </Border.Effect>
+                                        <ContentPresenter x:Name="ContentSite"
+                                                  VerticalAlignment="Center"
+                                                  HorizontalAlignment="Center"
+                                                  ContentSource="Header"
+                                                  RecognizesAccessKey="True"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Border" Property="Background">
+                                                <Setter.Value>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientStop Color="#1976D2" Offset="0"/>
+                                                        <GradientStop Color="#1565C0" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="White"/>
+                                            <Setter TargetName="Border" Property="BorderBrush" Value="#1976D2"/>
+                                            <Setter TargetName="Border" Property="Margin" Value="0,-2,0,0"/>
+                                            <Setter Property="Panel.ZIndex" Value="1"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Border" Property="Background">
+                                                <Setter.Value>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientStop Color="#E3F2FD" Offset="0"/>
+                                                        <GradientStop Color="#BBDEFB" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Setter TargetName="Border" Property="BorderBrush" Value="#64B5F6"/>
+                                        </Trigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="True"/>
+                                                <Condition Property="IsMouseOver" Value="True"/>
+                                            </MultiTrigger.Conditions>
+                                            <Setter TargetName="Border" Property="Background">
+                                                <Setter.Value>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientStop Color="#1E88E5" Offset="0"/>
+                                                        <GradientStop Color="#1976D2" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </MultiTrigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="#BDBDBD"/>
+                                            <Setter TargetName="Border" Property="Background" Value="#F5F5F5"/>
+                                            <Setter TargetName="Border" Property="BorderBrush" Value="#E0E0E0"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
 
-                    <RadioButton Content="פנימי"
-                     Grid.Column="2"
-                     HorizontalAlignment="Stretch"
-                     HorizontalContentAlignment="Center"
-                     GroupName="Tabs"
-                     Style="{StaticResource MaterialDesignTabRadioButton}"
-                     IsChecked="{Binding SelectedTab, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=LocalAddresses}" />
-                </Grid>
-            </materialDesign:ColorZone>
+                    <!-- Tab content style -->
+                    <Style x:Key="TabContentStyle" TargetType="Grid">
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="#FAFAFA" Offset="0"/>
+                                    <GradientStop Color="#F0F4F8" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Margin" Value="0"/>
+                    </Style>
 
+                    <!-- Text style for help tab -->
+                    <Style x:Key="ContentTextStyle" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="16"/>
+                        <Setter Property="FontWeight" Value="Medium"/>
+                        <Setter Property="Foreground" Value="#424242"/>
+                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="TextAlignment" Value="Center"/>
+                    </Style>
+                </TabControl.Resources>
+                
+                <!-- Tabs -->
+                <TabItem Header="ראשי" Width="114">
+                    <Grid Style="{StaticResource TabContentStyle}">
+                            <local:HomeUserControl />
+                    </Grid>
+                </TabItem>
 
+                <TabItem Header="רשימה לבנה" Width="116">
+                    <Grid Style="{StaticResource TabContentStyle}">
+                        <local:WhiteListUserControl />
+                    </Grid>
+                </TabItem>
 
-            <!-- Region -->
-            <Border>
-                <ContentControl prism:RegionManager.RegionName="CardsRegion" />
-            </Border>
+                <TabItem Header="פנימי" Width="114">
+                    <Grid Style="{StaticResource TabContentStyle}">
+                        <local:LocalAddressesUserControl />
+                    </Grid>
+                </TabItem>
+                
+                
+            </TabControl>
         </StackPanel>
+
+
+
     </Grid>
 </UserControl>

@@ -10,7 +10,9 @@
         prism:ViewModelLocator.AutoWireViewModel="True"
         
         Title="{Binding Title}"
-        Height="350" Width="525"
+        Height="531" Width="350"
+        ResizeMode="NoResize"
+        
         Icon="pack://siteoforigin:,,,/Assets/remote-desktop.ico"
         
         materialDesign:ColorZoneAssist.Mode="Dark"
@@ -20,11 +22,6 @@
         AllowsTransparency="False"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True"
-        
-        SizeToContent="WidthAndHeight"
-        MinWidth="400"
-        MaxWidth="550"
-        MinHeight="510"
 
         shell:WindowChrome.WindowChrome="{DynamicResource WindowChrome}"
         >

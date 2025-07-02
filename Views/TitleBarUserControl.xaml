@@ -47,6 +47,7 @@
                 </Button>
 
                 <!-- מקסימיזציה / שחזור -->
+                <!--
                 <Button Style="{StaticResource MaterialDesignFlatButton}" Width="40" Height="30" Padding="0"
                     WindowChrome.IsHitTestVisibleInChrome="True"
                     Click="MaximizeRestore_Click" ToolTip="מקסם / שחזר">
@@ -55,7 +56,8 @@
                         <Rectangle x:Name="RestoreIcon" Stroke="White" StrokeThickness="2" Width="12" Height="12" Visibility="Collapsed" />
                     </Grid>
                 </Button>
-
+                -->
+                
                 <!-- סגירה -->
                 <Button Style="{StaticResource MaterialDesignFlatButton}" Width="40" Height="30" Padding="0"
                     Click="Close_Click" ToolTip="סגור"

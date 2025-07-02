@@ -46,13 +46,6 @@ namespace RdpScopeToggler.ViewModels
 
         private void UpdateIndicators()
         {
-            Debug.WriteLine(rdpService.RdpData.IsRoleActive);
-            Debug.WriteLine(rdpService.RdpData.IsOpenForAll);
-            Debug.WriteLine(rdpService.RdpData.IsOpenForAlwaysOnList);
-            Debug.WriteLine(rdpService.RdpData.IsOpenForLocalComputers);
-            Debug.WriteLine(rdpService.RdpData.IsOpenForLocalComputersAndForWhiteList);
-
-
             if (rdpService.RdpData.IsOpenForAll)
             {
                 IsAlwaysOnOpen = true;
