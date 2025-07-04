@@ -7,6 +7,7 @@
         public bool IsOpenForAll {  get; set; }
         public bool IsOpenForLocalComputers { get; set; }
         public bool IsOpenForLocalComputersAndForWhiteList { get; set; }
+        public bool IsOpenForWhiteList { get; set; }
 
         public RdpInfoData()
         {

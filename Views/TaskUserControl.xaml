@@ -4,56 +4,138 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RdpScopeToggler.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:materialDesignElevation="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid
-            VerticalAlignment="Stretch"
-            HorizontalAlignment="Center" >
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <!-- Settings button in the corner -->
-            <Grid Margin="0 0 0 5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
 
-                <Grid.ColumnDefinitions >
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+    <UserControl.Resources>
+        <!-- גרדיאנט רקע מרהיב -->
+        <LinearGradientBrush x:Key="BackgroundGradient" StartPoint="0.5,0" EndPoint="0.5,1">
+            <GradientStop Color="#1a1a2e" Offset="0"/>
+            <GradientStop Color="#16213e" Offset="0.3"/>
+            <GradientStop Color="#0f3460" Offset="1"/>
+        </LinearGradientBrush>
+
+        <!-- גרדיאנט לכפתור -->
+        <LinearGradientBrush x:Key="ButtonGradient" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#ef4444" Offset="0"/>
+            <GradientStop Color="#dc2626" Offset="0.5"/>
+            <GradientStop Color="#b91c1c" Offset="1"/>
+        </LinearGradientBrush>
+
+        <!-- אנימציות -->
+        <Storyboard x:Key="PulseAnimation" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="ConnectionIndicator"
+                           Storyboard.TargetProperty="Opacity"
+                           From="1" To="0.4" Duration="0:0:2.0"
+                           AutoReverse="True"/>
+        </Storyboard>
+
+        <Storyboard x:Key="FloatingAnimation" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="MainCard"
+                           Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                           From="0" To="-8" Duration="0:0:3"
+                           AutoReverse="True"/>
+        </Storyboard>
+
+        <!-- סטיילים -->
+        <Style x:Key="ModernTextStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI Variable Display"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#40000000" BlurRadius="2" ShadowDepth="1" Opacity="0.3"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
+
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <BeginStoryboard Storyboard="{StaticResource PulseAnimation}"/>
+            <BeginStoryboard Storyboard="{StaticResource FloatingAnimation}"/>
+        </EventTrigger>
+    </UserControl.Triggers>
+
+        <!-- תוכן ראשי -->
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+        <!-- כרטיס ראשי עם אפקט זכוכית -->
+        <Border x:Name="MainCard"
+                    CornerRadius="24"
+                    Padding="10"
+                    RenderTransformOrigin="0.5,0.5">
+
+            <Grid >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
+                <!-- אינדיקטורים -->
+                <Grid HorizontalAlignment="Center" Grid.Row="0">
+                    <local:IndicatorsUserControl/>
+                </Grid>
 
-                <local:IndicatorsUserControl Grid.Column="2" />
+                <!-- אינדיקטור חיבור עם אנימציה -->
+                <Grid Grid.Row="1" Margin="0 15 0 0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Border x:Name="ConnectionIndicator"
+                                CornerRadius="10"
+                                    Padding="80 20"
+                                BorderThickness="0"
+                                 Background="#a7f2cf"
+                                 RenderTransformOrigin="0.5,0.5"
+                                >
 
+                        <Border.Effect>
+                            <DropShadowEffect Color="#d2fae5" BlurRadius="8" ShadowDepth="0"/>
+                        </Border.Effect>
+                    </Border>
+                    <TextBlock Text="החיבור פתוח!" 
+                                   FontSize="24"
+                                       Foreground="#059669"
+                                       VerticalAlignment="Center"
+                                   FlowDirection="RightToLeft" 
+                                   Style="{StaticResource ModernTextStyle}"
+                                   TextAlignment="Center"/>
+                </Grid>
+
+                <!-- שעון ספירה לאחור -->
+                <Border Grid.Row="3"
+                            CornerRadius="16" 
+                            Padding="15"
+                            Margin="0,10">
+                    <local:AnyClockUserControl
+                            DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CountDownDay="{Binding CountDownDay}"
+                            CountDownHour="{Binding CountDownHour}"
+                            CountDownMinute="{Binding CountDownMinute}"
+                            CountDownSecond="{Binding CountDownSecond}"
+                            TimeTitle="החיבור יסגר בעוד:"
+                            TimeTitleVisibility="Visible"
+                            IsReadOnly="True" />
+                </Border>
+
+                <!-- כפתור ניתוק -->
+                <Button Grid.Row="4"
+                        Content="ניתוק מיידי"
+                            Style="{DynamicResource DisconnectButton}"
+                            Padding="30,15"
+                            FontSize="18"
+                            Margin="0,20,0,0"
+                            Command="{Binding DisconnectCommand}"
+                            RenderTransformOrigin="0.5,0.5">
+                    <Button.RenderTransform>
+                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                    </Button.RenderTransform>
+                </Button>
             </Grid>
-            <TextBlock Text="החיבור פתוח!" FontSize="20" FlowDirection="RightToLeft" FontFamily="Bahnschrift" TextAlignment="Center" Foreground="Green" Margin="30" FontWeight="Bold" />
-            <TextBlock Text="החיבור יסגר בעוד:" FontSize="20" FlowDirection="RightToLeft" FontFamily="Bahnschrift" TextAlignment="Center" />
-
-            <local:AnyClockUserControl
-                DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                CountDownDay="{Binding CountDownDay}"
-                CountDownHour="{Binding CountDownHour}"
-                CountDownMinute="{Binding CountDownMinute}"
-                CountDownSecond="{Binding CountDownSecond}"
-                IsReadOnly="True" />
-
-            <Button 
-                Content="ניתוק מיידי"
-                Padding="5"
-                Margin="5 20"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                FontFamily="Bahnschrift"
-                FontSize="20"
-                Command="{Binding DisconnectCommand}"
-            />
-
-        </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

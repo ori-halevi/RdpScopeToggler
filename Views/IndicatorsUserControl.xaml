@@ -14,21 +14,17 @@
         <!-- Colors -->
         <SolidColorBrush x:Key="ActiveBrush" Color="#00E676"/>
         <SolidColorBrush x:Key="InactiveBrush" Color="#BDBDBD"/>
-        <SolidColorBrush x:Key="ExternalBrush" Color="#FF3D00"/>
-        <SolidColorBrush x:Key="WhiteListBrush" Color="#2979FF"/>
-        <SolidColorBrush x:Key="InternalBrush" Color="#FF9100"/>
-        <SolidColorBrush x:Key="AlwaysOnBrush" Color="#D500F9"/>
+
+        <SolidColorBrush x:Key="ExternalBrush" Color="{DynamicResource LightRedColor}"/>
+        <SolidColorBrush x:Key="WhiteListBrush" Color="{DynamicResource LightBlueColor}"/>
+        <SolidColorBrush x:Key="InternalBrush" Color="{DynamicResource LightOrangeColor}"/>
+        <SolidColorBrush x:Key="AlwaysOnBrush" Color="{DynamicResource LightPurpleColor}"/>
 
         <!-- Glow Effect Template -->
         <Style x:Key="GlowEllipseStyle" TargetType="Ellipse">
-            <Setter Property="Width" Value="22"/>
-            <Setter Property="Height" Value="22"/>
-            <Setter Property="StrokeThickness" Value="0"/>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="0.5"/>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Width" Value="22" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="StrokeThickness" Value="0" />
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="RenderTransform">
                 <Setter.Value>
@@ -73,20 +69,21 @@
             <Setter Property="Height" Value="15"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="White"/>
         </Style>
 
     </UserControl.Resources>
 
-    <Border BorderThickness="1" BorderBrush="#dee2e6"
+    <Border
             CornerRadius="18"
-            Padding="14,10"
+            Padding="7 5"
+            BorderBrush="{DynamicResource GrayBrush}" BorderThickness="1"
             materialDesignElevation:ShadowAssist.ShadowDepth="Depth3">
         <Border.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#e9ecef" Offset="1" />
-                <GradientStop Color="#e9ecef" Offset="0.2" />
-                <GradientStop Color="#f8f9fa" Offset="0" />
+            <LinearGradientBrush StartPoint="1,0" EndPoint="1,1">
+                <GradientStop Color="{DynamicResource GrayColor}" Offset="1" />
+                <GradientStop Color="{DynamicResource LightGrayColor}" Offset="0.01" />
+                <GradientStop Color="{DynamicResource LightGrayColor}" Offset="0.99" />
+                <GradientStop Color="{DynamicResource GrayColor}" Offset="0" />
             </LinearGradientBrush>
         </Border.Background>
 
@@ -94,45 +91,73 @@
                     HorizontalAlignment="Stretch" 
                     VerticalAlignment="Center">
 
-            <!-- External Network Indicator -->
-            <Grid ToolTip="גישה לרשתות חיצוניות" Margin="3">
+            <!-- External Addresses Indicator -->
+            <Grid ToolTip="{DynamicResource ExternalAddressesToolTip_translator}" Margin="3">
                 <Ellipse Style="{StaticResource GlowEllipseStyle}"
-                         Fill="{StaticResource ExternalBrush}"
-                         Tag="{Binding IsExternalOpen}"/>
-                <materialDesign:PackIcon Kind="Earth" Style="{StaticResource IconStyle}" />
+                         Fill="{DynamicResource ExternalBrush}"
+                         Tag="{Binding IsExternalOpen}"
+                         >
+                    <Ellipse.Effect>
+                        <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="0.5" Color="{DynamicResource RedColor}" />
+                    </Ellipse.Effect>
+                </Ellipse>
+                <Border BorderBrush="{DynamicResource RedBrush}" BorderThickness="1" CornerRadius="100">
+                    <materialDesign:PackIcon Kind="Earth" Style="{StaticResource IconStyle}" Foreground="{DynamicResource RedBrush}" />
+                </Border>
                 <Grid.Opacity>
                     <Binding Path="IsExternalOpen" Converter="{StaticResource BoolToOpacityConverter}" />
                 </Grid.Opacity>
             </Grid>
 
-            <!-- White List Network Indicator -->
-            <Grid ToolTip="גישה לרשימה לבנה" Margin="3">
-                <Ellipse Style="{StaticResource GlowEllipseStyle}"
-                         Fill="{StaticResource WhiteListBrush}"
-                         Tag="{Binding IsWhiteListOpen}"/>
-                <materialDesign:PackIcon Kind="Shield" Style="{StaticResource IconStyle}" />
-                <Grid.Opacity>
-                    <Binding Path="IsWhiteListOpen" Converter="{StaticResource BoolToOpacityConverter}" />
-                </Grid.Opacity>
-            </Grid>
-
-            <!-- Internal Network Indicator -->
-            <Grid ToolTip="גישה לכל הרשתות פנימיות" Margin="3">
+            <!-- Local Addresses Indicator -->
+            <Grid ToolTip="{DynamicResource LocalAddressesToolTip_translator}" Margin="3">
                 <Ellipse Style="{StaticResource GlowEllipseStyle}"
                          Fill="{StaticResource InternalBrush}"
-                         Tag="{Binding IsInternalOpen}"/>
-                <materialDesign:PackIcon Kind="Lan" Style="{StaticResource IconStyle}" />
+                         Tag="{Binding IsInternalOpen}"
+                         >
+                    <Ellipse.Effect>
+                        <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="0.5" Color="{DynamicResource OrangeColor}" />
+                    </Ellipse.Effect>
+                </Ellipse>
+                <Border BorderBrush="{DynamicResource OrangeBrush}" BorderThickness="1" CornerRadius="100">
+                    <materialDesign:PackIcon Kind="Lan" Style="{StaticResource IconStyle}"  Foreground="{DynamicResource OrangeBrush}"/>
+                </Border>
                 <Grid.Opacity>
                     <Binding Path="IsInternalOpen" Converter="{StaticResource BoolToOpacityConverter}" />
                 </Grid.Opacity>
             </Grid>
 
-            <!-- AlwaysOn Network Indicator -->
-            <Grid ToolTip="גישה לרשתות פנימיות שנבחרו" Margin="3">
+            <!-- White List Addresses Indicator -->
+            <Grid ToolTip="{DynamicResource WhiteListAddressesToolTip_translator}" Margin="3">
+                <Ellipse Style="{StaticResource GlowEllipseStyle}"
+                         Fill="{StaticResource WhiteListBrush}"
+                         Tag="{Binding IsWhiteListOpen}"
+                         >
+                    <Ellipse.Effect>
+                        <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="0.5" Color="{DynamicResource BlueColor}" />
+                    </Ellipse.Effect>
+                </Ellipse>
+                <Border BorderBrush="{DynamicResource BlueBrush}" BorderThickness="1" CornerRadius="100">
+                    <materialDesign:PackIcon Kind="Shield" Style="{StaticResource IconStyle}" Foreground="{DynamicResource BlueBrush}" />
+                </Border>
+                <Grid.Opacity>
+                    <Binding Path="IsWhiteListOpen" Converter="{StaticResource BoolToOpacityConverter}" />
+                </Grid.Opacity>
+            </Grid>
+
+            <!-- AlwaysOn Addresses Indicator -->
+            <Grid ToolTip="{DynamicResource AlwaysOnListAddressesToolTip_translator}" Margin="3">
                 <Ellipse Style="{StaticResource GlowEllipseStyle}"
                          Fill="{StaticResource AlwaysOnBrush}"
-                         Tag="{Binding IsAlwaysOnOpen}"/>
-                <materialDesign:PackIcon Kind="Power" Style="{StaticResource IconStyle}" />
+                         Tag="{Binding IsAlwaysOnOpen}"
+                         >
+                    <Ellipse.Effect>
+                        <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="0.5" Color="{DynamicResource PurpleColor}" />
+                    </Ellipse.Effect>
+                </Ellipse>
+                <Border BorderBrush="{DynamicResource PurpleBrush}" BorderThickness="1" CornerRadius="100">
+                    <materialDesign:PackIcon Kind="Power" Style="{StaticResource IconStyle}" Foreground="{DynamicResource PurpleBrush}" />
+                </Border>
                 <Grid.Opacity>
                     <Binding Path="IsAlwaysOnOpen" Converter="{StaticResource BoolToOpacityConverter}" />
                 </Grid.Opacity>

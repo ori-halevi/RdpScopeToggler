@@ -14,6 +14,12 @@
 		<None Remove="Assets\remote-desktop.png" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Page Remove="Resources\Buttons.xaml" />
+	  <Page Remove="Resources\Colors.xaml" />
+	  <Page Remove="Resources\Styles.xaml" />
+	  <Page Remove="Resources\Templates.xaml" />
+	</ItemGroup>
+	<ItemGroup>
 		<Content Include="Assets\cog.ico">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
@@ -39,6 +45,12 @@
 		  <PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="vocaluxe.dependencies.netfwtypelib" Version="1.0.1" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Resource Include="Resources\Buttons.xaml" />
+	  <Resource Include="Resources\Colors.xaml" />
+	  <Resource Include="Resources\Styles.xaml" />
+	  <Resource Include="Resources\Templates.xaml" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Update="Assets\Deployment\RdpScopeTogglerToastListener\Assets\remote-desktop.ico">

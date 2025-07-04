@@ -295,6 +295,16 @@ namespace RdpScopeToggler.Services.RdpService
                 RdpData.IsOpenForLocalComputersAndForWhiteList = (whiteListAfter.All(item => remoteAddressesList.Contains(item)) || rule.RemoteAddresses == "*");
             }
 
+            if (whiteList.Any())
+            {
+                string expected = string.Join(",", whiteList.Select(c => $"{c.Address}/255.255.255.255"));
+
+                var remoteAddressesList = SplitAndOrder(rule.RemoteAddresses);
+                var whiteListAfter = SplitAndOrder(expected);
+
+                RdpData.IsOpenForWhiteList = (whiteListAfter.All(item => remoteAddressesList.Contains(item)) || rule.RemoteAddresses == "*");
+            }
+
             if (alwaysOnList.Any())
             {
                 var remoteAddressesList = SplitAndOrder(rule.RemoteAddresses);

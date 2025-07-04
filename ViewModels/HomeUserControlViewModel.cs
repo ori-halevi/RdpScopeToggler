@@ -163,7 +163,7 @@ namespace RdpScopeToggler.ViewModels
                 }
                 else
                 {
-                    taskInfoStore.Action = ActionsEnum.LocalComputersAndWhiteList;
+                    taskInfoStore.Action = ActionsEnum.WhiteList;
                 }
             }
         }
@@ -211,10 +211,10 @@ namespace RdpScopeToggler.ViewModels
                 {
                     ValidateSelectedDateTime();
                     if (IsDateTimeEnabled && SelectedDateTime < DateTime.Now.AddMinutes(1)) return;
-                    regionManager.RequestNavigate("ContentRegion", "WaitingUserControl");
+                    regionManager.RequestNavigate("ActionsRegion", "WaitingUserControl");
                     return;
                 }
-                regionManager.RequestNavigate("ContentRegion", "TaskUserControl");
+                regionManager.RequestNavigate("ActionsRegion", "TaskUserControl");
             });
 
             UpdateDateCommand = new DelegateCommand(() =>

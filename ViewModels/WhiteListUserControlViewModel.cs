@@ -61,7 +61,10 @@ namespace RdpScopeToggler.ViewModels
             }
 
             // Subscribe to collection changes
-            WhiteListItems.CollectionChanged += WhiteListItems_CollectionChanged;
+            foreach (var item in WhiteListItems)
+            {
+                item.PropertyChanged += AlwaysOnEntry_PropertyChanged;
+            }
 
             AddItemCommand = new DelegateCommand(AddItem);
 
@@ -130,7 +133,7 @@ namespace RdpScopeToggler.ViewModels
             var options = new GenericDialogOptions
             {
                 Title = "Ip address error",
-                Message = $"כתובת ip לא הגיונית.\n{ipAddress}",
+                Message = $"כתובת ip לא הגיונית.\r\n{ipAddress}",
                 OnClose = () => { },
                 IsModal = true,
                 Topmost = true,
@@ -170,6 +173,12 @@ namespace RdpScopeToggler.ViewModels
                 WhiteListItems.Add(asd);
             }
 
+            // Subscribe to collection changes
+            foreach (var item in WhiteListItems)
+            {
+                item.PropertyChanged += AlwaysOnEntry_PropertyChanged;
+            }
+
             IsNotSaved = false;
         }
 
@@ -181,5 +190,5 @@ namespace RdpScopeToggler.ViewModels
             return Regex.IsMatch(ipString, @"^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.|$)){4}$");
         }
 
-}
+    }
 }

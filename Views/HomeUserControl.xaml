@@ -7,7 +7,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:materialDesignElevation="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
 
              xmlns:local="clr-namespace:RdpScopeToggler.Views"
              xmlns:converter="clr-namespace:RdpScopeToggler.Converters"
@@ -21,33 +20,32 @@
     <Border Padding="1" BorderThickness="0" BorderBrush="Red">
 
         <DockPanel>
-                <Border Padding="5" DockPanel.Dock="Top"  BorderThickness="0" BorderBrush="Red">
+            <Border Padding="5" DockPanel.Dock="Top"  BorderThickness="0" BorderBrush="Red">
 
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
-            <Border Padding="1" BorderThickness="0" BorderBrush="Red">
-                    <!-- Settings button in the corner -->
-                    <Grid Margin="0 0 0 5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+                    <Border Padding="1" BorderThickness="0" BorderBrush="Red">
+                        <!-- Settings button in the corner -->
+                        <Grid Margin="0 0 0 5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
 
-                        <Grid.ColumnDefinitions >
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions >
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-                        <Button Grid.Column="0" Width="32" Height="32" Padding="0"
-                            ToolTip="הגדרות"
-                            Command="{Binding NavigateToSettingsCommand}"
-                            Style="{DynamicResource MaterialDesignFloatingActionMiniLightButton}">
-                            <materialDesign:PackIcon Kind="Cog" Width="20" Height="20"/>
-                        </Button>
+                            <Button x:Name="SettingsButton" Grid.Column="0" Width="32" Height="32" Padding="0"
+                                Style="{StaticResource SettingsButton}"
+                                ToolTip="{DynamicResource Settings_translator}"
+                                Command="{Binding NavigateToSettingsCommand}"/>
 
-                        <local:IndicatorsUserControl Grid.Column="2" />
 
-                    </Grid>
+                            <local:IndicatorsUserControl Grid.Column="2" />
+
+                        </Grid>
 
                     </Border>
 
@@ -62,7 +60,7 @@
                         CountDownSecond="{Binding CountDownSecond}"
                         IsReadOnly="False" 
                         ShowSeconds="False"
-                        TimeTitle="הגדר טיימר:"
+                        TimeTitle="{DynamicResource SetTimer_translator}"
                         TimeTitleVisibility="Visible"
                         />
 
@@ -76,126 +74,75 @@
 
 
 
-                    <Button x:Name="ConnectButton"
-                        IsEnabled="{Binding IsDateValid}"
-                        Command="{Binding StartCommand}"
-                        Content="פתח גישה"
-                        Style="{StaticResource MaterialDesignRaisedButton}"
-                        materialDesign:ButtonAssist.CornerRadius="8"
-                        VerticalAlignment="Center"
-                        Foreground="White"
-                        FontSize="16"
-                        FontWeight="SemiBold"
-                        Height="45"
-                        Padding="5"
-                        Margin="10"
-                        materialDesign:RippleAssist.Feedback="{DynamicResource MaterialDesignBody}"
-                        materialDesign:ShadowAssist.ShadowDepth="Depth2"
-                        RenderTransformOrigin="0.5,0.5">
-
-                        <!-- Background שניתן לאנימציה -->
-                        <Button.Background>
-                            <SolidColorBrush Color="#0079FB"/>
-                        </Button.Background>
-
-                        <Button.Resources>
-                            <!-- אנימציה של הכפתור -->
-                            <Storyboard x:Key="ButtonHoverAnimation">
-                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
-                           To="1.05" Duration="0:0:0.2"/>
-                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                           To="1.05" Duration="0:0:0.2"/>
-                                <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
-                          To="#1976D2" Duration="0:0:0.2"/>
-                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.Effect).(DropShadowEffect.ShadowDepth)"
-                           To="6" Duration="0:0:0.2"/>
-                            </Storyboard>
-
-                            <Storyboard x:Key="ButtonLeaveAnimation">
-                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
-                           To="1.0" Duration="0:0:0.2"/>
-                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                           To="1.0" Duration="0:0:0.2"/>
-                                <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
-                          To="#2196F3" Duration="0:0:0.2"/>
-                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.Effect).(DropShadowEffect.ShadowDepth)"
-                           To="3" Duration="0:0:0.2"/>
-                            </Storyboard>
-                        </Button.Resources>
-
-                        <Button.RenderTransform>
-                            <ScaleTransform/>
-                        </Button.RenderTransform>
-
-                        <Button.Effect>
-                            <DropShadowEffect Color="#2196F3" Direction="270" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
-                        </Button.Effect>
-
-                        <Button.Triggers>
-                            <EventTrigger RoutedEvent="MouseEnter">
-                                <BeginStoryboard Storyboard="{StaticResource ButtonHoverAnimation}"/>
-                            </EventTrigger>
-                            <EventTrigger RoutedEvent="MouseLeave">
-                                <BeginStoryboard Storyboard="{StaticResource ButtonLeaveAnimation}"/>
-                            </EventTrigger>
-                        </Button.Triggers>
-                    </Button>
+                        <Button x:Name="ConnectButton"
+                            IsEnabled="{Binding IsDateValid}"
+                            Command="{Binding StartCommand}"
+                            Style="{StaticResource ConnectButton}"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            FontWeight="SemiBold"
+                            Height="45"
+                            Padding="5"
+                            Margin="10"
+                            RenderTransformOrigin="0.5,0.5">
+                            <TextBlock Text="{DynamicResource OpenAccess_translator}" />
+                        </Button>
                     </Border>
 
 
                     <Border Padding="1" BorderThickness="0" BorderBrush="Red">
 
 
-                    <Grid Margin="10" >
-                        <!-- Radio Buttons -->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10"
+                        <Grid Margin="10" >
+                            <!-- Radio Buttons -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10"
                             Panel.ZIndex="0">
-                            <RadioButton Content="Remote systems"
-                     GroupName="ActionsGroup"
-                     IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Remote systems}"
-                     Style="{StaticResource MaterialDesignRadioButton}"
-                     Margin="10,0"
-                     FontFamily="Bahnschrift"
-                     FontSize="16" />
+                                <RadioButton Content="{DynamicResource RemoteSystems_translator}"
+                                     GroupName="ActionsGroup"
+                                     IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Remote systems}"
+                                     Style="{StaticResource MaterialDesignRadioButton}"
+                                     Margin="10,0"
+                                     FontFamily="Bahnschrift"
+                                     FontSize="16" />
 
-                            <RadioButton Content="White list"
-                     GroupName="ActionsGroup"
-                     IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=White list}"
-                     Style="{StaticResource MaterialDesignRadioButton}"
-                     Margin="10,0"
-                     FontFamily="Bahnschrift"
-                     FontSize="16" />
-                        </StackPanel>
+                                <RadioButton Content="{DynamicResource WhiteList_translator}"
+                                     GroupName="ActionsGroup"
+                                     IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=White list}"
+                                     Style="{StaticResource MaterialDesignRadioButton}"
+                                     Margin="10,0"
+                                     FontFamily="Bahnschrift"
+                                     FontSize="16" />
+                            </StackPanel>
 
-                        <!-- הודעת שגיאה שתסתיר את הרדיו באטנים -->
-                        <materialDesign:Card Background="#FFF3CD"
-                         Visibility="{Binding HasDateTimeError, Converter={StaticResource BoolToVisibilityConverter}}"
-                         BorderBrush="#FFE69C"
-                         BorderThickness="1"
-                         HorizontalAlignment="Stretch"
-                         VerticalAlignment="Center"
-                         Panel.ZIndex="1">
-                            <StackPanel Orientation="Horizontal" Margin="15,10">
-                                <materialDesign:PackIcon Kind="LightbulbOutline"
+                            <!-- הודעת שגיאה שתסתיר את הרדיו באטנים -->
+                            <materialDesign:Card Background="#FFF3CD"
+                                 Visibility="{Binding HasDateTimeError, Converter={StaticResource BoolToVisibilityConverter}}"
+                                 BorderBrush="#FFE69C"
+                                 BorderThickness="1"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalAlignment="Center"
+                                 Panel.ZIndex="1">
+                                <StackPanel Orientation="Horizontal" Margin="15,10">
+                                    <materialDesign:PackIcon Kind="LightbulbOutline"
                                      Foreground="#856404"
                                      Width="18"
                                      Height="18"
                                      VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding DateTimeError}"
-                       Foreground="#856404"
-                       FontSize="12"
-                       Margin="8,0,0,0"
-                       TextWrapping="Wrap"
-                       VerticalAlignment="Center" />
-                            </StackPanel>
-                        </materialDesign:Card>
-                    </Grid>
+                                    <TextBlock Text="{Binding DateTimeError}"
+                                       Foreground="#856404"
+                                       FontSize="12"
+                                       Margin="8,0,0,0"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center" />
+                                </StackPanel>
+                            </materialDesign:Card>
+                        </Grid>
 
                     </Border>
 
 
 
-                    <Border BorderThickness="2" BorderBrush="#CBCBCB" CornerRadius="4"
+                    <Border BorderThickness="2" BorderBrush="{StaticResource BlueBrush}" CornerRadius="4"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top"
                         Padding="10">
@@ -209,19 +156,13 @@
                                VerticalAlignment="Center">
 
                                 <Button Command="{Binding UpdateDateCommand}"
-                                        ToolTip="עדכון תאריך"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Style="{DynamicResource MaterialDesignFloatingActionMiniDarkButton}"
-                                        IsEnabled="{Binding IsDateTimeEnabled}"
-                                        Margin="10 0 10 0"
-                                        RenderTransformOrigin="0.5,0.5"
-                                        >
-                                    <Button.RenderTransform>
-                                        <ScaleTransform ScaleX="0.8" ScaleY="0.8" />
-                                    </Button.RenderTransform>
-                                    <materialDesign:PackIcon Kind="CalendarRefreshOutline" Width="20" Height="20"/>
-                                </Button>
+                                    ToolTip="עדכון תאריך"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource UpdateDateButton}"
+                                    IsEnabled="{Binding IsDateTimeEnabled}"
+                                    Margin="10 0 10 0"/>
+
 
 
                                 <StackPanel Orientation="Horizontal" 
@@ -233,7 +174,7 @@
                                         PreviewMouseWheel="DatePicker_MouseWheel"
                                         SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         Style="{StaticResource MaterialDesignDatePicker}"
-                                        materialDesign:HintAssist.Hint="תאריך"
+                                        materialDesign:HintAssist.Hint="{DynamicResource Date_translator}"
                                         MinWidth="100"
                                         FontSize="14"
                                         IsEnabled="{Binding IsDateTimeEnabled}"/>
@@ -243,7 +184,7 @@
                                         PreviewMouseWheel="TimePicker_MouseWheel"
                                         SelectedTime="{Binding SelectedTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         Style="{StaticResource MaterialDesignTimePicker}"
-                                        materialDesign:HintAssist.Hint="שעה"
+                                        materialDesign:HintAssist.Hint="{DynamicResource Hour_translator}"
                                         MinWidth="60"
                                         FontSize="14"
                                         Is24Hours="True"
@@ -252,16 +193,11 @@
                                 </StackPanel>
 
 
-                                <CheckBox 
-                                    Style="{DynamicResource MaterialDesignSwitchToggleButton}"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Margin="10 0 10 0"
-                                    IsChecked="{Binding IsDateTimeEnabled, Mode=TwoWay}">
-                                    <CheckBox.LayoutTransform>
-                                        <ScaleTransform ScaleX="1" ScaleY="1" />
-                                    </CheckBox.LayoutTransform>
-                                </CheckBox>
+                                <CheckBox HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Margin="10 0 10 0"
+                                   Style="{StaticResource CustomToggleSwitch}"
+                                   IsChecked="{Binding IsDateTimeEnabled, Mode=TwoWay}"/>
                             </StackPanel>
 
 
@@ -272,7 +208,7 @@
 
 
                 </StackPanel>
-        </Border>
+            </Border>
 
 
         </DockPanel>

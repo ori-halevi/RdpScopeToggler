@@ -120,7 +120,7 @@ namespace RdpScopeToggler.ViewModels
                 _cts.Dispose();    // משחרר משאבים
                 _cts = null;       // מוחק את ההתייחסות
             }
-            regionManager.RequestNavigate("ContentRegion", "MainUserControl");
+            regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)

@@ -12,6 +12,7 @@ using System;
 using RdpScopeToggler.Services.NotificationService;
 using RdpScopeToggler.Models;
 using System.Collections.Generic;
+using RdpScopeToggler.Managers;
 
 namespace RdpScopeToggler
 {
@@ -58,11 +59,14 @@ namespace RdpScopeToggler
         {
             base.OnInitialized();
 
-            var regionManager = Container.Resolve<IRegionManager>();
-            regionManager.RequestNavigate("ContentRegion", "MainUserControl");
-            regionManager.RequestNavigate("CardsRegion", "HomeUserControl");
-        }
+            var savedCulture = "he"; // תביא מההגדרות שלך
+            LanguageManager.ChangeLanguage(savedCulture);
 
+
+            var regionManager = Container.Resolve<IRegionManager>();
+            regionManager.RequestNavigate("ContentRegion", "MainUserControl"); // In it you have all of the app activity.
+            regionManager.RequestNavigate("ActionsRegion", "HomeUserControl"); // In it you have the three pages of actions: Home, Waiting, Task
+        }
 
 
 
@@ -116,7 +120,7 @@ namespace RdpScopeToggler
             var options = new GenericDialogOptions
             {
                 Title = "הפעלה מחדש מומלצת",
-                Message = "המערכת זיהתה הפעלה ראשונית של התוכנה,\nאם לא תפעיל מחדש את המערכת יתכן שמשתמשים אחרים לא יקבלו התראות.",
+                Message = "המערכת זיהתה הפעלה ראשונית של התוכנה,\r\nאם לא תפעיל מחדש את המערכת יתכן שמשתמשים אחרים לא יקבלו התראות.",
                 OnClose = () => { },
                 IsModal = true,
                 Topmost = true,
@@ -161,7 +165,7 @@ namespace RdpScopeToggler
         private void HandleException(Exception ex, string source)
         {
             // לדוגמה – תוכל להחליף ל־Custom Error Window
-            MessageBox.Show($"התרחשה שגיאה ({source}):\n{ex.Message}", "שגיאת מערכת", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"התרחשה שגיאה ({source}):\r\nהודעת השגיאה:\r\n{ex.Message}", "שגיאת מערכת", MessageBoxButton.OK, MessageBoxImage.Error);
 
             // אפשר לשקול לוג (לוג מקומי/קבצים/שרת)
         }

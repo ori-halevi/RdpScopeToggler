@@ -16,10 +16,10 @@
         Icon="pack://siteoforigin:,,,/Assets/remote-desktop.ico"
         
         materialDesign:ColorZoneAssist.Mode="Dark"
-        Background="#FFFFFF"
+        Background="Transparent"
 
         WindowStyle="None"
-        AllowsTransparency="False"
+        AllowsTransparency="True"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True"
 
@@ -37,23 +37,44 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="3" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="3" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
-        <local:TitleBarUserControl Grid.Row="0" />
+        <local:TitleBarUserControl Grid.Row="0"/>
         
-        <Grid Grid.Row="1" Margin="0" VerticalAlignment="Stretch">
+        <Grid Grid.Row="2" Margin="0" VerticalAlignment="Stretch">
             <ContentControl prism:RegionManager.RegionName="ContentRegion" />
         </Grid>
-        
-        <TextBlock Grid.Row="2"
-            Text="v1.0.0"
-                       Style="{DynamicResource MaterialDesignButtonTextBlock}" 
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Bottom"
-                       Foreground="Gray"
-                       />
+
+        <Border Grid.Row="4"
+                CornerRadius="7"
+                BorderThickness="2"
+            >
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="{DynamicResource DarkBlueColor}" Offset="0"/>
+                    <GradientStop Color="{DynamicResource LightBlueColor}" Offset="0.5"/>
+                    <GradientStop Color="{DynamicResource DarkBlueColor}" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.BorderBrush>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="{DynamicResource LightBlueColor}" Offset="0"/>
+                    <GradientStop Color="{DynamicResource DarkBlueColor}" Offset="0.5"/>
+                    <GradientStop Color="{DynamicResource LightBlueColor}" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+            <TextBlock
+                Text="v1.0.0"
+                           Style="{DynamicResource MaterialDesignButtonTextBlock}" 
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Bottom"
+                           Foreground="Gray"
+                           />
+        </Border>
     </Grid>
 </Window>
 

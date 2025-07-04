@@ -81,7 +81,7 @@ namespace RdpScopeToggler.ViewModels
             }
                 IsAlwaysOnOpen = rdpService.RdpData.IsOpenForAlwaysOnList;
                 IsInternalOpen = rdpService.RdpData.IsOpenForLocalComputers;
-                IsWhiteListOpen = rdpService.RdpData.IsOpenForLocalComputersAndForWhiteList;
+                IsWhiteListOpen = rdpService.RdpData.IsOpenForWhiteList;
                 IsExternalOpen = rdpService.RdpData.IsOpenForAll;
         }
     }

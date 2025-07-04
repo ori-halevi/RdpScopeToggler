@@ -87,7 +87,10 @@ namespace RdpScopeToggler.ViewModels
             IsNotSaved = false;
 
             // Subscribe to collection changes
-            AlwaysOnListItems.CollectionChanged += AlwaysOnListItems_CollectionChanged;
+            foreach (var item in AlwaysOnListItems)
+            {
+                item.PropertyChanged += AlwaysOnEntry_PropertyChanged;
+            }
 
             LoadLocalDevicesCommand = new DelegateCommand(LoadLocalDevices);
 
@@ -166,7 +169,7 @@ namespace RdpScopeToggler.ViewModels
             var options = new GenericDialogOptions
             {
                 Title = "Ip address error",
-                Message = $"כתובת ip לא הגיונית.\n{ipAddress}",
+                Message = $"כתובת ip לא הגיונית.\r\n{ipAddress}",
                 OnClose = () => { },
                 IsModal = true,
                 Topmost = true,
@@ -182,19 +185,19 @@ namespace RdpScopeToggler.ViewModels
         private void Save()
         {
             filesService.CleanAlwaysOnList();
-            bool vaild = true;
+            bool valid = true;
             foreach (var client in AlwaysOnListItems)
             {
                 if (client.Address == "" && client.Name == "") continue;
                 if (!IsValidIPv4(client.Address))
                 {
                     ShowWarrning(client.Address);
-                    vaild = false;
+                    valid = false;
                     continue;
                 }
                 filesService.AddToAlwaysOnList(client.Address, client.IsOpen, client.Name);
             }
-            if (!vaild) return;
+            if (!valid) return;
 
 
             List<Client> alwaysOnList = filesService.GetAlwaysOnList();
@@ -206,6 +209,11 @@ namespace RdpScopeToggler.ViewModels
                 client.Name = ip.Name;
                 client.IsOpen = ip.IsOpen;
                 AlwaysOnListItems.Add(client);
+            }
+            // Subscribe to collection changes
+            foreach (var item in AlwaysOnListItems)
+            {
+                item.PropertyChanged += AlwaysOnEntry_PropertyChanged;
             }
 
             if (rdpService.LastAction == ActionsEnum.LocalComputersAndWhiteList)
@@ -226,7 +234,7 @@ namespace RdpScopeToggler.ViewModels
 
         bool IsValidIPv4(string ipString)
         {
-            return Regex.IsMatch(ipString, @"^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.|$)){4}$");
+            return (Regex.IsMatch(ipString, @"^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.|$)){4}$") && IPAddress.TryParse(ipString, out var address) && address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
         }
 
 

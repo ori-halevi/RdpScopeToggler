@@ -12,24 +12,44 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"            
              
              >
+    <UserControl.Resources>
+        <!-- סטיילים -->
+        <Style x:Key="ModernTextStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI Variable Display"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#40000000" BlurRadius="2" ShadowDepth="1" Opacity="0.3"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    
     <Grid>
-        <Border BorderThickness="1" BorderBrush="#dee2e6" CornerRadius="8" Margin="10" >
+        <Border BorderThickness="0" BorderBrush="#dee2e6" CornerRadius="8" Margin="10" >
             <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#e9ecef" Offset="1" />
-                    <GradientStop Color="#e9ecef" Offset="0.2" />
-                    <GradientStop Color="#f8f9fa" Offset="0" />
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,0.9">
+                    <GradientStop Color="Transparent" Offset="1" />
+                    <GradientStop Color="#e9ecef" Offset="0.55" />
+                    <GradientStop Color="#e9ecef" Offset="0.85" />
+                    <GradientStop Color="Transparent" Offset="0" />
                 </LinearGradientBrush>
             </Border.Background>
             <StackPanel>
-                <TextBlock Text="{Binding TimeTitle, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+
+                <!-- טקסט ספירה לאחור -->
+                <TextBlock
+                           Text="{Binding TimeTitle, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
                            Visibility="{Binding TimeTitleVisibility, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
-                           d:Text="בחר זמן:"
-                           TextAlignment="Center"
-                           FontSize="20" FlowDirection="RightToLeft" FontFamily="Bahnschrift"
-                           Margin="0 15 0 0"
-                           />
-                <Grid Margin="20 15 20 15" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            FontSize="18" 
+                            d:Text="Set a timer:"
+                            Style="{StaticResource ModernTextStyle}"
+                            Foreground="#475569"
+                            TextAlignment="Center"
+                            Margin="0 15 0 0"/>
+                
+                <Grid Margin="20 15 20 15" HorizontalAlignment="Center" VerticalAlignment="Center" FlowDirection="LeftToRight">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="auto" />

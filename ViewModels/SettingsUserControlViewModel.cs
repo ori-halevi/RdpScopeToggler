@@ -1,6 +1,7 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Navigation.Regions;
+using RdpScopeToggler.Managers;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
@@ -13,18 +14,35 @@ namespace RdpScopeToggler.ViewModels
         private string selectedLanguage;
         public string SelectedLanguage
         {
-            get { return selectedLanguage; }
-            set { SetProperty(ref selectedLanguage, value); }
+            get => selectedLanguage;
+            set
+            {
+                if (SetProperty(ref selectedLanguage, value))
+                {
+                    // Call language manager
+                    if (value == "עברית")
+                        LanguageManager.ChangeLanguage("he");
+                    else
+                        LanguageManager.ChangeLanguage("en");
+                }
+            }
         }
+
         public ICommand CloseCommand { get; }
+
+        private readonly IRegionManager regionManager;
+
         public SettingsUserControlViewModel(IRegionManager regionManager)
         {
+            this.regionManager = regionManager;
+
             LanguagesOptions = new ObservableCollection<string>
             {
-                "עברית",
-                "English"
+                "English",
+                "עברית"
             };
-            SelectedLanguage = LanguagesOptions[0];
+
+            SelectedLanguage = LanguagesOptions[0]; // default
 
             CloseCommand = new DelegateCommand(() =>
             {
@@ -32,10 +50,15 @@ namespace RdpScopeToggler.ViewModels
             });
         }
 
-        public void OnNavigatedTo(NavigationContext navigationContext) { }
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            // If needed, handle navigation parameters
+        }
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
-        public void OnNavigatedFrom(NavigationContext navigationContext) { }
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+        }
     }
 }

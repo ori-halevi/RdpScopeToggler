@@ -6,17 +6,24 @@
              
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              Height="40"
-             Background="#2C2C2C"
              >
-    <Border BorderBrush="#D0D0D0" BorderThickness=" 0 0 0 2">
-        <Grid Height="40" VerticalAlignment="Top">
-            <Grid.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#667eea" Offset="0"/>
-                    <GradientStop Color="#764ba2" Offset="0.5"/>
-                    <GradientStop Color="#667eea" Offset="1"/>
-                </LinearGradientBrush>
-            </Grid.Background>
+    <Border BorderThickness="2" Padding="0" Margin="0" CornerRadius="7">
+        <Border.BorderBrush>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="{DynamicResource LightBlueColor}" Offset="0"/>
+                <GradientStop Color="{DynamicResource BlueColor}" Offset="0.3"/>
+                <GradientStop Color="{DynamicResource DarkBlueColor}" Offset="1"/>
+            </LinearGradientBrush>
+        </Border.BorderBrush>
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="{DynamicResource DarkBlueColor}" Offset="0"/>
+                <GradientStop Color="{DynamicResource BlueColor}" Offset="0.3"/>
+                <GradientStop Color="{DynamicResource LightBlueColor}" Offset="1"/>
+            </LinearGradientBrush>
+        </Border.Background>
+        
+        <Grid Height="40" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <!-- אייקון -->
@@ -64,7 +71,7 @@
                     WindowChrome.IsHitTestVisibleInChrome="True"
                     Background="Transparent" 
                     MouseEnter="CloseButton_MouseEnter" MouseLeave="CloseButton_MouseLeave">
-                    <Path Data="M3,3 L11,11 M11,3 L3,11" Stroke="Red" StrokeThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Path Data="M3,3 L11,11 M11,3 L3,11" Stroke="White" StrokeThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
             </StackPanel>
         </Grid>

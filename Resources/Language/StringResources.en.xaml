@@ -1,0 +1,34 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <sys:String x:Key="OpenAccess_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Open access</sys:String>
+    <sys:String x:Key="ChooseLanguage_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Choose language:</sys:String>
+    <sys:String x:Key="Save_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Save</sys:String>
+
+    <sys:String x:Key="SetTimer_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Set a timer:</sys:String>
+    <sys:String x:Key="Hour_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Hour</sys:String>
+    <sys:String x:Key="Date_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Date</sys:String>
+    <sys:String x:Key="UpdateDate_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Update date</sys:String>
+
+    <sys:String x:Key="Settings_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Settings</sys:String>
+
+    <sys:String x:Key="RemoteSystems_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Remote systems</sys:String>
+    <sys:String x:Key="WhiteList_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">White list</sys:String>
+
+    <sys:String x:Key="LocalAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Local Addresses</sys:String>
+    <sys:String x:Key="WhiteListAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">White List Addresses</sys:String>
+
+    <sys:String x:Key="Add_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Add</sys:String>
+    <sys:String x:Key="SacnLocalAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Sacn local addresses</sys:String>
+    <sys:String x:Key="SacnningForLocalAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Scanning for local Addresses...</sys:String>
+
+    <sys:String x:Key="Main_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Main</sys:String>
+    <sys:String x:Key="Local_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Local</sys:String>
+
+    <sys:String x:Key="AlwaysOnListAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Always-On List access</sys:String>
+    <sys:String x:Key="WhiteListAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">White List access</sys:String>
+    <sys:String x:Key="ExternalAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">All external addresses access</sys:String>
+    <sys:String x:Key="LocalAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">All local addresses access</sys:String>
+    
+    
+</ResourceDictionary>
