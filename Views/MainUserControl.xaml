@@ -6,29 +6,33 @@
              mc:Ignorable="d"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:materialDesignElevation="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
-             
              xmlns:local="clr-namespace:RdpScopeToggler.Views"
              xmlns:converter="clr-namespace:RdpScopeToggler.Converters"
              xmlns:prism="http://prismlibrary.com/"             
              prism:ViewModelLocator.AutoWireViewModel="True">
+
     <UserControl.Resources>
         <converter:EnumToBoolConverter x:Key="EnumToBoolConverter" />
     </UserControl.Resources>
-    <Grid>
 
-        <!-- Tabs -->
+    <Grid>
         <TabControl Margin="0"
-            Padding="0"
-            Background="White"
-            BorderBrush="{StaticResource DarkBlueBrush}"
-            BorderThickness="2"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch"
-            >
+                    Padding="0"
+                    Background="White"
+                    BorderBrush="{StaticResource DarkBlueBrush}"
+                    BorderThickness="2"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    TabStripPlacement="Top">
 
             <TabControl.Resources>
+                <!-- TabPanel Style for centering and stretching -->
+                <Style TargetType="TabPanel">
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="IsItemsHost" Value="True"/>
+                </Style>
 
-                <!-- TabItem style -->
+                <!-- TabItem Style with improved hover behavior -->
                 <Style TargetType="TabItem">
                     <Setter Property="Padding" Value="15,8"/>
                     <Setter Property="Margin" Value="0"/>
@@ -37,30 +41,32 @@
                     <Setter Property="BorderThickness" Value="1,1,1,0"/>
                     <Setter Property="FontWeight" Value="SemiBold"/>
                     <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="TabItem">
                                 <Border x:Name="HeaderBorder"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="8,8,0,0"
-                                    Padding="{TemplateBinding Padding}"
-                                    Margin="{TemplateBinding Margin}">
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="8,8,0,0"
+                                        Padding="{TemplateBinding Padding}"
+                                        Margin="{TemplateBinding Margin}">
                                     <Border.Effect>
                                         <DropShadowEffect Color="Black"
-                                              Direction="270"
-                                              ShadowDepth="1"
-                                              BlurRadius="3"
-                                              Opacity="0.1"/>
+                                                          Direction="270"
+                                                          ShadowDepth="1"
+                                                          BlurRadius="3"
+                                                          Opacity="0.1"/>
                                     </Border.Effect>
                                     <ContentPresenter x:Name="ContentSite"
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center"
-                                          ContentSource="Header"
-                                          RecognizesAccessKey="True"/>
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Center"
+                                                      ContentSource="Header"
+                                                      RecognizesAccessKey="True"/>
                                 </Border>
                                 <ControlTemplate.Triggers>
+                                    <!-- Selected state -->
                                     <Trigger Property="IsSelected" Value="True">
                                         <Setter TargetName="HeaderBorder" Property="Background">
                                             <Setter.Value>
@@ -75,7 +81,13 @@
                                         <Setter TargetName="HeaderBorder" Property="Margin" Value="0,-2,0,0"/>
                                         <Setter Property="Panel.ZIndex" Value="1"/>
                                     </Trigger>
-                                    <Trigger SourceName="HeaderBorder" Property="IsMouseOver" Value="True">
+
+                                    <!-- Hover state for non-selected tabs only -->
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsSelected" Value="False"/>
+                                            <Condition SourceName="HeaderBorder" Property="IsMouseOver" Value="True"/>
+                                        </MultiTrigger.Conditions>
                                         <Setter TargetName="HeaderBorder" Property="Background">
                                             <Setter.Value>
                                                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
@@ -85,21 +97,9 @@
                                             </Setter.Value>
                                         </Setter>
                                         <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{StaticResource BlueBrush}"/>
-                                    </Trigger>
-                                    <MultiTrigger>
-                                        <MultiTrigger.Conditions>
-                                            <Condition Property="IsSelected" Value="True"/>
-                                            <Condition SourceName="HeaderBorder" Property="IsMouseOver" Value="True"/>
-                                        </MultiTrigger.Conditions>
-                                        <Setter TargetName="HeaderBorder" Property="Background">
-                                            <Setter.Value>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                    <GradientStop Color="{StaticResource LightBlueColor}" Offset="0"/>
-                                                    <GradientStop Color="{StaticResource BlueColor}" Offset="1"/>
-                                                </LinearGradientBrush>
-                                            </Setter.Value>
-                                        </Setter>
                                     </MultiTrigger>
+
+                                    <!-- Disabled state -->
                                     <Trigger Property="IsEnabled" Value="False">
                                         <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="{StaticResource GrayBrush}"/>
                                         <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource LightGrayBrush}"/>
@@ -111,7 +111,7 @@
                     </Setter>
                 </Style>
 
-                <!-- Tab content style -->
+                <!-- Tab Content Style -->
                 <Style x:Key="TabContentStyle" TargetType="Grid">
                     <Setter Property="Background">
                         <Setter.Value>
@@ -125,7 +125,7 @@
                     <Setter Property="Margin" Value="0"/>
                 </Style>
 
-                <!-- Text style for help tab -->
+                <!-- Text Style for Help Content -->
                 <Style x:Key="ContentTextStyle" TargetType="TextBlock">
                     <Setter Property="FontSize" Value="16"/>
                     <Setter Property="FontWeight" Value="Medium"/>
@@ -136,28 +136,27 @@
                 </Style>
             </TabControl.Resources>
 
-            <!-- Tabs -->
+            <!-- Main Tab -->
             <TabItem Header="{DynamicResource Main_translator}" Width="115.6">
                 <Grid Style="{StaticResource TabContentStyle}">
                     <ContentControl prism:RegionManager.RegionName="ActionsRegion" />
                 </Grid>
             </TabItem>
 
+            <!-- WhiteList Tab -->
             <TabItem Header="{DynamicResource WhiteList_translator}" Width="115.6">
                 <Grid Style="{StaticResource TabContentStyle}">
                     <local:WhiteListUserControl />
                 </Grid>
             </TabItem>
 
-            <TabItem Header="{DynamicResource Local_translator}" Width="115.6" >
+            <!-- Local Tab -->
+            <TabItem Header="{DynamicResource Local_translator}" Width="115.6">
                 <Grid Style="{StaticResource TabContentStyle}">
                     <local:LocalAddressesUserControl />
                 </Grid>
             </TabItem>
 
-
         </TabControl>
-
-
     </Grid>
 </UserControl>

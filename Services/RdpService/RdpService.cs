@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using RdpScopeToggler.Services.FilesService;
 using RdpScopeToggler.Stores;
 using System.Data;
-using LiveCharts.Maps;
 
 namespace RdpScopeToggler.Services.RdpService
 {
