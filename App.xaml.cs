@@ -13,6 +13,7 @@ using RdpScopeToggler.Services.NotificationService;
 using RdpScopeToggler.Models;
 using System.Collections.Generic;
 using RdpScopeToggler.Managers;
+using RdpScopeToggler.Services.LoggerService;
 
 namespace RdpScopeToggler
 {
@@ -29,6 +30,10 @@ namespace RdpScopeToggler
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            string pathToLoggerFolder = "C:\\ProgramData\\RdpScopeToggler\\Logs";
+
+            containerRegistry.RegisterSingleton<ILoggerService>(() => new LoggerService(pathToLoggerFolder));
+
             string pathToToastMessageFile = "C:\\ProgramData\\RdpScopeToggler\\ToastMessage.txt";
             string pathToToastSoftwareFile = "C:\\ProgramData\\RdpScopeToggler\\RdpScopeTogglerToastListener\\RdpScopeTogglerToastListener.exe";
             string sourceBaseDirectory = "Assets\\Deployment\\RdpScopeTogglerToastListener";
@@ -61,7 +66,6 @@ namespace RdpScopeToggler
 
             var savedCulture = "he"; // תביא מההגדרות שלך
             LanguageManager.ChangeLanguage(savedCulture);
-
 
             var regionManager = Container.Resolve<IRegionManager>();
             regionManager.RequestNavigate("ContentRegion", "MainUserControl"); // In it you have all of the app activity.

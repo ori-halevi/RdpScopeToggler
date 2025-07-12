@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using RdpScopeToggler.Services.FilesService;
 using RdpScopeToggler.Stores;
 using System.Data;
+using RdpScopeToggler.Services.LoggerService;
 
 namespace RdpScopeToggler.Services.RdpService
 {
@@ -21,8 +22,10 @@ namespace RdpScopeToggler.Services.RdpService
         public int? Port { get; set; }
 
         private readonly IFilesService _filesService;
-        public RdpService(IFilesService filesService)
+        private readonly ILoggerService _loggerService;
+        public RdpService(IFilesService filesService, ILoggerService loggerService)
         {
+            _loggerService = loggerService;
             _filesService = filesService;
             RdpData = new RdpInfoData();
             LastAction = ActionsEnum.LocalComputersAndWhiteList;
@@ -48,6 +51,8 @@ namespace RdpScopeToggler.Services.RdpService
 
                 Debug.WriteLine("Rule Disabled");
             });
+
+            _loggerService.Info($"RDP closed for all Including AlwaysOn-List.");
         }
 
         public void CloseRdpForAll()
@@ -81,6 +86,8 @@ namespace RdpScopeToggler.Services.RdpService
                 rule.RemoteAddresses = result;
                 Debug.WriteLine("Open for AlwaysOnList only!");
             });
+
+            _loggerService.Info($"RDP closed for all NOT Including AlwaysOn-List.");
         }
 
         public void OpenRdpForAll()
@@ -100,6 +107,8 @@ namespace RdpScopeToggler.Services.RdpService
 
                 Debug.WriteLine("Changed to: * (Any)");
             });
+
+            _loggerService.Info($"RDP opend for all.");
         }
 
         public void OpenRdpForLocalComputers()
@@ -130,6 +139,8 @@ namespace RdpScopeToggler.Services.RdpService
                 rule.RemoteAddresses = remoteAddresses;
                 Debug.WriteLine("Changed to: 192.168.0.0-192.168.255.255");
             });
+
+            _loggerService.Info($"RDP opend for local computers.");
         }
 
 
@@ -171,6 +182,8 @@ namespace RdpScopeToggler.Services.RdpService
                 rule.RemoteAddresses = result;
                 Debug.WriteLine("Changed to WhiteList");
             });
+
+            _loggerService.Info($"RDP opend for white list.");
         }
 
 
@@ -200,6 +213,8 @@ namespace RdpScopeToggler.Services.RdpService
                 Debug.WriteLine($"Rule found: {rule.Name}");
                 Debug.WriteLine($"Changed to: {remoteAddresses}");
             });
+
+            _loggerService.Info($"RDP opend for local computers and white list.");
         }
 
 
