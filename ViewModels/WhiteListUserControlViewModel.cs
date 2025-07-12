@@ -9,6 +9,7 @@ using Prism.Navigation.Regions;
 using RdpScopeToggler.Stores;
 using RdpScopeToggler.Models;
 using RdpScopeToggler.Views;
+using System.Diagnostics;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -154,6 +155,7 @@ namespace RdpScopeToggler.ViewModels
             {
                 if (!IsValidIPv4(client.Address))
                 {
+                    Debug.WriteLine(client.Name + " " + client.Address);
                     ShowWarrning(client.Address);
                     vaild = false;
                     continue;

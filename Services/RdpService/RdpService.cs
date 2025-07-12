@@ -303,6 +303,10 @@ namespace RdpScopeToggler.Services.RdpService
 
                 RdpData.IsOpenForWhiteList = (whiteListAfter.All(item => remoteAddressesList.Contains(item)) || rule.RemoteAddresses == "*");
             }
+            else
+            {
+                RdpData.IsOpenForWhiteList = rule.RemoteAddresses == "*";
+            }
 
             if (alwaysOnList.Any())
             {

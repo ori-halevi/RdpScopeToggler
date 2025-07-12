@@ -5,10 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
+             xmlns:converter="clr-namespace:RdpScopeToggler.Converters"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              prism:ViewModelLocator.AutoWireViewModel="True"
              d:DesignHeight="600" d:DesignWidth="400"
              >
+    <UserControl.Resources>
+        <converter:StringNullOrEmptyToVisibilityConverter x:Key="StringNullOrEmptyToVisibilityConverter"/>
+    </UserControl.Resources>
     <Grid>
         <DockPanel LastChildFill="True">
 
@@ -78,23 +82,45 @@
                                                 <!-- Address -->
                                                 <Border Grid.Column="1"
                                                         BorderBrush="Black" BorderThickness="1" CornerRadius="5" Margin="5 0">
-                                                    <TextBox Text="{Binding Address, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    <Grid>
+                                                        <TextBox x:Name="AddressTextBox"
+                                                         Text="{Binding Address, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                          HorizontalAlignment="Stretch"
                                                          VerticalAlignment="Center"
                                                          TextAlignment="Center"
                                                          VerticalContentAlignment="Center"
                                                          FontSize="15"/>
+                                                        <TextBlock Text="203.0.113.42"
+                                                        Foreground="{DynamicResource GrayBrush}"
+                                                        Margin="5,0"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center"
+                                                        IsHitTestVisible="False"
+                                                        Visibility="{Binding Text, ElementName=AddressTextBox, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"/>
+                                                    </Grid>
                                                 </Border>
+
                                                 <!-- Name -->
                                                 <Border Grid.Column="2"
                                                         BorderBrush="Black" BorderThickness="1" CornerRadius="5" Margin="5 0">
-                                                    <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                         HorizontalAlignment="Stretch"
-                                                         VerticalAlignment="Center"
-                                                         TextAlignment="Center"
-                                                         VerticalContentAlignment="Center"
-                                                         FontSize="15"/>
+                                                    <Grid>
+                                                        <TextBox x:Name="NameTextBox"
+                                                             Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                             HorizontalAlignment="Stretch"
+                                                             VerticalAlignment="Center"
+                                                             TextAlignment="Center"
+                                                             VerticalContentAlignment="Center"
+                                                             FontSize="15"/>
+                                                        <TextBlock Text="RemoteServer"
+                                                           Foreground="{DynamicResource GrayBrush}"
+                                                           Margin="5,0"
+                                                           VerticalAlignment="Center"
+                                                           HorizontalAlignment="Center"
+                                                           IsHitTestVisible="False"
+                                                           Visibility="{Binding Text, ElementName=NameTextBox, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"/>
+                                                    </Grid>
                                                 </Border>
+                                                
                                             </Grid>
 
                                         </DockPanel>

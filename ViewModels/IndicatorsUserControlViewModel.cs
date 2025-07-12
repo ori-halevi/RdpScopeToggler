@@ -46,39 +46,6 @@ namespace RdpScopeToggler.ViewModels
 
         private void UpdateIndicators()
         {
-            if (rdpService.RdpData.IsOpenForAll)
-            {
-                IsAlwaysOnOpen = true;
-                IsInternalOpen = true;
-                IsWhiteListOpen = true;
-                IsExternalOpen = true;
-            }
-            else if (rdpService.RdpData.IsOpenForLocalComputersAndForWhiteList)
-            {
-                IsExternalOpen = false;
-                IsWhiteListOpen = true;
-                IsInternalOpen = true;
-            }
-            else if (rdpService.RdpData.IsOpenForLocalComputers)
-            {
-                IsAlwaysOnOpen = true;
-                IsInternalOpen = true;
-                IsWhiteListOpen = false;
-                IsExternalOpen = false;
-            }
-
-            if (rdpService.RdpData.IsOpenForAlwaysOnList)
-            {
-                IsAlwaysOnOpen = true;
-            }
-
-            if (!rdpService.RdpData.IsRoleActive)
-            {
-                IsAlwaysOnOpen = false;
-                IsInternalOpen = false;
-                IsWhiteListOpen = false;
-                IsExternalOpen = false;
-            }
                 IsAlwaysOnOpen = rdpService.RdpData.IsOpenForAlwaysOnList;
                 IsInternalOpen = rdpService.RdpData.IsOpenForLocalComputers;
                 IsWhiteListOpen = rdpService.RdpData.IsOpenForWhiteList;
