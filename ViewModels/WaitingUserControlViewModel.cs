@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
+using RdpScopeToggler.Services.LoggerService;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -65,10 +66,12 @@ namespace RdpScopeToggler.ViewModels
         private CancellationTokenSource _cts;
         private readonly IRegionManager regionManager;
         private TaskInfoStore taskInfoStore;
-        public WaitingUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore)
+        private readonly ILoggerService loggerService;
+        public WaitingUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore, ILoggerService loggerService)
         {
             this.taskInfoStore = taskInfoStore;
             this.regionManager = regionManager;
+            this.loggerService = loggerService;
             CancelSchedulingCommand = new DelegateCommand(CancelScheduling);
         }
 
@@ -144,8 +147,16 @@ namespace RdpScopeToggler.ViewModels
             if (!string.IsNullOrWhiteSpace(durationText))
                 Message += $"משך: {durationText}.";
 
+            // לוג ברור ומפורט
+            loggerService.Info(
+                $"Scheduled RDP accessibility configured. Target: {target}. " +
+                $"Start date: {formattedDate} {formattedTime}. " +
+                $"Duration: {durationText}."
+            );
+
             StartCountingDown();
         }
+
 
         /// <summary>
         /// Builds a duration string dynamically, omitting zero values.

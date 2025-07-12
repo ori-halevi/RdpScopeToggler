@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using RdpScopeToggler.Services.NotificationService;
+using RdpScopeToggler.Services.LoggerService;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -49,9 +50,11 @@ namespace RdpScopeToggler.ViewModels
         private readonly IRdpService rdpService;
         private readonly TaskInfoStore taskInfoStore;
         private readonly INotificationService notificationService;
+        private readonly ILoggerService loggerService;
 
-        public TaskUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore, IRdpService rdpService, INotificationService notificationService)
+        public TaskUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore, IRdpService rdpService, INotificationService notificationService, ILoggerService loggerService)
         {
+            this.loggerService = loggerService;
             this.rdpService = rdpService;
             this.taskInfoStore = taskInfoStore;
             this.notificationService = notificationService;
@@ -135,6 +138,9 @@ namespace RdpScopeToggler.ViewModels
             CountDownHour = taskInfoStore.Duration.Hours;
             CountDownMinute = taskInfoStore.Duration.Minutes;
             CountDownSecond = taskInfoStore.Duration.Seconds;
+
+            var durationString = $"{CountDownDay} days, {CountDownHour} hours, {CountDownMinute} minutes, {CountDownSecond} seconds";
+            loggerService.Info($"RDP accessibility window started. The RDP will be available for: {durationString}");
 
             StartCountingDown();
         }
