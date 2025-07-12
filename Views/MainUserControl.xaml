@@ -15,17 +15,25 @@
         <converter:EnumToBoolConverter x:Key="EnumToBoolConverter" />
     </UserControl.Resources>
 
-    <Grid>
-        <TabControl Margin="0"
-                    Padding="0"
-                    Background="White"
-                    BorderBrush="{StaticResource DarkBlueBrush}"
-                    BorderThickness="2"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
-                    TabStripPlacement="Top">
+    <Border CornerRadius="8">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="40"/>
+                <!-- גובה החלק הכחול -->
+            </Grid.RowDefinitions>
 
-            <TabControl.Resources>
+            <TabControl Grid.Row="0"
+                        Grid.RowSpan="2"
+                        Panel.ZIndex="1"
+                        Margin="0"
+                        Padding="0"
+                        BorderThickness="0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        TabStripPlacement="Top"
+                        Background="Transparent">
+                <TabControl.Resources>            
                 <!-- TabPanel Style for centering and stretching -->
                 <Style TargetType="TabPanel">
                     <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -66,8 +74,8 @@
                                                       RecognizesAccessKey="True"/>
                                 </Border>
                                 <ControlTemplate.Triggers>
-                                    <!-- Selected state -->
-                                    <Trigger Property="IsSelected" Value="True">
+                                    <!-- Non-selected state -->
+                                    <Trigger Property="IsSelected" Value="False">
                                         <Setter TargetName="HeaderBorder" Property="Background">
                                             <Setter.Value>
                                                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
@@ -78,9 +86,14 @@
                                         </Setter>
                                         <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="White"/>
                                         <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{StaticResource DarkBlueBrush}"/>
+                                    </Trigger>
+                                    
+                                    <!-- Selected state -->
+                                    <Trigger Property="IsSelected" Value="True">
                                         <Setter TargetName="HeaderBorder" Property="Margin" Value="0,-2,0,0"/>
                                         <Setter Property="Panel.ZIndex" Value="1"/>
                                     </Trigger>
+
 
                                     <!-- Hover state for non-selected tabs only -->
                                     <MultiTrigger>
@@ -112,8 +125,9 @@
                 </Style>
 
                 <!-- Tab Content Style -->
-                <Style x:Key="TabContentStyle" TargetType="Grid">
-                    <Setter Property="Background">
+                <Style x:Key="TabContentStyle" TargetType="Border">
+                        <Setter Property="CornerRadius" Value="0 0 8 8" />
+                        <Setter Property="Background">
                         <Setter.Value>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                                 <GradientStop Color="{StaticResource LightGrayColor}" Offset="0"/>
@@ -138,25 +152,34 @@
 
             <!-- Main Tab -->
             <TabItem Header="{DynamicResource Main_translator}" Width="115.6">
-                <Grid Style="{StaticResource TabContentStyle}">
+                <Border Style="{StaticResource TabContentStyle}">
                     <ContentControl prism:RegionManager.RegionName="ActionsRegion" />
-                </Grid>
+                </Border>
             </TabItem>
 
             <!-- WhiteList Tab -->
             <TabItem Header="{DynamicResource WhiteList_translator}" Width="115.6">
-                <Grid Style="{StaticResource TabContentStyle}">
+                <Border Style="{StaticResource TabContentStyle}">
                     <local:WhiteListUserControl />
-                </Grid>
+                </Border>
             </TabItem>
 
             <!-- Local Tab -->
             <TabItem Header="{DynamicResource Local_translator}" Width="115.6">
-                <Grid Style="{StaticResource TabContentStyle}">
+                <Border Style="{StaticResource TabContentStyle}">
                     <local:LocalAddressesUserControl />
-                </Grid>
+                </Border>
             </TabItem>
 
-        </TabControl>
-    </Grid>
+            </TabControl>
+
+            <!-- ריבוע כחול בתחתית -->
+            <Border Grid.Row="1"
+                    Background="{DynamicResource DarkBlueBrush}"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    CornerRadius="0,0,8,8"/>
+
+        </Grid>
+    </Border>
 </UserControl>

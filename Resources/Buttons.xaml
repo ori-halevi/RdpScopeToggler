@@ -75,7 +75,6 @@
     </Style>
 
 
-
     <Style TargetType="Button" x:Key="SettingsButton">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -348,6 +347,78 @@
     </Style>
 
 
+
+
+
+    <Style TargetType="Button" x:Key="CancelScheduleButton">
+        <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource OrangeBrush}"/>
+        <Setter Property="Padding" Value="10,5"/>
+        <Setter Property="Margin" Value="5"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="BorderBrush" Value="{StaticResource OrangeBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <ScaleTransform ScaleX="1" ScaleY="1"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="Black" Direction="270" ShadowDepth="0.5" BlurRadius="5" Opacity="0.2"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="5">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      RecognizesAccessKey="True"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <EventTrigger RoutedEvent="MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetProperty="(Button.RenderTransform).(ScaleTransform.ScaleX)"
+                                                 To="1.00" Duration="0:0:0.2"/>
+                                    <DoubleAnimation Storyboard.TargetProperty="(Button.RenderTransform).(ScaleTransform.ScaleY)"
+                                                 To="1.00" Duration="0:0:0.2"/>
+                                    <ColorAnimation Storyboard.TargetName="border"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="{StaticResource LightOrangeColor}" Duration="0:0:0.2"/>
+                                    <DoubleAnimation Storyboard.TargetProperty="(Button.Effect).(DropShadowEffect.ShadowDepth)"
+                                                 To="2" Duration="0:0:0.2"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+
+                        <EventTrigger RoutedEvent="MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetProperty="(Button.RenderTransform).(ScaleTransform.ScaleX)"
+                                                 To="1.0" Duration="0:0:0.2"/>
+                                    <DoubleAnimation Storyboard.TargetProperty="(Button.RenderTransform).(ScaleTransform.ScaleY)"
+                                                 To="1.0" Duration="0:0:0.2"/>
+                                    <ColorAnimation Storyboard.TargetName="border"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="{StaticResource BackgroundColor}" Duration="0:0:0.2"/>
+                                    <DoubleAnimation Storyboard.TargetProperty="(Button.Effect).(DropShadowEffect.ShadowDepth)"
+                                                 To="0.5" Duration="0:0:0.2"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
 
 

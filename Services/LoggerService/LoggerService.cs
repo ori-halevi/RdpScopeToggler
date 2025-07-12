@@ -47,20 +47,28 @@ namespace RdpScopeToggler.Services.LoggerService
         {
             lock (_lock)
             {
-                // בודק אם הקובץ קיים ואם עבר את הגודל המקסימלי
-                if (File.Exists(_logFilePath))
+                try
                 {
-                    var fileInfo = new FileInfo(_logFilePath);
-                    if (fileInfo.Length >= MaxFileSizeBytes)
+                    // בודק אם הקובץ קיים ואם עבר את הגודל המקסימלי
+                    if (File.Exists(_logFilePath))
                     {
-                        _logFilePath = GetNewLogFilePath();
+                        var fileInfo = new FileInfo(_logFilePath);
+                        if (fileInfo.Length >= MaxFileSizeBytes)
+                        {
+                            _logFilePath = GetNewLogFilePath();
+                        }
                     }
-                }
 
-                var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{level}] {message}";
-                File.AppendAllText(_logFilePath, logEntry + Environment.NewLine);
+                    var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{level}] {message}";
+                    File.AppendAllText(_logFilePath, logEntry + Environment.NewLine);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Failed to write log: {ex.Message}", ex);
+                }
             }
         }
+
 
         public void Debug(string message)
         {

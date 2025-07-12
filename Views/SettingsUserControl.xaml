@@ -16,40 +16,52 @@
     <Border Margin="2.5" Background="{DynamicResource BackgroundBrush}" Padding="10"
             CornerRadius="8"
             >
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
 
-        <!-- תוכן -->
-        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" >
-
-            <StackPanel>
+            <!-- תוכן -->
+            <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" >
 
                 <!-- כותרת -->
-                <TextBlock Text="הגדרות כלליות" FontSize="24" FontWeight="Bold" Margin="0 0 0 10"/>
-                <!-- בחירת שפה -->
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="בחר שפה:" FontSize="16" Margin="10 0 10 10" VerticalAlignment="Center" TextAlignment="Center" />
-                    <ComboBox SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}" 
+                <TextBlock Text="{DynamicResource Settings_translator}"
+                           FontSize="24" FontWeight="Bold"
+                           Margin="0 0 0 10"
+                           HorizontalAlignment="Center"
+                           />
+
+                <StackPanel>
+
+                    <!-- בחירת שפה -->
+                    <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
+                        <TextBlock Text="Language:" FontSize="16" Margin="10 0 10 10" VerticalAlignment="Center" TextAlignment="Center" />
+                        <ComboBox SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}" 
                           ItemsSource="{Binding LanguagesOptions}"
                           FontSize="16" Height="30" VerticalAlignment="Center"
                           Style="{StaticResource MaterialDesignDataGridComboBox}">
-                    </ComboBox>
+                        </ComboBox>
+                    </StackPanel>
+                    
+                    <!--  Open logs folder  -->
+                    <Button 
+                        Style="{DynamicResource SimpleButton}"
+                        Content="{DynamicResource OpenLogsFolder_translator}"
+                        Command="{Binding OpenLogsFolderCommand}"
+                        />
                 </StackPanel>
+
+                <Border BorderBrush="Gray" BorderThickness="0 0 1 0" Margin="15" />
+
             </StackPanel>
 
-            <Border BorderBrush="Gray" BorderThickness="0 0 1 0" Margin="15" />
-
-        </StackPanel>
-
-        <!-- כפתור סגירה -->
-        <Button Grid.Row="2" Content="סגור"
+            <!-- כפתור סגירה -->
+            <Button Grid.Row="2" Content="{DynamicResource Close_translator}"
                 Command="{Binding CloseCommand}"
                             Style="{StaticResource MaterialDesignOutlinedButton}" />
-    </Grid>
+        </Grid>
     </Border>
 </UserControl>

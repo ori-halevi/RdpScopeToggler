@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using RdpScopeToggler.Services.LoggerService;
+using System.Windows;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -98,7 +99,7 @@ namespace RdpScopeToggler.ViewModels
                 }
 
                 // Do action
-                regionManager.RequestNavigate("ContentRegion", "TaskUserControl");
+                regionManager.RequestNavigate("ActionsRegion", "TaskUserControl");
 
             }
             catch (TaskCanceledException)
@@ -126,35 +127,16 @@ namespace RdpScopeToggler.ViewModels
             regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
         }
 
-        public void OnNavigatedTo(NavigationContext navigationContext)
+        private static string T(string key)
         {
-            var date = taskInfoStore.Date.Value;
-            var duration = taskInfoStore.Duration;
-
-            string formattedDate = date.GetDateTimeFormats()[0];
-            string formattedTime = $"{date.Hour:D2}:{date.Minute:D2}";
-
-            string durationText = BuildDurationString(duration);
-
-            string target = "רשתות חיצוניות";
-            if (taskInfoStore.Action == ActionsEnum.LocalComputersAndWhiteList)
-                target = "רשימה לבנה";
-
-            string targetMsg = $"מטרה: {target}.\r\n";
-            string dateMsg = $"תאריך: {formattedDate} {formattedTime}.\r\n";
-            Message = targetMsg + dateMsg;
-
-            if (!string.IsNullOrWhiteSpace(durationText))
-                Message += $"משך: {durationText}.";
-
-            // לוג ברור ומפורט
-            loggerService.Info(
-                $"Scheduled RDP accessibility configured. Target: {target}. " +
-                $"Start date: {formattedDate} {formattedTime}. " +
-                $"Duration: {durationText}."
-            );
-
-            StartCountingDown();
+            var result = Application.Current.TryFindResource(key) as string;
+            if (result == null)
+            {
+                // אפשר גם לכתוב לוג
+                Console.WriteLine($"Missing translation key: {key}");
+                return key;
+            }
+            return result;
         }
 
 
@@ -166,17 +148,50 @@ namespace RdpScopeToggler.ViewModels
             List<string> parts = new();
 
             if (duration.Days > 0)
-                parts.Add($"{duration.Days} ימים");
+                parts.Add($"{duration.Days} {T("Days_translator")}");
             if (duration.Hours > 0)
-                parts.Add($"{duration.Hours} שעות");
+                parts.Add($"{duration.Hours} {T("Hours_translator")}");
             if (duration.Minutes > 0)
-                parts.Add($"{duration.Minutes} דקות");
+                parts.Add($"{duration.Minutes} {T("Minutes_translator")}");
             if (duration.Seconds > 0)
-                parts.Add($"{duration.Seconds} שניות");
+                parts.Add($"{duration.Seconds} {T("Seconds_translator")}");
 
-            return string.Join(" ו-", parts);
+            return string.Join($" {T("And_translator")}-", parts);
         }
 
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            var date = taskInfoStore.Date.Value;
+            var duration = taskInfoStore.Duration;
+
+            string formattedDate = date.GetDateTimeFormats()[0];
+            string formattedTime = $"{date.Hour:D2}:{date.Minute:D2}";
+
+            string durationText = BuildDurationString(duration);
+
+            string targetKey = "RemoteSystems_translator";
+            if (taskInfoStore.Action == ActionsEnum.LocalComputersAndWhiteList)
+                targetKey = "WhiteList_translator";
+
+            string target = T(targetKey);
+
+            string targetMsg = $"{T("Target_translator")}: {target}.\r\n";
+            string dateMsg = $"{T("Date_translator")}: {formattedDate} {formattedTime}.\r\n";
+            Message = targetMsg + dateMsg;
+
+            if (!string.IsNullOrWhiteSpace(durationText))
+                Message += $"{T("Duration_translator")}: {durationText}.";
+
+            // לוג ברור ומפורט
+            loggerService.Info(
+                $"Scheduled RDP accessibility configured. Target: {target}. " +
+                $"Start date: {formattedDate} {formattedTime}. " +
+                $"Duration: {durationText}."
+            );
+
+            StartCountingDown();
+        }
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 

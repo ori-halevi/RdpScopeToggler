@@ -20,20 +20,6 @@
             <GradientStop Color="#e2e8f0" Offset="1" />
         </RadialGradientBrush>
 
-        <!-- גרדיאנט לכפתור ביטול -->
-        <LinearGradientBrush x:Key="CancelButtonGradient" StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#f59e0b" Offset="0"/>
-            <GradientStop Color="#d97706" Offset="0.5"/>
-            <GradientStop Color="#b45309" Offset="1"/>
-        </LinearGradientBrush>
-
-        <!-- אנימציות -->
-        <Storyboard x:Key="WaitingPulse" RepeatBehavior="Forever">
-            <DoubleAnimation Storyboard.TargetName="WaitingIndicator"
-                           Storyboard.TargetProperty="Opacity"
-                           From="1" To="0.4" Duration="0:0:2"
-                           AutoReverse="True"/>
-        </Storyboard>
 
         <Storyboard x:Key="FloatingCard" RepeatBehavior="Forever">
             <DoubleAnimation Storyboard.TargetName="MainCard"
@@ -42,11 +28,6 @@
                            AutoReverse="True"/>
         </Storyboard>
 
-        <Storyboard x:Key="SpinningDots" RepeatBehavior="Forever">
-            <DoubleAnimation Storyboard.TargetName="LoadingDots"
-                           Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
-                           From="0" To="360" Duration="0:0:3"/>
-        </Storyboard>
 
         <!-- סטיילים -->
         <Style x:Key="ModernTextStyle" TargetType="TextBlock">
@@ -68,64 +49,11 @@
             <Setter Property="LineHeight" Value="24"/>
         </Style>
 
-        <Style x:Key="CancelButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource CancelButtonGradient}"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="FontFamily" Value="Segoe UI Variable Display"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect Color="#40f59e0b" BlurRadius="12" ShadowDepth="3"/>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="border"
-                                RenderTransformOrigin="0.5,0.5"
-                                Background="{TemplateBinding Background}" 
-                                CornerRadius="20"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background">
-                                    <Setter.Value>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                            <GradientStop Color="#fbbf24" Offset="0"/>
-                                            <GradientStop Color="#f59e0b" Offset="0.5"/>
-                                            <GradientStop Color="#d97706" Offset="1"/>
-                                        </LinearGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter TargetName="border" Property="RenderTransform">
-                                    <Setter.Value>
-                                        <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="RenderTransform">
-                                    <Setter.Value>
-                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </UserControl.Resources>
 
     <UserControl.Triggers>
         <EventTrigger RoutedEvent="Loaded">
-            <BeginStoryboard Storyboard="{StaticResource WaitingPulse}"/>
             <BeginStoryboard Storyboard="{StaticResource FloatingCard}"/>
-            <BeginStoryboard Storyboard="{StaticResource SpinningDots}"/>
         </EventTrigger>
     </UserControl.Triggers>
 
@@ -133,8 +61,7 @@
         <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="10">
             <!-- כרטיס ראשי עם אפקט זכוכית -->
         <Border x:Name="MainCard"
-                    Padding="5"
-                    Background="{StaticResource CardGradient}"
+                    Padding="0"
                     CornerRadius="28"
                     RenderTransformOrigin="0.5,0.5">
 
@@ -149,7 +76,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- אינדיקטורים -->
-                    <Grid Grid.Row="0" HorizontalAlignment="Center"
+                    <Grid Grid.Row="0" HorizontalAlignment="Right"
                           Margin="0 5 0 0"
                           >
                         <local:IndicatorsUserControl/>
@@ -157,27 +84,22 @@
 
 
                     <!-- שעון ספירה לאחור -->
-                    <Border Grid.Row="1"
+                <Border Grid.Row="1"
                             Margin="0 15 0 0"
-                            Background="#f8fafc" 
                             CornerRadius="18">
-                        <Border.Effect>
-                            <DropShadowEffect Color="#10000000" BlurRadius="8" ShadowDepth="2" Opacity="0.2"/>
-                        </Border.Effect>
-                        <local:AnyClockUserControl
+                    <local:AnyClockUserControl
                             DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             CountDownDay="{Binding CountDownDay}"
                             CountDownHour="{Binding CountDownHour}"
                             CountDownMinute="{Binding CountDownMinute}"
                             CountDownSecond="{Binding CountDownSecond}"
                             IsReadOnly="True" 
-                            TimeTitle="הפתיחה תחל בעוד:"
+                            TimeTitle="{DynamicResource AccessOpenIn_translator}"
                             TimeTitleVisibility="Visible"/>
                     </Border>
 
                     <!-- הודעה -->
                     <Border Grid.Row="2" 
-                            Background="#f1f5f9" 
                             CornerRadius="16" 
                             Padding="10"
                             Margin="0,15,0,10">
@@ -198,52 +120,26 @@
 
                     <!-- אינדיקטור המתנה עם אנימציה -->
                     <Grid Grid.Row="3" Margin="0,3,0,5" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                        <Border x:Name="WaitingIndicator" Grid.Column="1" Grid.ColumnSpan="2"
-                                CornerRadius="20"
-                                Width="190"
-                                Padding="12"
-                                Background="#3b82f6"
-                                RenderTransformOrigin="0.5,0.5">
-                            <Border.Effect>
-                                <DropShadowEffect Color="#3b82f6" BlurRadius="10" ShadowDepth="0" Opacity="0.4"/>
-                            </Border.Effect>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" >
-                                <!-- נקודות מסתובבות -->
-                                <Canvas x:Name="LoadingDots" Width="24" Height="24" Margin="0,0,10,0"
-                                        RenderTransformOrigin="0.5,0.5">
-                                    <Canvas.RenderTransform>
-                                        <RotateTransform/>
-                                    </Canvas.RenderTransform>
-                                    <Ellipse Width="4" Height="4" Fill="White" Canvas.Left="10" Canvas.Top="2"/>
-                                    <Ellipse Width="4" Height="4" Fill="White" Canvas.Left="18" Canvas.Top="10"/>
-                                    <Ellipse Width="4" Height="4" Fill="White" Canvas.Left="10" Canvas.Top="18"/>
-                                    <Ellipse Width="4" Height="4" Fill="White" Canvas.Left="2" Canvas.Top="10"/>
-                                </Canvas>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- כפתור ביטול -->
-                        <Button Grid.Row="4" Grid.Column="2"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Right"
-                             Content="ביטול התזמון"
-                             Style="{StaticResource CancelButtonStyle}"
-                             Padding="25,12"
-                             Margin="0 0 0 2"
-                             FontSize="16"
+                    <!-- כפתור ביטול -->
+                    <Button Grid.Row="4" Grid.Column="2"
+                                x:Name="CancelScheduleButton"
                              Command="{Binding CancelSchedulingCommand}"
+                             Content="{DynamicResource Cancel_translator}"
+                             Style="{DynamicResource CancelScheduleButton}"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            FontWeight="SemiBold"
+                            Height="40" Width="75"
+                            Padding="5" Margin="10"
                              RenderTransformOrigin="0.5,0.5">
-                            <Button.RenderTransform>
-                                <ScaleTransform ScaleX="1" ScaleY="1.03"/>
-                            </Button.RenderTransform>
-                        </Button>
+                    </Button>
 
                     </Grid>
 

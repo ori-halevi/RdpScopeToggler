@@ -9,6 +9,8 @@ namespace RdpScopeToggler.Managers
 {
     public static class LanguageManager
     {
+        // TODO: Make all langs Enum!
+        public static string SelectedLanguage { get; set; }
         public static void ChangeLanguage(string culture)
         {
             var dict = new ResourceDictionary();
@@ -16,9 +18,11 @@ namespace RdpScopeToggler.Managers
             {
                 case "he":
                     dict.Source = new Uri("Resources/Language/StringResources.he.xaml", UriKind.Relative);
+                    SelectedLanguage = "עברית";
                     break;
                 default:
                     dict.Source = new Uri("Resources/Language/StringResources.en.xaml", UriKind.Relative);
+                    SelectedLanguage = "English";
                     break;
             }
 
@@ -38,8 +42,6 @@ namespace RdpScopeToggler.Managers
             else
                 Application.Current.MainWindow.FlowDirection = FlowDirection.LeftToRight;
         }
-
-
     }
 
 }
