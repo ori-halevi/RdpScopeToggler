@@ -151,21 +151,21 @@
             </TabControl.Resources>
 
             <!-- Main Tab -->
-            <TabItem Header="{DynamicResource Main_translator}" Width="115.6">
+            <TabItem Header="{DynamicResource Main_translator}" Width="115.4">
                 <Border Style="{StaticResource TabContentStyle}">
                     <ContentControl prism:RegionManager.RegionName="ActionsRegion" />
                 </Border>
             </TabItem>
 
             <!-- WhiteList Tab -->
-            <TabItem Header="{DynamicResource WhiteList_translator}" Width="115.6">
+            <TabItem Header="{DynamicResource WhiteList_translator}" Width="115.4">
                 <Border Style="{StaticResource TabContentStyle}">
                     <local:WhiteListUserControl />
                 </Border>
             </TabItem>
 
             <!-- Local Tab -->
-            <TabItem Header="{DynamicResource Local_translator}" Width="115.6">
+            <TabItem Header="{DynamicResource Local_translator}" Width="115.4">
                 <Border Style="{StaticResource TabContentStyle}">
                     <local:LocalAddressesUserControl />
                 </Border>
