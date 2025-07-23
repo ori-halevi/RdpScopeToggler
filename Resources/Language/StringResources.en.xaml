@@ -44,7 +44,7 @@
     <sys:String x:Key="And_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">And</sys:String>
 
     <sys:String x:Key="AccessEnabled_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Access enabled!</sys:String>
-    <sys:String x:Key="Disconnect_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">ניתוק מיידי</sys:String>
+    <sys:String x:Key="Disconnect_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Disconnect</sys:String>
 
 
 </ResourceDictionary>
