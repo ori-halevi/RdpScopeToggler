@@ -2,7 +2,7 @@
 
 # 
 
-# !\[RdpScopeToggler Icon](Assets/remote-desktop.png)
+# <img src="Assets/remote-desktop.png" alt="RdpScopeToggler Icon" width="64" height="64">
 
 # 
 
@@ -58,7 +58,7 @@
 
 # \### Main Interface
 
-# !\[Main Interface](Assets/Preview%20images/Main-removebg.png)
+# !\[Main Interface](Assets/Preview%20images/screenshot1.png)
 
 # \*The main control panel showing access lists and status indicators\*
 
@@ -66,25 +66,25 @@
 
 # \### Whitelist Management
 
-# !\[Whitelist Management](Assets/Preview%20images/Local-removebg.png)
+# !\[Whitelist Management](Assets/Preview%20images/screenshot2.png)
 
 # \*Configure and manage your whitelist addresses\*
 
 # 
 
-# \### Waiting Page
+# \### Status Indicators
 
-# !\[Status Indicators](Assets/Preview%20images/Waiting-removebg.png)
+# !\[Status Indicators](Assets/Preview%20images/screenshot3.png)
 
 # \*Real-time monitoring of RDP access status\*
 
 # 
 
-# \### Access enabled Page
+# \### Scheduling Interface
 
-# !\[Scheduling Interface](Assets/Preview%20images/AccessEnabled-removebg.png)
+# !\[Scheduling Interface](Assets/Preview%20images/screenshot4.png)
 
-# \*Monitor access control and disconnection\*
+# \*Set up time-based access control and automatic disconnection\*
 
 # 
 
