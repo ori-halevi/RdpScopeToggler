@@ -36,11 +36,15 @@
     <sys:String x:Key="ExternalAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">All external addresses access</sys:String>
     <sys:String x:Key="LocalAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">All local addresses access</sys:String>
 
+    <sys:String x:Key="TheConnectionWillCloseIn_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">The connection will close in:</sys:String>
     <sys:String x:Key="Days_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Days</sys:String>
     <sys:String x:Key="Hours_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Hours</sys:String>
     <sys:String x:Key="Minutes_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Minutes</sys:String>
     <sys:String x:Key="Seconds_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Seconds</sys:String>
     <sys:String x:Key="And_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">And</sys:String>
+
+    <sys:String x:Key="AccessEnabled_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Access enabled!</sys:String>
+    <sys:String x:Key="Disconnect_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">ניתוק מיידי</sys:String>
 
 
 </ResourceDictionary>

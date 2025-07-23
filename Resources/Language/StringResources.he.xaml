@@ -36,12 +36,16 @@
     <sys:String x:Key="ExternalAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">גישה לכל הכתובות חיצוניות</sys:String>
     <sys:String x:Key="LocalAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">גישה לכל הכתובות המקומיות</sys:String>
 
+    <sys:String x:Key="TheConnectionWillCloseIn_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">החיבור יסגר בעוד:</sys:String>
     <sys:String x:Key="Days_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">ימים</sys:String>
     <sys:String x:Key="Hours_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">שעות</sys:String>
     <sys:String x:Key="Minutes_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">דקות</sys:String>
     <sys:String x:Key="Seconds_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">שניות</sys:String>
     <sys:String x:Key="And_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">ו</sys:String>
 
+    <sys:String x:Key="AccessEnabled_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">הגישה מאופשרת!</sys:String>
+    <sys:String x:Key="Disconnect_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">ניתוק מיידי</sys:String>
+    
 
     <sys:String x:Key="EEEEEEEE_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">EEEEEEEEEE</sys:String>
     

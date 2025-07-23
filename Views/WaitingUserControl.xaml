@@ -101,8 +101,8 @@
                     <!-- הודעה -->
                     <Border Grid.Row="2" 
                             CornerRadius="16" 
-                            Padding="10"
-                            Margin="0,15,0,10">
+                            Padding="5"
+                            Margin="0,10,0,10">
                         <Border.Effect>
                             <DropShadowEffect Color="#08000000" BlurRadius="6" ShadowDepth="1" Opacity="0.15"/>
                         </Border.Effect>

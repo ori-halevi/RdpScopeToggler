@@ -30,7 +30,7 @@
         <Storyboard x:Key="PulseAnimation" RepeatBehavior="Forever">
             <DoubleAnimation Storyboard.TargetName="ConnectionIndicator"
                            Storyboard.TargetProperty="Opacity"
-                           From="1" To="0.4" Duration="0:0:2.0"
+                           From="1" To="0.8" Duration="0:0:2.0"
                            AutoReverse="True"/>
         </Storyboard>
 
@@ -87,7 +87,7 @@
                 <Grid Grid.Row="1" Margin="0 15 0 0" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Border x:Name="ConnectionIndicator"
                                 CornerRadius="10"
-                                    Padding="80 20"
+                                    Padding="10 10"
                                 BorderThickness="0"
                                  Background="#a7f2cf"
                                  RenderTransformOrigin="0.5,0.5"
@@ -96,14 +96,13 @@
                         <Border.Effect>
                             <DropShadowEffect Color="#d2fae5" BlurRadius="8" ShadowDepth="0"/>
                         </Border.Effect>
+                    <TextBlock Text="{DynamicResource AccessEnabled_translator}"
+                            FontSize="24"
+                            Foreground="#059669"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource ModernTextStyle}"
+                            TextAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="החיבור פתוח!" 
-                                   FontSize="24"
-                                       Foreground="#059669"
-                                       VerticalAlignment="Center"
-                                   FlowDirection="RightToLeft" 
-                                   Style="{StaticResource ModernTextStyle}"
-                                   TextAlignment="Center"/>
                 </Grid>
 
                 <!-- שעון ספירה לאחור -->
@@ -117,14 +116,14 @@
                             CountDownHour="{Binding CountDownHour}"
                             CountDownMinute="{Binding CountDownMinute}"
                             CountDownSecond="{Binding CountDownSecond}"
-                            TimeTitle="החיבור יסגר בעוד:"
+                            TimeTitle="{DynamicResource TheConnectionWillCloseIn_translator}"
                             TimeTitleVisibility="Visible"
                             IsReadOnly="True" />
                 </Border>
 
                 <!-- כפתור ניתוק -->
                 <Button Grid.Row="4"
-                        Content="ניתוק מיידי"
+                        Content="{DynamicResource Disconnect_translator}"
                             Style="{DynamicResource DisconnectButton}"
                             Padding="30,15"
                             FontSize="18"
