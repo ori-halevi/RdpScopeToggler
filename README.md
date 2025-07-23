@@ -58,7 +58,9 @@
 
 # \### Main Interface
 
-# !\[Main Interface](Assets/Preview%20images/screenshot1.png)
+# <img src="Assets/Preview%20images/Main-removebg.png" alt="Main Interface" style="max-width: 100%; height: auto;">
+
+# 
 
 # \*The main control panel showing access lists and status indicators\*
 
@@ -66,25 +68,31 @@
 
 # \### Whitelist Management
 
-# !\[Whitelist Management](Assets/Preview%20images/screenshot2.png)
+# <img src="Assets/Preview%20images/Local-removebg.png" alt="Whitelist Management" style="max-width: 100%; height: auto;">
+
+# 
 
 # \*Configure and manage your whitelist addresses\*
 
 # 
 
-# \### Status Indicators
+# \### Waiting Page
 
-# !\[Status Indicators](Assets/Preview%20images/screenshot3.png)
+# <img src="Assets/Preview%20images/Waiting-removebg.png" alt="Status Indicators" style="max-width: 100%; height: auto;">
+
+# 
 
 # \*Real-time monitoring of RDP access status\*
 
 # 
 
-# \### Scheduling Interface
+# \### Access enabled Page
 
-# !\[Scheduling Interface](Assets/Preview%20images/screenshot4.png)
+# <img src="Assets/Preview%20images/AccessEnabled-removebg.png" alt="Scheduling Interface" style="max-width: 100%; height: auto;">
 
-# \*Set up time-based access control and automatic disconnection\*
+# 
+
+# \*Monitor access control and disconnection\*
 
 # 
 
