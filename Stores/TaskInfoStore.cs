@@ -8,5 +8,4 @@ namespace RdpScopeToggler.Stores
         public ActionsEnum Action { get; set; }
         public DateTime? Date { get; set; }
     }
-
 }

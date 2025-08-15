@@ -5,7 +5,7 @@
         RemoteSystems,
         WhiteList,
         LocalComputersAndWhiteList,
-        LocalComputers
+        LocalComputers,
+        CloseRdp
     }
-
 }

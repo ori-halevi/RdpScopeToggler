@@ -81,6 +81,8 @@ namespace RdpScopeToggler.ViewModels
             _cts?.Cancel();
             _cts = new CancellationTokenSource();
 
+            Debug.WriteLine(taskInfoStore.Date.Value);
+
             var remaining = taskInfoStore.Date.Value - DateTime.Now;
             if (remaining.TotalSeconds <= 0)
                 return;
