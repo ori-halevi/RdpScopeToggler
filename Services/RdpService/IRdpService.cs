@@ -1,4 +1,5 @@
-﻿using RdpScopeToggler.Stores;
+﻿using RdpScopeCommands.Stores;
+using RdpScopeToggler.Stores;
 using System;
 
 namespace RdpScopeToggler.Services.RdpService

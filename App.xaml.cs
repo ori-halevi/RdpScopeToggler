@@ -14,6 +14,8 @@ using RdpScopeToggler.Models;
 using System.Collections.Generic;
 using RdpScopeToggler.Managers;
 using RdpScopeToggler.Services.LoggerService;
+using RdpScopeCommands;
+using RdpScopeToggler.Services.PipeClientService;
 
 namespace RdpScopeToggler
 {
@@ -46,7 +48,8 @@ namespace RdpScopeToggler
             });
             Container.Resolve<INotificationService>().InitializeInstallation();
 
-            containerRegistry.RegisterSingleton<IRdpService, RdpService>();
+            containerRegistry.RegisterSingleton<IPipeClientService, PipeClientService>();
+            containerRegistry.RegisterSingleton<IRdpController, RdpController>();
             containerRegistry.RegisterSingleton<IFilesService, FilesService>();
             containerRegistry.RegisterSingleton<TaskInfoStore>();
 

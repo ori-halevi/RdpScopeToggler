@@ -1,13 +1,20 @@
-﻿using Prism.Mvvm;
-using Prism.Commands;
-using System.Windows.Input;
+﻿using Prism.Commands;
+using Prism.Mvvm;
+using Prism.Navigation;
 using Prism.Navigation.Regions;
-using System;
-using System.Collections.ObjectModel;
+using RdpScopeCommands.Stores;
+using RdpScopeToggler.Services.LoggerService;
+using RdpScopeToggler.Services.PipeClientService;
 using RdpScopeToggler.Stores;
-using System.Windows;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
-using RdpScopeToggler.Views;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Windows.Input;
 
 
 namespace RdpScopeToggler.ViewModels
@@ -178,9 +185,13 @@ namespace RdpScopeToggler.ViewModels
 
         private TaskInfoStore taskInfoStore;
         private IRegionManager regionManager;
+        private readonly ILoggerService loggerService;
+        private readonly IPipeClientService pipeClientService;
 
-        public HomeUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore)
+        public HomeUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore, ILoggerService loggerService, IPipeClientService pipeClientService)
         {
+            this.pipeClientService = pipeClientService;
+            this.loggerService = loggerService;
             this.regionManager = regionManager;
             this.taskInfoStore = taskInfoStore;
 
@@ -203,7 +214,6 @@ namespace RdpScopeToggler.ViewModels
             };
             SelectedAction = Options[0];
 
-
             NavigateToSettingsCommand = new DelegateCommand(NavigateToSettings);
             StartCommand = new DelegateCommand(() =>
             {
@@ -211,10 +221,19 @@ namespace RdpScopeToggler.ViewModels
                 {
                     ValidateSelectedDateTime();
                     if (IsDateTimeEnabled && SelectedDateTime < DateTime.Now.AddMinutes(1)) return;
-                    regionManager.RequestNavigate("ActionsRegion", "WaitingUserControl");
+                    Debug.WriteLine($"SelectedDateTime: {SelectedDateTime}");
+                    pipeClientService.SendAddTask(taskInfoStore.Action, SelectedDateTime);
+                    DateTime closeRdpDate = SelectedDateTime.Add(taskInfoStore.Duration);
+                    pipeClientService.SendAddTask(ActionsEnum.LocalComputersAndWhiteList, closeRdpDate);
+                    //CheckIfNeed();
                     return;
                 }
-                regionManager.RequestNavigate("ActionsRegion", "TaskUserControl");
+
+                DateTime now1 = DateTime.Now;
+                DateTime closeRdpDate1 = now1.Add(taskInfoStore.Duration);
+                pipeClientService.SendAddTask(ActionsEnum.LocalComputersAndWhiteList, closeRdpDate1);
+                pipeClientService.SendAddTask(taskInfoStore.Action, now1);
+                //CheckIfNeed();
             });
 
             UpdateDateCommand = new DelegateCommand(() =>
@@ -251,12 +270,39 @@ namespace RdpScopeToggler.ViewModels
         }
 
 
+        private void CheckIfNeedToNavigate()
+        {
+            RdpTask? task = pipeClientService.GetUpcomingTask();
+            if (task == null) return;
+
+            if (task.NextTask == null)
+            {
+                var parameters = new NavigationParameters
+                {
+                    { "task", task }
+                };
+                regionManager.RequestNavigate("ActionsRegion", "TaskUserControl", parameters);
+            }
+            else
+            {
+                var parameters = new NavigationParameters
+                {
+                    { "task", task }
+                };
+                regionManager.RequestNavigate("ActionsRegion", "WaitingUserControl", parameters);
+            }
+
+        }
+
         private void NavigateToSettings()
         {
             regionManager.RequestNavigate("ContentRegion", "SettingsUserControl");
         }
 
-        public void OnNavigatedTo(NavigationContext navigationContext) { }
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            CheckIfNeedToNavigate();
+        }
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 

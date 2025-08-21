@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RdpScopeCommands.Stores;
+using System;
 
 namespace RdpScopeToggler.Stores
 {
@@ -6,6 +7,6 @@ namespace RdpScopeToggler.Stores
     {
         public TimeSpan Duration { get; set; }
         public ActionsEnum Action { get; set; }
-        public DateTime? Date { get; set; }
+        public DateTime Date { get; set; }
     }
 }

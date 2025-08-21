@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using RdpScopeCommands.Stores;
 using RdpScopeToggler.Stores;
 
 namespace RdpScopeToggler.Services.FilesService

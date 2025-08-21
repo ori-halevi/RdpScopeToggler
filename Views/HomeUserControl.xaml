@@ -85,7 +85,10 @@
                             Padding="5"
                             Margin="10"
                             RenderTransformOrigin="0.5,0.5">
-                            <TextBlock Text="{DynamicResource OpenAccess_translator}" />
+                            <TextBlock 
+                                d:Text="Open Access"
+                                Text="{DynamicResource OpenAccess_translator}"
+                                />
                         </Button>
                     </Border>
 

@@ -1,16 +1,19 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Navigation.Regions;
+using RdpScopeCommands.Stores;
+using RdpScopeToggler.Services.LoggerService;
 using RdpScopeToggler.Stores;
 using System;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Windows.Input;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using RdpScopeToggler.Services.LoggerService;
+using System.Diagnostics;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -60,6 +63,9 @@ namespace RdpScopeToggler.ViewModels
             get { return message; }
             set { SetProperty(ref message, value); }
         }
+
+        private RdpTask MainTask { get; set; }
+        private RdpTask CloseRdpTask { get; set; }
         #endregion
 
         public ICommand CancelSchedulingCommand {  get; set; }
@@ -76,16 +82,14 @@ namespace RdpScopeToggler.ViewModels
             CancelSchedulingCommand = new DelegateCommand(CancelScheduling);
         }
 
-        private async void StartCountingDown()
+        private async void StartCountingDown(RdpTask task)
         {
             _cts?.Cancel();
             _cts = new CancellationTokenSource();
 
-            Debug.WriteLine(taskInfoStore.Date.Value);
+            Debug.WriteLine(taskInfoStore.Date);
 
-            var remaining = taskInfoStore.Date.Value - DateTime.Now;
-            if (remaining.TotalSeconds <= 0)
-                return;
+            var remaining = task.Date - DateTime.Now;
 
             try
             {
@@ -99,10 +103,6 @@ namespace RdpScopeToggler.ViewModels
                     CountDownMinute = remaining.Minutes;
                     CountDownSecond = remaining.Seconds;
                 }
-
-                // Do action
-                regionManager.RequestNavigate("ActionsRegion", "TaskUserControl");
-
             }
             catch (TaskCanceledException)
             {
@@ -113,6 +113,7 @@ namespace RdpScopeToggler.ViewModels
                 // Clean always
                 _cts?.Dispose();
                 _cts = null;
+                regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
             }
         }
 
@@ -126,8 +127,65 @@ namespace RdpScopeToggler.ViewModels
                 _cts.Dispose();    // משחרר משאבים
                 _cts = null;       // מוחק את ההתייחסות
             }
+            CancelTasks();
             regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
         }
+
+        private void CancelTasks()
+        {
+            RdpTask[] rdpTasks = new RdpTask[]
+            {
+                MainTask,
+                CloseRdpTask
+            };
+            WriteToFile(rdpTasks);
+        }
+        private void WriteToFile(RdpTask[] rdpTasks)
+        {
+            try
+            {
+                string filePath = @"C:\ProgramData\RdpScopeToggler\Tasks.json";
+
+                // הגדרת JsonSerializer עם פורמט מותאם לתאריכים
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Converters =
+                    {
+                        new JsonStringEnumConverter(),       // <--- מאפשר המרה בין Enum למחרוזת
+                    }
+                };
+
+                // קרא את הקובץ אם קיים
+                List<RdpTask> tasks;
+                if (File.Exists(filePath))
+                {
+                    string json = File.ReadAllText(filePath);
+                    tasks = JsonSerializer.Deserialize<List<RdpTask>>(json, options) ?? new List<RdpTask>();
+                }
+                else
+                {
+                    tasks = new List<RdpTask>();
+                }
+
+                // ערוך את הstate של המשימות
+                foreach (var task in tasks)
+                {
+                    if (task.Id.Equals(rdpTasks[0].Id) || task.Id.Equals(rdpTasks[1].Id))
+                    {
+                        task.State = StateEnum.Canceled;
+                    }
+                }
+
+                // שמור חזרה לקובץ
+                File.WriteAllText(filePath, JsonSerializer.Serialize(tasks, options));
+            }
+            catch (Exception ex)
+            {
+                loggerService.Error($"Failed to write task: {ex.Message}");
+            }
+        }
+
 
         private static string T(string key)
         {
@@ -164,35 +222,47 @@ namespace RdpScopeToggler.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            var date = taskInfoStore.Date.Value;
-            var duration = taskInfoStore.Duration;
+            if (navigationContext.Parameters.ContainsKey("task"))
+            {
+                MainTask = navigationContext.Parameters.GetValue<RdpTask>("task");
+                CloseRdpTask = MainTask.NextTask;
+                TimeSpan Duration = MainTask.Date - DateTime.Now;
 
-            string formattedDate = date.GetDateTimeFormats()[0];
-            string formattedTime = $"{date.Hour:D2}:{date.Minute:D2}";
+                CountDownDay = Duration.Days;
+                CountDownHour = Duration.Hours;
+                CountDownMinute = Duration.Minutes;
+                CountDownSecond = Duration.Seconds;
 
-            string durationText = BuildDurationString(duration);
+                var date = MainTask.Date;
+                TimeSpan duration = CloseRdpTask.Date - MainTask.Date;
 
-            string targetKey = "RemoteSystems_translator";
-            if (taskInfoStore.Action == ActionsEnum.LocalComputersAndWhiteList)
-                targetKey = "WhiteList_translator";
+                string formattedDate = date.GetDateTimeFormats()[0];
+                string formattedTime = $"{date.Hour:D2}:{date.Minute:D2}";
 
-            string target = T(targetKey);
+                string durationText = BuildDurationString(duration);
 
-            string targetMsg = $"{T("Target_translator")}: {target}.\r\n";
-            string dateMsg = $"{T("Date_translator")}: {formattedDate} {formattedTime}.\r\n";
-            Message = targetMsg + dateMsg;
+                string targetKey = "RemoteSystems_translator";
+                if (MainTask.Action == ActionsEnum.LocalComputersAndWhiteList)
+                    targetKey = "WhiteList_translator";
 
-            if (!string.IsNullOrWhiteSpace(durationText))
-                Message += $"{T("Duration_translator")}: {durationText}.";
+                string target = T(targetKey);
 
-            // לוג ברור ומפורט
-            loggerService.Info(
-                $"Scheduled RDP accessibility configured. Target: {target}. " +
-                $"Start date: {formattedDate} {formattedTime}. " +
-                $"Duration: {durationText}."
-            );
+                string targetMsg = $"{T("Target_translator")}: {target}.\r\n";
+                string dateMsg = $"{T("Date_translator")}: {formattedDate} {formattedTime}.\r\n";
+                Message = targetMsg + dateMsg;
 
-            StartCountingDown();
+                if (!string.IsNullOrWhiteSpace(durationText))
+                    Message += $"{T("Duration_translator")}: {durationText}.";
+
+                // לוג ברור ומפורט
+                loggerService.Info(
+                    $"Scheduled RDP accessibility configured. Target: {target}. " +
+                    $"Start date: {formattedDate} {formattedTime}. " +
+                    $"Duration: {durationText}."
+                );
+
+                StartCountingDown(MainTask);
+            }
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
