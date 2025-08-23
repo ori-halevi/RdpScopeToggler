@@ -1,23 +1,20 @@
-﻿using RdpScopeToggler.Services.RdpService;
-using Prism.Commands;
+﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Navigation.Regions;
+using RdpScopeCommands;
+using RdpScopeCommands.Stores;
+using RdpScopeToggler.Services.LoggerService;
+using RdpScopeToggler.Services.NotificationService;
+using RdpScopeToggler.Services.PipeClientService;
 using RdpScopeToggler.Stores;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using RdpScopeToggler.Services.NotificationService;
-using RdpScopeToggler.Services.LoggerService;
-using System.Windows;
-using System.Collections.Generic;
-using System.Text.Json;
-using System.IO;
-using System.Text.Json.Serialization;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using RdpScopeCommands;
-using static System.Windows.Forms.AxHost;
-using RdpScopeCommands.Stores;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -62,9 +59,13 @@ namespace RdpScopeToggler.ViewModels
         private readonly TaskInfoStore taskInfoStore;
         private readonly INotificationService notificationService;
         private readonly ILoggerService loggerService;
+        private readonly IPipeClientService pipeClientService;
+        private bool _isCountingDown = false;
 
-        public TaskUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore, IRdpController rdpService, INotificationService notificationService, ILoggerService loggerService)
+        public TaskUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore, IRdpController rdpService,
+            INotificationService notificationService, ILoggerService loggerService, IPipeClientService pipeClientService)
         {
+            this.pipeClientService = pipeClientService;
             this.loggerService = loggerService;
             this.rdpService = rdpService;
             this.taskInfoStore = taskInfoStore;
@@ -82,84 +83,27 @@ namespace RdpScopeToggler.ViewModels
                 _cts.Dispose();    // משחרר משאבים
                 _cts = null;       // מוחק את ההתייחסות
             }
-            CancelTask();
-            regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
-        }
-
-        private void CancelTask()
-        {
-            WriteToFile(MainTask);
-        }
-        private void WriteToFile(RdpTask mainTask)
-        {
-            try
-            {
-                string filePath = @"C:\ProgramData\RdpScopeToggler\Tasks.json";
-
-                // הגדרת JsonSerializer עם פורמט מותאם לתאריכים
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    Converters =
-                    {
-                        new JsonStringEnumConverter(),       // <--- מאפשר המרה בין Enum למחרוזת
-                    }
-                };
-
-                // קרא את הקובץ אם קיים
-                List<RdpTask> tasks;
-                if (File.Exists(filePath))
-                {
-                    string json = File.ReadAllText(filePath);
-                    tasks = JsonSerializer.Deserialize<List<RdpTask>>(json, options) ?? new List<RdpTask>();
-                }
-                else
-                {
-                    tasks = new List<RdpTask>();
-                }
-
-                // ערוך את הstate של המשימות
-                foreach (var task in tasks)
-                {
-                    if (task.Id.Equals(mainTask.Id))
-                    {
-                        task.State = StateEnum.Canceled;
-                    }
-                }
-
-
-                var newTask = new RdpTask
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Date = DateTime.Now,
-                    Action = ActionsEnum.LocalComputersAndWhiteList,
-                    State = StateEnum.InQueue
-                };
-
-                // הוסף את הטסק החדש
-                tasks.Add(newTask);
-
-                // שמור חזרה לקובץ
-                File.WriteAllText(filePath, JsonSerializer.Serialize(tasks, options));
-            }
-            catch (Exception ex)
-            {
-                loggerService.Error($"Failed to write task: {ex.Message}");
-            }
+            pipeClientService.ForceExecuteTask(MainTask.Id);
+            //regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
         }
 
         private async void StartCountingDown()
         {
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _cts = new CancellationTokenSource();
-
-            var remaining = new TimeSpan(CountDownDay, CountDownHour, CountDownMinute, CountDownSecond);
+            if (_isCountingDown) return; // אם כבר רץ – לא להריץ שוב
+            _isCountingDown = true;
 
             try
             {
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                var remaining = new TimeSpan(CountDownDay, CountDownHour, CountDownMinute, CountDownSecond);
+
                 while (remaining.TotalSeconds > 0)
                 {
+                    if (_cts == null)
+                        break;
                     await Task.Delay(1000, _cts.Token);
                     remaining = remaining.Subtract(TimeSpan.FromSeconds(1));
 
@@ -184,7 +128,8 @@ namespace RdpScopeToggler.ViewModels
                     _cts.Dispose();    // משחרר משאבים
                     _cts = null;       // מוחק את ההתייחסות
                 }
-                regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
+                _isCountingDown = false; // שחרור הנעילה
+                //regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
             }
         }
 
@@ -194,6 +139,11 @@ namespace RdpScopeToggler.ViewModels
             {
                 MainTask = navigationContext.Parameters.GetValue<RdpTask>("task");
                 TimeSpan Duration = MainTask.Date - DateTime.Now;
+                if (Duration.TotalSeconds <= 0 && MainTask.NextTask != null)
+                {
+                    MainTask = MainTask.NextTask;
+                    Duration = MainTask.Date - DateTime.Now;
+                }
 
                 CountDownDay = Duration.Days;
                 CountDownHour = Duration.Hours;

@@ -74,6 +74,7 @@ namespace RdpScopeToggler.ViewModels
         private readonly IRegionManager regionManager;
         private TaskInfoStore taskInfoStore;
         private readonly ILoggerService loggerService;
+        private bool _isCountingDown = false;
         public WaitingUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore, ILoggerService loggerService)
         {
             this.taskInfoStore = taskInfoStore;
@@ -84,15 +85,17 @@ namespace RdpScopeToggler.ViewModels
 
         private async void StartCountingDown(RdpTask task)
         {
-            _cts?.Cancel();
-            _cts = new CancellationTokenSource();
-
-            Debug.WriteLine(taskInfoStore.Date);
-
-            var remaining = task.Date - DateTime.Now;
-
+            if (_isCountingDown) return; // אם כבר רץ – לא להריץ שוב
+            _isCountingDown = true;
             try
             {
+                _cts?.Cancel();
+                _cts = new CancellationTokenSource();
+
+                Debug.WriteLine(taskInfoStore.Date);
+
+                var remaining = task.Date - DateTime.Now;
+
                 while (remaining.TotalSeconds > 0)
                 {
                     await Task.Delay(1000, _cts.Token);
@@ -113,7 +116,8 @@ namespace RdpScopeToggler.ViewModels
                 // Clean always
                 _cts?.Dispose();
                 _cts = null;
-                regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
+                _isCountingDown = false; // שחרור הנעילה
+                //regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
             }
         }
 

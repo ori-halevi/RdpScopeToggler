@@ -6,17 +6,21 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static RdpScopeToggler.ViewModels.IndicatorsUserControlViewModel;
 
 namespace RdpScopeToggler.Services.PipeClientService
 {
     public interface IPipeClientService
     {
-        event Action<string> MessageReceived;
+        event Action<ServiceMessage> MessageReceived;
 
-        Task ConnectAsync(CancellationToken cancellationToken = default);
-
+        Task<bool> ConnectAsync(CancellationToken cancellationToken = default);
+        void StartAutoReconnect();
+        Task AskForUpdate();
         Task SendAsync(string message, CancellationToken cancellationToken = default);
-        void SendAddTask(ActionsEnum action, DateTime date);
+        void SendAddTask(RdpTask taskToAdd);
+        void ForceExecuteTask(string taskId);
+        void SendRemoveTask(string taskId);
         RdpTask? GetUpcomingTask();
         bool IsConnected { get; }
     }

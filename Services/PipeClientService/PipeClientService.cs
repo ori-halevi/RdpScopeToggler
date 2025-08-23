@@ -1,4 +1,5 @@
-﻿using RdpScopeCommands.Stores;
+﻿using Prism.Navigation.Regions;
+using RdpScopeCommands.Stores;
 using RdpScopeToggler.Stores;
 using System;
 using System.Diagnostics;
@@ -9,7 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using static RdpScopeToggler.ViewModels.IndicatorsUserControlViewModel;
 
 namespace RdpScopeToggler.Services.PipeClientService
 {
@@ -20,51 +21,152 @@ namespace RdpScopeToggler.Services.PipeClientService
         private StreamReader _reader;
         private StreamWriter _writer;
         private bool _isListening = false;
+        private CancellationTokenSource? _cts;
+        private IRegionManager regionManager;
+        private bool _isConnected = false;
+        private readonly object _lock = new();
 
-        public event Action<string> MessageReceived;
+        public event Action<ServiceMessage> MessageReceived;
+        public event Action? Connected;
+        public event Action? Disconnected;
         public bool IsConnected => _client?.IsConnected ?? false;
 
-        public PipeClientService(string pipeName = "RdpScopePipe")
+        public PipeClientService(IRegionManager regionManager)
         {
-            _pipeName = pipeName;
+            _pipeName = "RdpScopePipe";
+            this.regionManager = regionManager;
         }
-
-        public async Task ConnectAsync(CancellationToken cancellationToken = default)
+        public async Task<bool> ConnectAsync(CancellationToken cancellationToken = default)
         {
-            if (_client != null && _client.IsConnected) return; // חיבור יחיד
+            if (_isListening || _isConnected)
+                return true;
 
-            _client = new NamedPipeClientStream(".", _pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
-            await _client.ConnectAsync(cancellationToken);
-
-            _reader = new StreamReader(_client, Encoding.UTF8);
-            _writer = new StreamWriter(_client, Encoding.UTF8) { AutoFlush = true };
-
-            if (!_isListening)
+            while (!cancellationToken.IsCancellationRequested)
             {
-                _isListening = true;
-                _ = Task.Run(() => ListenLoop(cancellationToken), cancellationToken);
+                try
+                {
+                    _client = new NamedPipeClientStream(".", _pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+                    await _client.ConnectAsync(2000, cancellationToken);
+                    _reader = new StreamReader(_client, Encoding.UTF8);
+                    _writer = new StreamWriter(_client, Encoding.UTF8) { AutoFlush = true };
+
+                    Connected?.Invoke();
+                    _isConnected = true;
+                    _isListening = true;
+
+                    // ListenLoop יחכה עד שהחיבור נופל, לא קורא ConnectAsync שוב
+                    _ = Task.Run(() => ListenLoop(cancellationToken), cancellationToken);
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Pipe connect failed: {ex.Message}");
+                }
+
+                try { await Task.Delay(2000, cancellationToken); }
+                catch (TaskCanceledException) { return false; }
             }
+
+            return false;
         }
 
         private async Task ListenLoop(CancellationToken cancellationToken)
         {
             try
             {
-                while (!cancellationToken.IsCancellationRequested && IsConnected)
+                while (!cancellationToken.IsCancellationRequested && _client != null && _client.IsConnected)
                 {
-                    string line = await _reader.ReadLineAsync();
-                    if (line == null) break;
+                    try
+                    {
+                        string? line = await _reader.ReadLineAsync();
+                        if (line == null) break;
 
-                    MessageReceived?.Invoke(line);
+                        var messageAsJson = JsonSerializer.Deserialize<ServiceMessage>(line, new JsonSerializerOptions
+                        {
+                            WriteIndented = true,
+                            Converters = { new JsonStringEnumConverter() }
+                        });
+
+                        MessageReceived?.Invoke(messageAsJson);
+                    }
+                    catch (Exception ex) when (ex is TimeoutException || ex is IOException)
+                    {
+                        Debug.WriteLine($"Pipe read error: {ex.Message}");
+                    }
                 }
             }
-            catch (Exception ex)
+            finally
             {
-                // אפשר לוג פה
-                Console.WriteLine($"PipeClientService ListenLoop error: {ex.Message}");
+                Disconnected?.Invoke();
+                Cleanup();
             }
         }
 
+
+
+        private void Cleanup()
+        {
+            _reader?.Dispose();
+            _writer?.Dispose();
+            _client?.Dispose();
+            _reader = null;
+            _writer = null;
+            _client = null;
+            _isConnected = false;
+            _isListening = false;
+        }
+
+        private CancellationTokenSource _reconnectCts;
+
+        public void StartAutoReconnect()
+        {
+            _reconnectCts = new CancellationTokenSource();
+            _ = Task.Run(async () =>
+            {
+                while (!_reconnectCts.IsCancellationRequested)
+                {
+                    if (!_isConnected)
+                    {
+                        Debug.WriteLine("Attempting to reconnect pipe...");
+                        bool success = await ConnectAsync(_reconnectCts.Token);
+                        if (success)
+                        {
+                            Debug.WriteLine("Reconnected successfully!");
+                        }
+                    }
+
+                    // המתנה בין ניסיונות חיבור
+                    try { await Task.Delay(5000, _reconnectCts.Token); }
+                    catch (TaskCanceledException) { break; }
+                }
+            });
+        }
+
+        public void StopAutoReconnect()
+        {
+            _reconnectCts?.Cancel();
+        }
+
+
+
+
+
+
+
+
+
+
+
+        public Task AskForUpdate()
+        {
+            var message = new
+            {
+                command = "Update"
+            };
+            SendToWindowsServer(message);
+            return Task.CompletedTask;
+        }
         public async Task SendAsync(string message, CancellationToken cancellationToken = default)
         {
             if (!IsConnected) return;
@@ -80,21 +182,45 @@ namespace RdpScopeToggler.Services.PipeClientService
             }
         }
 
-        public void SendAddTask(ActionsEnum action, DateTime date)
+        public void SendAddTask(RdpTask taskToAdd)
         {
             var payload = new
             {
                 command = "AddTask",
-                task = new
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Date = date.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-                    Action = action.ToString(),
-                    State = "InQueue"
-                }
+                task = taskToAdd
             };
 
             SendToWindowsServer(payload);
+        }
+
+        public void SendRemoveTask(string taskId)
+        {
+            var payload = new
+            {
+                command = "UpdateTaskAsCanceled",
+                taskId
+            };
+
+            SendToWindowsServer(payload);
+        }
+
+        public void ForceExecuteTask(string taskId)
+        {
+            var payload = new
+            {
+                command = "UpdateTaskAsCanceled",
+                taskId
+            };
+
+            SendToWindowsServer(payload);
+
+
+            var payload2 = new
+            {
+                command = "AddTask",
+                task = new RdpTask(DateTime.Now, ActionsEnum.LocalComputersAndWhiteList)
+            };
+            SendToWindowsServer(payload2);
         }
 
         public RdpTask GetUpcomingTask()
@@ -106,17 +232,17 @@ namespace RdpScopeToggler.Services.PipeClientService
 
             string json = JsonSerializer.Serialize(payload);
 
-            using (var client = new NamedPipeClientStream(".", _pipeName, PipeDirection.InOut))
+            using (_client)
             {
-                client.Connect(3000);
+                _client.Connect(3000);
 
                 // שליחה
                 byte[] buffer = Encoding.UTF8.GetBytes(json);
-                client.Write(buffer, 0, buffer.Length);
-                client.Flush();
+                _client.Write(buffer, 0, buffer.Length);
+                _client.Flush();
 
                 // קריאה תשובה
-                using (var reader = new StreamReader(client, Encoding.UTF8, false, 1024, true))
+                using (var reader = new StreamReader(_client, Encoding.UTF8, false, 1024, true))
                 {
                     string responseJson = reader.ReadLine(); // עד סוף שורה
                     if (string.IsNullOrWhiteSpace(responseJson))
@@ -132,16 +258,15 @@ namespace RdpScopeToggler.Services.PipeClientService
         }
 
 
-        private void SendToWindowsServer(object payload)
+        private async Task SendToWindowsServer(object payload)
         {
-            string json = JsonSerializer.Serialize(payload);
+            if (!_isConnected || _writer == null)
+                await ConnectAsync();
 
-            using (var client = new NamedPipeClientStream(".", _pipeName, PipeDirection.Out))
+            lock (_lock) // מונע כתיבה בו זמנית ממספר threads
             {
-                client.Connect(3000); // timeout 3 שניות
-                byte[] buffer = Encoding.UTF8.GetBytes(json);
-                client.Write(buffer, 0, buffer.Length);
-                client.Flush();
+                string json = JsonSerializer.Serialize(payload);
+                _writer.WriteLine(json);
             }
         }
     }

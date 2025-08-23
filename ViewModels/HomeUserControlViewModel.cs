@@ -7,14 +7,11 @@ using RdpScopeToggler.Services.LoggerService;
 using RdpScopeToggler.Services.PipeClientService;
 using RdpScopeToggler.Stores;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Windows;
 using System.Windows.Input;
+using static RdpScopeToggler.ViewModels.IndicatorsUserControlViewModel;
 
 
 namespace RdpScopeToggler.ViewModels
@@ -194,6 +191,7 @@ namespace RdpScopeToggler.ViewModels
             this.loggerService = loggerService;
             this.regionManager = regionManager;
             this.taskInfoStore = taskInfoStore;
+            this.pipeClientService.MessageReceived += OnMessageReceived;
 
             CountDownDay = 0;
             CountDownHour = 0;
@@ -217,22 +215,24 @@ namespace RdpScopeToggler.ViewModels
             NavigateToSettingsCommand = new DelegateCommand(NavigateToSettings);
             StartCommand = new DelegateCommand(() =>
             {
+                RdpTask task = new RdpTask();
+                task.Action = taskInfoStore.Action;
                 if (IsDateTimeEnabled)
                 {
                     ValidateSelectedDateTime();
                     if (IsDateTimeEnabled && SelectedDateTime < DateTime.Now.AddMinutes(1)) return;
-                    Debug.WriteLine($"SelectedDateTime: {SelectedDateTime}");
-                    pipeClientService.SendAddTask(taskInfoStore.Action, SelectedDateTime);
+                    task.Date = SelectedDateTime;
                     DateTime closeRdpDate = SelectedDateTime.Add(taskInfoStore.Duration);
-                    pipeClientService.SendAddTask(ActionsEnum.LocalComputersAndWhiteList, closeRdpDate);
-                    //CheckIfNeed();
+                    task.NextTask = new RdpTask(closeRdpDate, ActionsEnum.LocalComputersAndWhiteList);
+                    pipeClientService.SendAddTask(task);
                     return;
                 }
 
                 DateTime now1 = DateTime.Now;
                 DateTime closeRdpDate1 = now1.Add(taskInfoStore.Duration);
-                pipeClientService.SendAddTask(ActionsEnum.LocalComputersAndWhiteList, closeRdpDate1);
-                pipeClientService.SendAddTask(taskInfoStore.Action, now1);
+                task.Date = now1;
+                task.NextTask = new RdpTask(closeRdpDate1, ActionsEnum.LocalComputersAndWhiteList);
+                pipeClientService.SendAddTask(task);
                 //CheckIfNeed();
             });
 
@@ -244,7 +244,44 @@ namespace RdpScopeToggler.ViewModels
                 SelectedDate = now.Date;
                 SelectedTime = DateTime.Now.AddMinutes(2);
             });
+        }
 
+        private void OnMessageReceived(ServiceMessage message)
+        {
+            UpdateNavigate(message.CurrentTask);
+        }
+        private void UpdateNavigate(RdpTask currentTask)
+        {
+            if (currentTask == null)
+                return;
+            if (currentTask.State == StateEnum.Executed && currentTask.NextTask != null && currentTask.NextTask.State == StateEnum.Executed)
+                return;
+
+            var parameters = new NavigationParameters
+            {
+                { "task", currentTask }
+            };
+            if (currentTask.State == StateEnum.Executed && currentTask.NextTask != null && currentTask.NextTask.State == StateEnum.InQueue)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    regionManager.RequestNavigate("ActionsRegion", "TaskUserControl", parameters);
+                });
+            }
+            else if (currentTask.State == StateEnum.InQueue && currentTask.NextTask != null && currentTask.NextTask.State == StateEnum.InQueue)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    regionManager.RequestNavigate("ActionsRegion", "WaitingUserControl", parameters);
+                });
+            }
+            else
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    regionManager.RequestNavigate("ActionsRegion", "HomeUserControl", parameters);
+                });
+            }
         }
 
         private void ValidateSelectedDateTime()
@@ -275,7 +312,7 @@ namespace RdpScopeToggler.ViewModels
             RdpTask? task = pipeClientService.GetUpcomingTask();
             if (task == null) return;
 
-            if (task.NextTask == null)
+            if (task.State != StateEnum.InQueue && task.NextTask != null)
             {
                 var parameters = new NavigationParameters
                 {
@@ -301,7 +338,7 @@ namespace RdpScopeToggler.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            CheckIfNeedToNavigate();
+            // CheckIfNeedToNavigate();
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;

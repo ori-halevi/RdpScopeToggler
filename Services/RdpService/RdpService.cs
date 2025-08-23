@@ -6,7 +6,6 @@ using NetFwTypeLib;
 using System.Linq;
 using System.Collections.Generic;
 using RdpScopeToggler.Services.FilesService;
-using RdpScopeToggler.Stores;
 using System.Data;
 using RdpScopeToggler.Services.LoggerService;
 using RdpScopeCommands.Stores;
