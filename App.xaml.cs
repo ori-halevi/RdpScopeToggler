@@ -8,6 +8,7 @@ using RdpScopeToggler.Services.LoggerService;
 using RdpScopeToggler.Services.NotificationService;
 using RdpScopeToggler.Services.PipeClientService;
 using RdpScopeToggler.Stores;
+using RdpScopeToggler.ViewModels;
 using RdpScopeToggler.Views;
 using System;
 using System.Drawing;
@@ -75,13 +76,18 @@ namespace RdpScopeToggler
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            string pathToLoggerFolder = "C:\\ProgramData\\RdpScopeToggler\\Logs";
+            #region Logger service
 
+            const string pathToLoggerFolder = "C:\\ProgramData\\RdpScopeToggler\\Logs";
             containerRegistry.RegisterSingleton<ILoggerService>(() => new LoggerService(pathToLoggerFolder));
 
-            string pathToToastMessageFile = "C:\\ProgramData\\RdpScopeToggler\\ToastMessage.txt";
-            string pathToToastSoftwareFile = "C:\\ProgramData\\RdpScopeToggler\\RdpScopeTogglerToastListener\\RdpScopeTogglerToastListener.exe";
-            string sourceBaseDirectory = "Assets\\Deployment\\RdpScopeTogglerToastListener";
+            #endregion
+
+            #region Notification service
+
+            const string pathToToastMessageFile = "C:\\ProgramData\\RdpScopeToggler\\ToastMessage.txt";
+            const string pathToToastSoftwareFile = "C:\\ProgramData\\RdpScopeToggler\\RdpScopeTogglerToastListener\\RdpScopeTogglerToastListener.exe";
+            const string sourceBaseDirectory = "Assets\\Deployment\\RdpScopeTogglerToastListener";
 
             containerRegistry.RegisterSingleton<INotificationService>(() =>
             {
@@ -91,11 +97,14 @@ namespace RdpScopeToggler
             });
             Container.Resolve<INotificationService>().InitializeInstallation();
 
+            #endregion
+
             containerRegistry.RegisterSingleton<IRdpController, RdpController>();
             containerRegistry.RegisterSingleton<IFilesService, FilesService>();
             containerRegistry.RegisterSingleton<TaskInfoStore>();
             containerRegistry.RegisterSingleton<IPipeClientService, PipeClientService>();
 
+            containerRegistry.RegisterSingleton<IndicatorsUserControlViewModel>();
             containerRegistry.RegisterForNavigation<HomeUserControl>();
             containerRegistry.RegisterForNavigation<WaitingUserControl>();
             containerRegistry.RegisterForNavigation<TaskUserControl>();
@@ -118,19 +127,18 @@ namespace RdpScopeToggler
             LanguageManager.ChangeLanguage(savedCulture);
 
             var pipeClient = Container.Resolve<IPipeClientService>();
-                pipeClient.StartAutoReconnect();
+            if (await pipeClient.ConnectAsync(CancellationToken.None))
+            {
                 var regionManager = Container.Resolve<IRegionManager>();
                 regionManager.RequestNavigate("ContentRegion", "MainUserControl");
                 regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
-            /*if (await pipeClient.ConnectAsync(CancellationToken.None))
-            {
 
                 pipeClient.AskForUpdate();
             }
             else
             {
                 // אופציונלי: תראה הודעת שגיאה/תנסה שוב
-            }*/
+            }
         }
 
 

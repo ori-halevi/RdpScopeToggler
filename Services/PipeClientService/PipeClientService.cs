@@ -117,39 +117,6 @@ namespace RdpScopeToggler.Services.PipeClientService
             _isListening = false;
         }
 
-        private CancellationTokenSource _reconnectCts;
-
-        public void StartAutoReconnect()
-        {
-            _reconnectCts = new CancellationTokenSource();
-            _ = Task.Run(async () =>
-            {
-                while (!_reconnectCts.IsCancellationRequested)
-                {
-                    if (!_isConnected)
-                    {
-                        Debug.WriteLine("Attempting to reconnect pipe...");
-                        bool success = await ConnectAsync(_reconnectCts.Token);
-                        if (success)
-                        {
-                            Debug.WriteLine("Reconnected successfully!");
-                        }
-                    }
-
-                    // המתנה בין ניסיונות חיבור
-                    try { await Task.Delay(5000, _reconnectCts.Token); }
-                    catch (TaskCanceledException) { break; }
-                }
-            });
-        }
-
-        public void StopAutoReconnect()
-        {
-            _reconnectCts?.Cancel();
-        }
-
-
-
 
 
 

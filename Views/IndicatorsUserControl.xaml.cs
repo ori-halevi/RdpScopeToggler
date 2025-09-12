@@ -1,4 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using RdpScopeToggler.ViewModels;
+using System.Windows.Controls;
+using Prism.Ioc;
+
 
 namespace RdpScopeToggler.Views
 {
@@ -10,6 +13,7 @@ namespace RdpScopeToggler.Views
         public IndicatorsUserControl()
         {
             InitializeComponent();
+            DataContext = ContainerLocator.Container.Resolve<IndicatorsUserControlViewModel>();
         }
     }
 }

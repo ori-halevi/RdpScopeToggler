@@ -15,7 +15,6 @@ namespace RdpScopeToggler.Services.PipeClientService
         event Action<ServiceMessage> MessageReceived;
 
         Task<bool> ConnectAsync(CancellationToken cancellationToken = default);
-        void StartAutoReconnect();
         Task AskForUpdate();
         Task SendAsync(string message, CancellationToken cancellationToken = default);
         void SendAddTask(RdpTask taskToAdd);

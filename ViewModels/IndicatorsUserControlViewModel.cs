@@ -6,13 +6,14 @@ using RdpScopeToggler.Stores;
 using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Windows;
 
 namespace RdpScopeToggler.ViewModels
 {
     public class IndicatorsUserControlViewModel : BindableBase
     {
         #region Properties
-        private bool isInternalOpen = true;
+        private bool isInternalOpen;
         public bool IsInternalOpen
         {
             get => isInternalOpen;
@@ -52,6 +53,8 @@ namespace RdpScopeToggler.ViewModels
         private IRegionManager regionManager;
         public IndicatorsUserControlViewModel(IRegionManager regionManager, IPipeClientService pipeClientService)
         {
+            Debug.WriteLine($"[VM CREATED] Hash={this.GetHashCode()}");
+
             this.regionManager = regionManager;
 
             this.pipeClientService = pipeClientService;
@@ -69,10 +72,16 @@ namespace RdpScopeToggler.ViewModels
         private void UpdateIndicators(RdpInfoData rdpInfoData)
         {
             Debug.WriteLine($"Update Indicators...");
-            IsAlwaysOnOpen = rdpInfoData.IsOpenForAlwaysOnList;
-            IsInternalOpen = rdpInfoData.IsOpenForLocalComputers;
-            IsWhiteListOpen = rdpInfoData.IsOpenForWhiteList;
-            IsExternalOpen = rdpInfoData.IsOpenForAll;
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                IsAlwaysOnOpen = rdpInfoData.IsOpenForAlwaysOnList;
+                IsInternalOpen = rdpInfoData.IsOpenForLocalComputers;
+                IsWhiteListOpen = rdpInfoData.IsOpenForWhiteList;
+                IsExternalOpen = rdpInfoData.IsOpenForAll;
+            });
+
+            Debug.WriteLine($"IsAlwaysOnOpen: {IsAlwaysOnOpen},\nIsInternalOpen: {IsInternalOpen},\nIsWhiteListOpen: {IsWhiteListOpen},\nIsExternalOpen: {IsExternalOpen}");
+            Debug.WriteLine($"IsAlwaysOnOpen: {rdpInfoData.IsOpenForAlwaysOnList},\nIsInternalOpen: {rdpInfoData.IsOpenForLocalComputers},\nIsWhiteListOpen: {rdpInfoData.IsOpenForWhiteList},\nIsExternalOpen: {rdpInfoData.IsOpenForAll}");
         }
     }
 }
