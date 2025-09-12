@@ -2,6 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:materialDesignElevation="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
              xmlns:converter="clr-namespace:RdpScopeToggler.Converters"
@@ -107,8 +109,12 @@
                     <materialDesign:PackIcon Kind="Earth" Style="{StaticResource IconStyle}" Foreground="{DynamicResource RedBrush}" />
                 </Border>
                 <Grid.Opacity>
-                    <Binding Path="IsExternalOpen" Converter="{StaticResource BoolToOpacityConverter}" />
+                    <Binding Path="IsExternalOpen"
+                     Converter="{StaticResource BoolToOpacityConverter}"
+                     diag:PresentationTraceSources.TraceLevel="High" />
                 </Grid.Opacity>
+
+
             </Grid>
 
             <!-- Local Addresses Indicator -->

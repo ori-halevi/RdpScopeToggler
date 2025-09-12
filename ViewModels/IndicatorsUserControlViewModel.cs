@@ -1,12 +1,19 @@
-﻿using RdpScopeToggler.Services.RdpService;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
+using Prism.Navigation.Regions;
+using RdpScopeCommands.Stores;
+using RdpScopeToggler.Services.PipeClientService;
+using RdpScopeToggler.Stores;
+using System;
 using System.Diagnostics;
+using System.Threading;
+using System.Windows;
 
 namespace RdpScopeToggler.ViewModels
 {
     public class IndicatorsUserControlViewModel : BindableBase
     {
-        private bool isInternalOpen = true;
+        #region Properties
+        private bool isInternalOpen;
         public bool IsInternalOpen
         {
             get => isInternalOpen;
@@ -34,22 +41,47 @@ namespace RdpScopeToggler.ViewModels
             get => isAlwaysOnOpen;
             set => SetProperty(ref isAlwaysOnOpen, value);
         }
-
-
-        private readonly IRdpService rdpService;
-        public IndicatorsUserControlViewModel(IRdpService rdpService)
+        #endregion
+        public class ServiceMessage
         {
-            this.rdpService = rdpService;
-            rdpService.RdpDataUpdated += UpdateIndicators;
-            rdpService.RefreshRdpData();
+            public RdpTask CurrentTask { get; set; } = new RdpTask();
+            public RdpInfoData CurrentRdpState { get; set; } = new RdpInfoData();
+            public DateTime TimeStemp { get; set; } = DateTime.UtcNow;
         }
 
-        private void UpdateIndicators()
+        private readonly IPipeClientService pipeClientService;
+        private IRegionManager regionManager;
+        public IndicatorsUserControlViewModel(IRegionManager regionManager, IPipeClientService pipeClientService)
         {
-                IsAlwaysOnOpen = rdpService.RdpData.IsOpenForAlwaysOnList;
-                IsInternalOpen = rdpService.RdpData.IsOpenForLocalComputers;
-                IsWhiteListOpen = rdpService.RdpData.IsOpenForWhiteList;
-                IsExternalOpen = rdpService.RdpData.IsOpenForAll;
+            Debug.WriteLine($"[VM CREATED] Hash={this.GetHashCode()}");
+
+            this.regionManager = regionManager;
+
+            this.pipeClientService = pipeClientService;
+            this.pipeClientService.MessageReceived += OnMessageReceived;
+        }
+
+        private void OnMessageReceived(ServiceMessage message)
+        {
+            Debug.WriteLine("Got new message...");
+
+            // Update the indicators
+            UpdateIndicators(message.CurrentRdpState);
+        }
+
+        private void UpdateIndicators(RdpInfoData rdpInfoData)
+        {
+            Debug.WriteLine($"Update Indicators...");
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                IsAlwaysOnOpen = rdpInfoData.IsOpenForAlwaysOnList;
+                IsInternalOpen = rdpInfoData.IsOpenForLocalComputers;
+                IsWhiteListOpen = rdpInfoData.IsOpenForWhiteList;
+                IsExternalOpen = rdpInfoData.IsOpenForAll;
+            });
+
+            Debug.WriteLine($"IsAlwaysOnOpen: {IsAlwaysOnOpen},\nIsInternalOpen: {IsInternalOpen},\nIsWhiteListOpen: {IsWhiteListOpen},\nIsExternalOpen: {IsExternalOpen}");
+            Debug.WriteLine($"IsAlwaysOnOpen: {rdpInfoData.IsOpenForAlwaysOnList},\nIsInternalOpen: {rdpInfoData.IsOpenForLocalComputers},\nIsWhiteListOpen: {rdpInfoData.IsOpenForWhiteList},\nIsExternalOpen: {rdpInfoData.IsOpenForAll}");
         }
     }
 }

@@ -1,13 +1,17 @@
-﻿using Prism.Mvvm;
-using Prism.Commands;
-using System.Windows.Input;
+﻿using Prism.Commands;
+using Prism.Mvvm;
+using Prism.Navigation;
 using Prism.Navigation.Regions;
+using RdpScopeCommands.Stores;
+using RdpScopeToggler.Services.LoggerService;
+using RdpScopeToggler.Services.PipeClientService;
+using RdpScopeToggler.Stores;
 using System;
 using System.Collections.ObjectModel;
-using RdpScopeToggler.Stores;
-using System.Windows;
 using System.Diagnostics;
-using RdpScopeToggler.Views;
+using System.Windows;
+using System.Windows.Input;
+using static RdpScopeToggler.ViewModels.IndicatorsUserControlViewModel;
 
 
 namespace RdpScopeToggler.ViewModels
@@ -178,11 +182,16 @@ namespace RdpScopeToggler.ViewModels
 
         private TaskInfoStore taskInfoStore;
         private IRegionManager regionManager;
+        private readonly ILoggerService loggerService;
+        private readonly IPipeClientService pipeClientService;
 
-        public HomeUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore)
+        public HomeUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore, ILoggerService loggerService, IPipeClientService pipeClientService)
         {
+            this.pipeClientService = pipeClientService;
+            this.loggerService = loggerService;
             this.regionManager = regionManager;
             this.taskInfoStore = taskInfoStore;
+            this.pipeClientService.MessageReceived += OnMessageReceived;
 
             CountDownDay = 0;
             CountDownHour = 0;
@@ -203,18 +212,28 @@ namespace RdpScopeToggler.ViewModels
             };
             SelectedAction = Options[0];
 
-
             NavigateToSettingsCommand = new DelegateCommand(NavigateToSettings);
             StartCommand = new DelegateCommand(() =>
             {
+                RdpTask task = new RdpTask();
+                task.Action = taskInfoStore.Action;
                 if (IsDateTimeEnabled)
                 {
                     ValidateSelectedDateTime();
                     if (IsDateTimeEnabled && SelectedDateTime < DateTime.Now.AddMinutes(1)) return;
-                    regionManager.RequestNavigate("ActionsRegion", "WaitingUserControl");
+                    task.Date = SelectedDateTime;
+                    DateTime closeRdpDate = SelectedDateTime.Add(taskInfoStore.Duration);
+                    task.NextTask = new RdpTask(closeRdpDate, ActionsEnum.LocalComputersAndWhiteList);
+                    pipeClientService.SendAddTask(task);
                     return;
                 }
-                regionManager.RequestNavigate("ActionsRegion", "TaskUserControl");
+
+                DateTime now1 = DateTime.Now;
+                DateTime closeRdpDate1 = now1.Add(taskInfoStore.Duration);
+                task.Date = now1;
+                task.NextTask = new RdpTask(closeRdpDate1, ActionsEnum.LocalComputersAndWhiteList);
+                pipeClientService.SendAddTask(task);
+                //CheckIfNeed();
             });
 
             UpdateDateCommand = new DelegateCommand(() =>
@@ -225,7 +244,44 @@ namespace RdpScopeToggler.ViewModels
                 SelectedDate = now.Date;
                 SelectedTime = DateTime.Now.AddMinutes(2);
             });
+        }
 
+        private void OnMessageReceived(ServiceMessage message)
+        {
+            UpdateNavigate(message.CurrentTask);
+        }
+        private void UpdateNavigate(RdpTask currentTask)
+        {
+            if (currentTask == null)
+                return;
+            if (currentTask.State == StateEnum.Executed && currentTask.NextTask != null && currentTask.NextTask.State == StateEnum.Executed)
+                return;
+
+            var parameters = new NavigationParameters
+            {
+                { "task", currentTask }
+            };
+            if (currentTask.State == StateEnum.Executed && currentTask.NextTask != null && currentTask.NextTask.State == StateEnum.InQueue)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    regionManager.RequestNavigate("ActionsRegion", "TaskUserControl", parameters);
+                });
+            }
+            else if (currentTask.State == StateEnum.InQueue && currentTask.NextTask != null && currentTask.NextTask.State == StateEnum.InQueue)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    regionManager.RequestNavigate("ActionsRegion", "WaitingUserControl", parameters);
+                });
+            }
+            else
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    regionManager.RequestNavigate("ActionsRegion", "HomeUserControl", parameters);
+                });
+            }
         }
 
         private void ValidateSelectedDateTime()
@@ -251,12 +307,39 @@ namespace RdpScopeToggler.ViewModels
         }
 
 
+        private void CheckIfNeedToNavigate()
+        {
+            RdpTask? task = pipeClientService.GetUpcomingTask();
+            if (task == null) return;
+
+            if (task.State != StateEnum.InQueue && task.NextTask != null)
+            {
+                var parameters = new NavigationParameters
+                {
+                    { "task", task }
+                };
+                regionManager.RequestNavigate("ActionsRegion", "TaskUserControl", parameters);
+            }
+            else
+            {
+                var parameters = new NavigationParameters
+                {
+                    { "task", task }
+                };
+                regionManager.RequestNavigate("ActionsRegion", "WaitingUserControl", parameters);
+            }
+
+        }
+
         private void NavigateToSettings()
         {
             regionManager.RequestNavigate("ContentRegion", "SettingsUserControl");
         }
 
-        public void OnNavigatedTo(NavigationContext navigationContext) { }
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            // CheckIfNeedToNavigate();
+        }
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 

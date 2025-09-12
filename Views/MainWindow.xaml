@@ -72,7 +72,7 @@
                 </LinearGradientBrush>
             </Border.BorderBrush>
             <TextBlock
-                Text="v1.0.0"
+                Text="v1.1.0"
                            Style="{DynamicResource MaterialDesignButtonTextBlock}" 
                            HorizontalAlignment="Center"
                            VerticalAlignment="Bottom"

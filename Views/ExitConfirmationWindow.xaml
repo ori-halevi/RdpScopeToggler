@@ -17,7 +17,7 @@
         <TextBlock Text="האם אתה בטוח שברצונך לצאת מהתוכנה?" 
                    FontSize="16" FontWeight="Bold" Margin="0 0 0 20"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
-            <Button Width="80" Margin="10 0" Click="Yes_Click">כן</Button>
+            <Button Width="80" Margin="10 0" Click="Yes_Click" IsDefault="True">כן</Button>
             <Button Width="80" Margin="10 0" Click="No_Click">לא</Button>
         </StackPanel>
     </StackPanel>

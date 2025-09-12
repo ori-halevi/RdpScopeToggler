@@ -1,19 +1,21 @@
-﻿using System.Windows;
-using Prism.Ioc;
-using System.Drawing;
+﻿using Prism.Ioc;
 using Prism.Navigation.Regions;
-using RdpScopeToggler.Views;
-using RdpScopeToggler.Stores;
-using RdpScopeToggler.Services.FilesService;
-using RdpScopeToggler.Services.RdpService;
-using System.Threading.Tasks;
-using System.Windows.Threading;
-using System;
-using RdpScopeToggler.Services.NotificationService;
-using RdpScopeToggler.Models;
-using System.Collections.Generic;
+using RdpScopeCommands;
 using RdpScopeToggler.Managers;
+using RdpScopeToggler.Models;
+using RdpScopeToggler.Services.FilesService;
 using RdpScopeToggler.Services.LoggerService;
+using RdpScopeToggler.Services.NotificationService;
+using RdpScopeToggler.Services.PipeClientService;
+using RdpScopeToggler.Stores;
+using RdpScopeToggler.ViewModels;
+using RdpScopeToggler.Views;
+using System;
+using System.Drawing;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace RdpScopeToggler
 {
@@ -27,53 +29,6 @@ namespace RdpScopeToggler
         {
             return Container.Resolve<MainWindow>();
         }
-
-        protected override void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            string pathToLoggerFolder = "C:\\ProgramData\\RdpScopeToggler\\Logs";
-
-            containerRegistry.RegisterSingleton<ILoggerService>(() => new LoggerService(pathToLoggerFolder));
-
-            string pathToToastMessageFile = "C:\\ProgramData\\RdpScopeToggler\\ToastMessage.txt";
-            string pathToToastSoftwareFile = "C:\\ProgramData\\RdpScopeToggler\\RdpScopeTogglerToastListener\\RdpScopeTogglerToastListener.exe";
-            string sourceBaseDirectory = "Assets\\Deployment\\RdpScopeTogglerToastListener";
-
-            containerRegistry.RegisterSingleton<INotificationService>(() =>
-            {
-                var notificationService = new NotificationService(pathToToastMessageFile, pathToToastSoftwareFile, sourceBaseDirectory);
-                notificationService.NotificationToolInstalled += App_NotificationToolInstalled;
-                return notificationService;
-            });
-            Container.Resolve<INotificationService>().InitializeInstallation();
-
-            containerRegistry.RegisterSingleton<IRdpService, RdpService>();
-            containerRegistry.RegisterSingleton<IFilesService, FilesService>();
-            containerRegistry.RegisterSingleton<TaskInfoStore>();
-
-            containerRegistry.RegisterForNavigation<HomeUserControl>();
-            containerRegistry.RegisterForNavigation<WaitingUserControl>();
-            containerRegistry.RegisterForNavigation<TaskUserControl>();
-            containerRegistry.RegisterForNavigation<SettingsUserControl>();
-            containerRegistry.RegisterForNavigation<WhiteListUserControl>();
-            containerRegistry.RegisterForNavigation<MainUserControl>();
-            containerRegistry.RegisterForNavigation<LocalAddressesUserControl>();
-        }
-
-
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-
-            var savedCulture = "he"; // תביא מההגדרות שלך
-            LanguageManager.ChangeLanguage(savedCulture);
-
-            var regionManager = Container.Resolve<IRegionManager>();
-            regionManager.RequestNavigate("ContentRegion", "MainUserControl"); // In it you have all of the app activity.
-            regionManager.RequestNavigate("ActionsRegion", "HomeUserControl"); // In it you have the three pages of actions: Home, Waiting, Task
-        }
-
-
-
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -116,6 +71,74 @@ namespace RdpScopeToggler
                 if (ea.Button == System.Windows.Forms.MouseButtons.Left)
                     ShowMainWindow();
             };
+        }
+
+
+        protected override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            #region Logger service
+
+            const string pathToLoggerFolder = "C:\\ProgramData\\RdpScopeToggler\\Logs";
+            containerRegistry.RegisterSingleton<ILoggerService>(() => new LoggerService(pathToLoggerFolder));
+
+            #endregion
+
+            #region Notification service
+
+            const string pathToToastMessageFile = "C:\\ProgramData\\RdpScopeToggler\\ToastMessage.txt";
+            const string pathToToastSoftwareFile = "C:\\ProgramData\\RdpScopeToggler\\RdpScopeTogglerToastListener\\RdpScopeTogglerToastListener.exe";
+            const string sourceBaseDirectory = "Assets\\Deployment\\RdpScopeTogglerToastListener";
+
+            containerRegistry.RegisterSingleton<INotificationService>(() =>
+            {
+                var notificationService = new NotificationService(pathToToastMessageFile, pathToToastSoftwareFile, sourceBaseDirectory);
+                notificationService.NotificationToolInstalled += App_NotificationToolInstalled;
+                return notificationService;
+            });
+            Container.Resolve<INotificationService>().InitializeInstallation();
+
+            #endregion
+
+            containerRegistry.RegisterSingleton<IRdpController, RdpController>();
+            containerRegistry.RegisterSingleton<IFilesService, FilesService>();
+            containerRegistry.RegisterSingleton<TaskInfoStore>();
+            containerRegistry.RegisterSingleton<IPipeClientService, PipeClientService>();
+
+            containerRegistry.RegisterSingleton<IndicatorsUserControlViewModel>();
+            containerRegistry.RegisterForNavigation<HomeUserControl>();
+            containerRegistry.RegisterForNavigation<WaitingUserControl>();
+            containerRegistry.RegisterForNavigation<TaskUserControl>();
+            containerRegistry.RegisterForNavigation<SettingsUserControl>();
+            containerRegistry.RegisterForNavigation<WhiteListUserControl>();
+            containerRegistry.RegisterForNavigation<MainUserControl>();
+            containerRegistry.RegisterForNavigation<LocalAddressesUserControl>();
+
+        }
+
+
+
+
+
+        protected override async void OnInitialized()
+        {
+            base.OnInitialized();
+
+            var savedCulture = "he";
+            LanguageManager.ChangeLanguage(savedCulture);
+
+            var pipeClient = Container.Resolve<IPipeClientService>();
+            if (await pipeClient.ConnectAsync(CancellationToken.None))
+            {
+                var regionManager = Container.Resolve<IRegionManager>();
+                regionManager.RequestNavigate("ContentRegion", "MainUserControl");
+                regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
+
+                pipeClient.AskForUpdate();
+            }
+            else
+            {
+                // אופציונלי: תראה הודעת שגיאה/תנסה שוב
+            }
         }
 
 

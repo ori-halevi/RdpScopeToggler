@@ -14,6 +14,8 @@ using System.Net.NetworkInformation;
 using System.Linq;
 using RdpScopeToggler.Models;
 using RdpScopeToggler.Views;
+using RdpScopeCommands;
+using RdpScopeCommands.Stores;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -65,9 +67,9 @@ namespace RdpScopeToggler.ViewModels
         public DelegateCommand NavigateToHomeCommand { get; }
 
         private readonly IFilesService filesService;
-        private readonly IRdpService rdpService;
+        private readonly IRdpController rdpService;
 
-        public LocalAddressesUserControlViewModel(IRegionManager regionManager, IFilesService filesService, IRdpService rdpService)
+        public LocalAddressesUserControlViewModel(IRegionManager regionManager, IFilesService filesService, IRdpController rdpService)
         {
             isLoading = false;
             this.filesService = filesService;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using RdpScopeCommands.Stores;
 using RdpScopeToggler.Stores;
 
 namespace RdpScopeToggler.Services.FilesService

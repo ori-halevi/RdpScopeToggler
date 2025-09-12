@@ -10,6 +10,7 @@ using RdpScopeToggler.Stores;
 using RdpScopeToggler.Models;
 using RdpScopeToggler.Views;
 using System.Diagnostics;
+using RdpScopeCommands.Stores;
 
 namespace RdpScopeToggler.ViewModels
 {

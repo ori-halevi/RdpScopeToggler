@@ -56,6 +56,11 @@
 		<PackageReference Include="vocaluxe.dependencies.netfwtypelib" Version="1.0.1" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Reference Include="RdpScopeCommands">
+	    <HintPath>..\RdpScopeCommands\bin\Debug\net8.0\RdpScopeCommands.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+	<ItemGroup>
 	  <Resource Include="Resources\Buttons.xaml" />
 	  <Resource Include="Resources\Colors.xaml" />
 	  <Resource Include="Resources\Styles.xaml" />
