@@ -1,6 +1,7 @@
-﻿using System;
-using System.Windows;
+﻿using RdpScopeToggler.Helpers;
+using System;
 using System.Drawing;
+using System.Windows;
 
 namespace RdpScopeToggler.Managers
 {
@@ -24,9 +25,20 @@ namespace RdpScopeToggler.Managers
             notifyIcon.Visible = true;
 
             var contextMenu = new System.Windows.Forms.ContextMenuStrip();
+            const string RepoApiUrl = "https://github.com/ori-halevi/RdpScopeToggler/releases";
 
-            contextMenu.Items.Add("פתח חלון", null, (s, ea) => onOpenWindow?.Invoke());
-            contextMenu.Items.Add("יציאה", null, (s, ea) => onExit?.Invoke());
+            contextMenu.Items.Add("GitHub", null, (s, ea) =>
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = RepoApiUrl,
+                    UseShellExecute = true
+                };
+                System.Diagnostics.Process.Start(psi);
+            });
+            
+            contextMenu.Items.Add(TranslationHelper.Translate("OpenWindow_translator"), null, (s, ea) => onOpenWindow?.Invoke());
+            contextMenu.Items.Add(TranslationHelper.Translate("Exit_translator"), null, (s, ea) => onExit?.Invoke());
 
             notifyIcon.ContextMenuStrip = contextMenu;
 

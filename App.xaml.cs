@@ -1,4 +1,6 @@
-﻿using Prism.Ioc;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Prism.Container.Unity;
+using Prism.Ioc;
 using Prism.Navigation.Regions;
 using RdpScopeCommands;
 using RdpScopeToggler.Managers;
@@ -6,11 +8,14 @@ using RdpScopeToggler.Services.FilesService;
 using RdpScopeToggler.Services.LanguageService;
 using RdpScopeToggler.Services.LoggerService;
 using RdpScopeToggler.Services.PipeClientService;
+using RdpScopeToggler.Services.UpdateCheckerService;
 using RdpScopeToggler.ViewModels;
 using RdpScopeToggler.Views;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -56,6 +61,14 @@ namespace RdpScopeToggler
             #endregion
 
             // Register services
+            containerRegistry.RegisterSingleton<IUpdateCheckerService, UpdateCheckerService>();
+            // Unity + IHttpClientFactory
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddHttpClient();
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            containerRegistry.RegisterInstance(serviceProvider.GetRequiredService<IHttpClientFactory>());
+
             containerRegistry.RegisterSingleton<ILanguageService, LanguageService>();
             containerRegistry.RegisterSingleton<IRdpController, RdpController>();
             containerRegistry.RegisterSingleton<IFilesService, FilesService>();
@@ -81,6 +94,16 @@ namespace RdpScopeToggler
         protected override async void OnInitialized()
         {
             base.OnInitialized();
+
+            var updateChecker = Container.Resolve<IUpdateCheckerService>();
+            await updateChecker.CheckForUpdatesAsync();
+
+            #region Initialize language
+
+            ILanguageService languageService = Container.Resolve<ILanguageService>();
+            languageService.LoadLanguage();
+
+            #endregion
 
             #region Initialize Tray Icon
 
@@ -109,17 +132,9 @@ namespace RdpScopeToggler
 
             #endregion
 
-            #region Initialize language
-            Container.Resolve<ILanguageService>().LoadLanguage();
-
-            #endregion
-
-
             // Copy files of RdpScopeTogglerService
             string sourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Deployment");
             string targetPath = @"C:\ProgramData\RdpScopeToggler";
-
-
 
             string sourceDelServiceFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Deployment", "RdpScopeService");
             string targetDelServicePath = @"C:\ProgramData\RdpScopeToggler\RdpScopeService";

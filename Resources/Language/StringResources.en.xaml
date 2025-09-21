@@ -55,7 +55,9 @@
         Select a future date at least one minute ahead
     </sys:String>
 
-
     <sys:String x:Key="SkipCountdown_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Skip the Countdown</sys:String>
-    
+
+    <sys:String x:Key="OpenWindow_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Open window</sys:String>
+    <sys:String x:Key="Exit_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Exit</sys:String>
+
 </ResourceDictionary>

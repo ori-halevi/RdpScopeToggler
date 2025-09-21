@@ -23,26 +23,27 @@ namespace RdpScopeToggler.Services.LanguageService
             // Update settings file
             filesService.WriteLanguageToSettings(language);
 
-            // 
-            var dict = new ResourceDictionary();
-            dict.Source = new Uri("Resources/Language/StringResources." + language + ".xaml", UriKind.Relative);
-
-            // הסרת מילון קודם אם קיים
-            var oldDict = Application.Current.Resources.MergedDictionaries
-                            .FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("StringResources."));
-            if (oldDict != null)
-            {
-                Application.Current.Resources.MergedDictionaries.Remove(oldDict);
-            }
-
-            Application.Current.Resources.MergedDictionaries.Add(dict);
-
             // טיפול בכיוון ימין לשמאל
-            if (language == "he")
-                Application.Current.MainWindow.FlowDirection = FlowDirection.RightToLeft;
-            else
-                Application.Current.MainWindow.FlowDirection = FlowDirection.LeftToRight;
+            Application.Current.MainWindow.FlowDirection =
+                language == "he" ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+
+            // נתיב ה־dictionary
+            string dictionaryPath = $"Resources/Language/StringResources.{language}.xaml";
+
+            // מחפשים אם כבר קיים dictionary של שפה
+            var existing = Application.Current.Resources.MergedDictionaries
+                .FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("StringResources."));
+            if (existing != null)
+                Application.Current.Resources.MergedDictionaries.Remove(existing);
+
+            // מוסיפים את dictionary החדש
+            var dict = new ResourceDictionary
+            {
+                Source = new Uri(dictionaryPath, UriKind.Relative)
+            };
+            Application.Current.Resources.MergedDictionaries.Add(dict);
         }
+
 
         public void LoadLanguage()
         {

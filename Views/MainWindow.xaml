@@ -77,12 +77,12 @@
                 </LinearGradientBrush>
             </Border.BorderBrush>
             <TextBlock
-                Text="v1.1.0"
-                           Style="{DynamicResource MaterialDesignButtonTextBlock}" 
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Bottom"
-                           Foreground="Gray"
-                           />
+                Text="{Binding Version}"
+                Style="{DynamicResource MaterialDesignButtonTextBlock}" 
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Foreground="Gray"
+                />
         </Border>
     </Grid>
 </Window>

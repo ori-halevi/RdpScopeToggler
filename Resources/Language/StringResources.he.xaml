@@ -57,7 +57,10 @@
         בחר תאריך עתידי לפחות בדקה אחת
     </sys:String>
 
+    <sys:String x:Key="OpenWindow_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">פתח חלון</sys:String>
+    <sys:String x:Key="Exit_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">יציאה</sys:String>
 
+    
     <sys:String x:Key="EEEEEEEE_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">EEEEEEEEEE</sys:String>
     
 </ResourceDictionary>
