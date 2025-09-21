@@ -4,6 +4,6 @@
     {
         public string SelectedLanguage { get; set; }
         void SetLanguage(string language);
-        void LoadLanguage(string pathToSettingsFile);
+        void LoadLanguage();
     }
 }

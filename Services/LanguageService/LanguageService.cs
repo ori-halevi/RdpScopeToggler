@@ -1,9 +1,6 @@
-﻿using RdpScopeToggler.Models;
-using RdpScopeToggler.Services.FilesService;
+﻿using RdpScopeToggler.Services.FilesService;
 using System;
-using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Windows;
 
 namespace RdpScopeToggler.Services.LanguageService
@@ -47,21 +44,11 @@ namespace RdpScopeToggler.Services.LanguageService
                 Application.Current.MainWindow.FlowDirection = FlowDirection.LeftToRight;
         }
 
-        public void LoadLanguage(string pathToSettingsFile)
+        public void LoadLanguage()
         {
-            if (!File.Exists(pathToSettingsFile))
-                throw new FileNotFoundException("Settings file not found.", pathToSettingsFile);
+            string language = filesService.GetLanguageFromSettings();
 
-            // קריאת תוכן הקובץ
-            var json = File.ReadAllText(pathToSettingsFile);
-
-            // המרה לאובייקט
-            var settings = JsonSerializer.Deserialize<Settings>(json);
-
-            if (settings == null || string.IsNullOrWhiteSpace(settings.Language))
-                return;
-
-            SetLanguage(settings.Language);
+            SetLanguage(language);
         }
 
     }
