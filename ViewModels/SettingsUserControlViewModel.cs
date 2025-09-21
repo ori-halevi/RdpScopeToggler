@@ -1,7 +1,7 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Navigation.Regions;
-using RdpScopeToggler.Managers;
+using RdpScopeToggler.Services.LanguageService;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -22,10 +22,14 @@ namespace RdpScopeToggler.ViewModels
                 if (SetProperty(ref selectedLanguage, value))
                 {
                     // Call language manager
-                    if (value == "עברית")
-                        LanguageManager.ChangeLanguage("he");
+                    if (value == "עברית" || value == "he")
+                    {
+                        languageService.SetLanguage("he");
+                    }
                     else
-                        LanguageManager.ChangeLanguage("en");
+                    {
+                        languageService.SetLanguage("en");
+                    }
                 }
             }
         }
@@ -34,10 +38,12 @@ namespace RdpScopeToggler.ViewModels
         public ICommand OpenLogsFolderCommand { get; }
 
         private readonly IRegionManager regionManager;
+        private readonly ILanguageService languageService;
 
-        public SettingsUserControlViewModel(IRegionManager regionManager)
+        public SettingsUserControlViewModel(IRegionManager regionManager, ILanguageService languageService)
         {
             this.regionManager = regionManager;
+            this.languageService = languageService;
 
             LanguagesOptions = new ObservableCollection<string>
             {
@@ -45,12 +51,13 @@ namespace RdpScopeToggler.ViewModels
                 "עברית"
             };
 
-            SelectedLanguage = LanguageManager.SelectedLanguage;
+            SelectedLanguage = languageService.SelectedLanguage;
 
             CloseCommand = new DelegateCommand(() =>
             {
                 regionManager.RequestNavigate("ContentRegion", "MainUserControl");
             });
+
             OpenLogsFolderCommand = new DelegateCommand(() =>
             {
                 string pathToLoggerFolder = "C:\\ProgramData\\RdpScopeToggler\\Logs";
@@ -71,15 +78,14 @@ namespace RdpScopeToggler.ViewModels
 
         }
 
-        public void OnNavigatedTo(NavigationContext navigationContext)
-        {
-            // If needed, handle navigation parameters
-        }
+        #region Navigation Methods
+
+        public void OnNavigatedTo(NavigationContext navigationContext) { }
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
-        public void OnNavigatedFrom(NavigationContext navigationContext)
-        {
-        }
+        public void OnNavigatedFrom(NavigationContext navigationContext) { }
+
+        #endregion
     }
 }

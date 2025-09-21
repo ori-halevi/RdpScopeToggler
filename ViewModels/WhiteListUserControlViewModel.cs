@@ -1,16 +1,14 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
-using System.Windows;
+using Prism.Navigation.Regions;
+using RdpScopeCommands.Stores;
+using RdpScopeToggler.Models;
+using RdpScopeToggler.Services.FilesService;
+using RdpScopeToggler.Views;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using RdpScopeToggler.Services.FilesService;
-using System.Text.RegularExpressions;
-using Prism.Navigation.Regions;
-using RdpScopeToggler.Stores;
-using RdpScopeToggler.Models;
-using RdpScopeToggler.Views;
 using System.Diagnostics;
-using RdpScopeCommands.Stores;
+using System.Text.RegularExpressions;
 
 namespace RdpScopeToggler.ViewModels
 {

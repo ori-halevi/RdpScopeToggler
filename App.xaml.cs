@@ -2,16 +2,13 @@
 using Prism.Navigation.Regions;
 using RdpScopeCommands;
 using RdpScopeToggler.Managers;
-using RdpScopeToggler.Models;
 using RdpScopeToggler.Services.FilesService;
+using RdpScopeToggler.Services.LanguageService;
 using RdpScopeToggler.Services.LoggerService;
-using RdpScopeToggler.Services.NotificationService;
 using RdpScopeToggler.Services.PipeClientService;
-using RdpScopeToggler.Stores;
 using RdpScopeToggler.ViewModels;
 using RdpScopeToggler.Views;
 using System;
-using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -32,45 +29,18 @@ namespace RdpScopeToggler
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            base.OnStartup(e);
+
+            #region Exception handling
             // האזנה לשגיאות גלובליות
             AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
             DispatcherUnhandledException += OnDispatcherUnhandledException;
             TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+            #endregion
 
+            // App will only shut down when Shutdown() is called explicitly,
+            // not automatically when windows are closed
             Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-
-            base.OnStartup(e);
-
-            notifyIcon = new System.Windows.Forms.NotifyIcon();
-            notifyIcon.Icon = new Icon("Assets/remote-desktop.ico");
-            notifyIcon.Visible = true;
-            notifyIcon.Text = "Rdp Scope Toggler";
-
-            var contextMenu = new System.Windows.Forms.ContextMenuStrip();
-
-            contextMenu.Items.Add("פתח חלון", null, (s, ea) => ShowMainWindow());
-            contextMenu.Items.Add("יציאה", null, (s, ea) =>
-            {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    var confirmWindow = new ExitConfirmationWindow();
-                    confirmWindow.ShowDialog();
-
-                    if (confirmWindow.UserConfirmed)
-                    {
-                        App.notifyIcon.Visible = false;
-                        Application.Current.Shutdown();
-                    }
-                });
-            });
-
-            notifyIcon.ContextMenuStrip = contextMenu;
-
-            notifyIcon.MouseClick += (s, ea) =>
-            {
-                if (ea.Button == System.Windows.Forms.MouseButtons.Left)
-                    ShowMainWindow();
-            };
         }
 
 
@@ -83,28 +53,16 @@ namespace RdpScopeToggler
 
             #endregion
 
-            #region Notification service
-
-            const string pathToToastMessageFile = "C:\\ProgramData\\RdpScopeToggler\\ToastMessage.txt";
-            const string pathToToastSoftwareFile = "C:\\ProgramData\\RdpScopeToggler\\RdpScopeTogglerToastListener\\RdpScopeTogglerToastListener.exe";
-            const string sourceBaseDirectory = "Assets\\Deployment\\RdpScopeTogglerToastListener";
-
-            containerRegistry.RegisterSingleton<INotificationService>(() =>
-            {
-                var notificationService = new NotificationService(pathToToastMessageFile, pathToToastSoftwareFile, sourceBaseDirectory);
-                notificationService.NotificationToolInstalled += App_NotificationToolInstalled;
-                return notificationService;
-            });
-            Container.Resolve<INotificationService>().InitializeInstallation();
-
-            #endregion
-
+            // Register services
+            containerRegistry.RegisterSingleton<ILanguageService, LanguageService>();
             containerRegistry.RegisterSingleton<IRdpController, RdpController>();
             containerRegistry.RegisterSingleton<IFilesService, FilesService>();
-            containerRegistry.RegisterSingleton<TaskInfoStore>();
             containerRegistry.RegisterSingleton<IPipeClientService, PipeClientService>();
-
             containerRegistry.RegisterSingleton<IndicatorsUserControlViewModel>();
+
+
+            // Register navigation
+            containerRegistry.RegisterForNavigation<WaitingForServiceUserControl>();
             containerRegistry.RegisterForNavigation<HomeUserControl>();
             containerRegistry.RegisterForNavigation<WaitingUserControl>();
             containerRegistry.RegisterForNavigation<TaskUserControl>();
@@ -112,7 +70,6 @@ namespace RdpScopeToggler
             containerRegistry.RegisterForNavigation<WhiteListUserControl>();
             containerRegistry.RegisterForNavigation<MainUserControl>();
             containerRegistry.RegisterForNavigation<LocalAddressesUserControl>();
-
         }
 
 
@@ -123,41 +80,57 @@ namespace RdpScopeToggler
         {
             base.OnInitialized();
 
-            var savedCulture = "he";
-            LanguageManager.ChangeLanguage(savedCulture);
+            #region Initialize Tray Icon
 
-            var pipeClient = Container.Resolve<IPipeClientService>();
-            if (await pipeClient.ConnectAsync(CancellationToken.None))
+            var trayIconManager = Container.Resolve<TrayIconManager>();
+            trayIconManager.Initialize(
+                iconPath: "Assets/remote-desktop.ico",
+                tooltip: "Rdp Scope Toggler",
+                onOpenWindow: ShowMainWindow,
+                onExit: () =>
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        var confirmWindow = new ExitConfirmationWindow();
+                        confirmWindow.ShowDialog();
+
+                        if (confirmWindow.UserConfirmed)
+                        {
+                            trayIconManager.Dispose();
+                            Application.Current.Shutdown();
+                        }
+                    });
+                });
+
+            // מחברים את החלון ל־TrayIconManager
+            trayIconManager.AttachWindow(MainWindow);
+
+            #endregion
+
+            #region Initialize language
+
+            const string pathToSettingsFile = "C:\\ProgramData\\RdpScopeToggler\\Settings.json";
+            Container.Resolve<ILanguageService>().LoadLanguage(pathToSettingsFile);
+
+            #endregion
+
+            var regionManager = Container.Resolve<IRegionManager>();
+            regionManager.RequestNavigate("ContentRegion", "WaitingForServiceUserControl");
+
+            var pipeClientService = Container.Resolve<IPipeClientService>();
+            Container.Resolve<NavigationManager>();
+
+            if (await pipeClientService.ConnectAsync(CancellationToken.None))
             {
-                var regionManager = Container.Resolve<IRegionManager>();
                 regionManager.RequestNavigate("ContentRegion", "MainUserControl");
                 regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
 
-                pipeClient.AskForUpdate();
+                pipeClientService.AskForUpdate();
             }
             else
             {
                 // אופציונלי: תראה הודעת שגיאה/תנסה שוב
             }
-        }
-
-
-        private void App_NotificationToolInstalled()
-        {
-            var options = new GenericDialogOptions
-            {
-                Title = "הפעלה מחדש מומלצת",
-                Message = "המערכת זיהתה הפעלה ראשונית של התוכנה,\r\nאם לא תפעיל מחדש את המערכת יתכן שמשתמשים אחרים לא יקבלו התראות.",
-                OnClose = () => { },
-                IsModal = true,
-                Topmost = true,
-            };
-
-            var dialog = new GenericDialogWindow(options);
-            if (options.IsModal)
-                dialog.ShowDialog();
-            else
-                dialog.Show();
         }
 
         private void ShowMainWindow()
@@ -168,6 +141,9 @@ namespace RdpScopeToggler
             MainWindow.Show();
             MainWindow.Activate();
         }
+
+
+        #region Exception handling
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
@@ -197,12 +173,6 @@ namespace RdpScopeToggler
             // אפשר לשקול לוג (לוג מקומי/קבצים/שרת)
         }
 
-
-
-
-
-
-
-
+        #endregion
     }
 }

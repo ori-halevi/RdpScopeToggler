@@ -1,12 +1,7 @@
-﻿using RdpScopeCommands.Stores;
-using RdpScopeToggler.Stores;
+﻿using RdpScopeToggler.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static RdpScopeToggler.ViewModels.IndicatorsUserControlViewModel;
 
 namespace RdpScopeToggler.Services.PipeClientService
 {
@@ -18,7 +13,6 @@ namespace RdpScopeToggler.Services.PipeClientService
         Task AskForUpdate();
         Task SendAsync(string message, CancellationToken cancellationToken = default);
         void SendAddTask(RdpTask taskToAdd);
-        void ForceExecuteTask(string taskId);
         void SendRemoveTask(string taskId);
         RdpTask? GetUpcomingTask();
         bool IsConnected { get; }

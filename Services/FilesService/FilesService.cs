@@ -1,38 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using RdpScopeCommands.Stores;
+using RdpScopeToggler.Models;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using RdpScopeCommands.Stores;
-using RdpScopeToggler.Stores;
 
 namespace RdpScopeToggler.Services.FilesService
 {
     public class FilesService : IFilesService
     {
+        #region Public Methodes
+
+        #region WhiteList
+
         public List<Client> GetWhiteList()
         {
             EnsureListFileExists("WhiteList.json");
             return ReadList("WhiteList.json");
         }
-        public List<Client> GetAlwaysOnList()
-        {
-            EnsureListFileExists("AlwaysOnList.json");
-            return ReadList("AlwaysOnList.json");
-        }
-
 
         public void AddToWhiteList(string ip, string name = "Unnamed")
         {
             EnsureListFileExists("WhiteList.json");
             WriteToList(ip, name, true, "WhiteList.json");
         }
-
-        public void AddToAlwaysOnList(string ip, bool isOpen, string name = "Unnamed")
-        {
-            EnsureListFileExists("AlwaysOnList.json");
-            WriteToList(ip, name, isOpen, "AlwaysOnList.json");
-        }
-
 
         public void CleanWhiteList()
         {
@@ -43,6 +34,22 @@ namespace RdpScopeToggler.Services.FilesService
                 WriteIndented = true
             });
             File.WriteAllText(filePath, updatedJson);
+        }
+
+        #endregion
+
+        #region AlwaysOnList
+
+        public List<Client> GetAlwaysOnList()
+        {
+            EnsureListFileExists("AlwaysOnList.json");
+            return ReadList("AlwaysOnList.json");
+        }
+
+        public void AddToAlwaysOnList(string ip, bool isOpen, string name = "Unnamed")
+        {
+            EnsureListFileExists("AlwaysOnList.json");
+            WriteToList(ip, name, isOpen, "AlwaysOnList.json");
         }
 
         public void CleanAlwaysOnList()
@@ -56,6 +63,40 @@ namespace RdpScopeToggler.Services.FilesService
             File.WriteAllText(filePath, updatedJson);
         }
 
+        #endregion
+
+        #region Language
+
+        public void WriteLanguageToSettings(string language)
+        {
+            const string pathToSettingsFile = @"C:\ProgramData\RdpScopeToggler\Settings.json";
+
+            Settings settings;
+
+            // אם הקובץ קיים – נקרא אותו, כדי לא לאבד נתונים נוספים
+            if (File.Exists(pathToSettingsFile))
+            {
+                var json = File.ReadAllText(pathToSettingsFile);
+                settings = JsonSerializer.Deserialize<Settings>(json) ?? new Settings();
+            }
+            else
+            {
+                settings = new Settings();
+            }
+
+            // עדכון השפה
+            settings.Language = language;
+
+            // כתיבה חזרה לקובץ (עם עיצוב יפה לקריאה)
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            var updatedJson = JsonSerializer.Serialize(settings, options);
+
+            File.WriteAllText(pathToSettingsFile, updatedJson);
+        }
+
+        #endregion
+
+        #endregion
 
 
         #region Private Methodes
@@ -131,7 +172,6 @@ namespace RdpScopeToggler.Services.FilesService
                 return new List<Client>();
             }
         }
-
 
         private void EnsureListFileExists(string fileName = "WhiteList.json")
         {

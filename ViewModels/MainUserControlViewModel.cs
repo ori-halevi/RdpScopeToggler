@@ -1,5 +1,4 @@
 ﻿using Prism.Mvvm;
-using Prism.Navigation.Regions;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -9,5 +8,4 @@ namespace RdpScopeToggler.ViewModels
         {
         }
     }
-
 }

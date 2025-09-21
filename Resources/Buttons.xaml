@@ -28,46 +28,66 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="border"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="5">
-                        <ContentPresenter HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"
-                                      RecognizesAccessKey="True"/>
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="5">
+                        <ContentPresenter x:Name="contentPresenter"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  RecognizesAccessKey="True"/>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <EventTrigger RoutedEvent="MouseEnter">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <DoubleAnimation Storyboard.TargetProperty="(Button.RenderTransform).(ScaleTransform.ScaleX)"
+                        <!-- Disabled State Trigger -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="#FFB0B0B0"/>
+                            <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="#FF6D6D6D"/>
+                            <Setter Property="Cursor" Value="Arrow"/>
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="Black" Direction="270" ShadowDepth="1" BlurRadius="3" Opacity="0.1"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+
+                        <!-- Mouse Enter Animation (only when enabled) -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                                <Condition Property="IsEnabled" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="(Button.RenderTransform).(ScaleTransform.ScaleX)"
                                                  To="1.05" Duration="0:0:0.2"/>
-                                    <DoubleAnimation Storyboard.TargetProperty="(Button.RenderTransform).(ScaleTransform.ScaleY)"
+                                        <DoubleAnimation Storyboard.TargetProperty="(Button.RenderTransform).(ScaleTransform.ScaleY)"
                                                  To="1.05" Duration="0:0:0.2"/>
-                                    <ColorAnimation Storyboard.TargetName="border"
+                                        <ColorAnimation Storyboard.TargetName="border"
                                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
                                                 To="{StaticResource DarkGreenColor}" Duration="0:0:0.2"/>
-                                    <DoubleAnimation Storyboard.TargetProperty="(Button.Effect).(DropShadowEffect.ShadowDepth)"
+                                        <DoubleAnimation Storyboard.TargetProperty="(Button.Effect).(DropShadowEffect.ShadowDepth)"
                                                  To="6" Duration="0:0:0.2"/>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-
-                        <EventTrigger RoutedEvent="MouseLeave">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <DoubleAnimation Storyboard.TargetProperty="(Button.RenderTransform).(ScaleTransform.ScaleX)"
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </MultiTrigger.EnterActions>
+                            <MultiTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="(Button.RenderTransform).(ScaleTransform.ScaleX)"
                                                  To="1.0" Duration="0:0:0.2"/>
-                                    <DoubleAnimation Storyboard.TargetProperty="(Button.RenderTransform).(ScaleTransform.ScaleY)"
+                                        <DoubleAnimation Storyboard.TargetProperty="(Button.RenderTransform).(ScaleTransform.ScaleY)"
                                                  To="1.0" Duration="0:0:0.2"/>
-                                    <ColorAnimation Storyboard.TargetName="border"
+                                        <ColorAnimation Storyboard.TargetName="border"
                                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
                                                 To="{StaticResource GreenColor}" Duration="0:0:0.2"/>
-                                    <DoubleAnimation Storyboard.TargetProperty="(Button.Effect).(DropShadowEffect.ShadowDepth)"
+                                        <DoubleAnimation Storyboard.TargetProperty="(Button.Effect).(DropShadowEffect.ShadowDepth)"
                                                  To="3" Duration="0:0:0.2"/>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </MultiTrigger.ExitActions>
+                        </MultiTrigger>
+
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

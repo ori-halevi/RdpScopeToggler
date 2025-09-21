@@ -1,6 +1,6 @@
 ﻿using Prism.Navigation.Regions;
 using RdpScopeCommands.Stores;
-using RdpScopeToggler.Stores;
+using RdpScopeToggler.Models;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -10,7 +10,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using static RdpScopeToggler.ViewModels.IndicatorsUserControlViewModel;
 
 namespace RdpScopeToggler.Services.PipeClientService
 {
@@ -54,7 +53,7 @@ namespace RdpScopeToggler.Services.PipeClientService
                     _isConnected = true;
                     _isListening = true;
 
-                    // ListenLoop יחכה עד שהחיבור נופל, לא קורא ConnectAsync שוב
+                    // ListenLoop will wait until the connection will be closed, not call ConnectAsync again
                     _ = Task.Run(() => ListenLoop(cancellationToken), cancellationToken);
 
                     return true;
@@ -89,6 +88,7 @@ namespace RdpScopeToggler.Services.PipeClientService
                         });
 
                         MessageReceived?.Invoke(messageAsJson);
+                        Debug.WriteLine($"Pipe message received: {line}");
                     }
                     catch (Exception ex) when (ex is TimeoutException || ex is IOException)
                     {
@@ -169,25 +169,6 @@ namespace RdpScopeToggler.Services.PipeClientService
             };
 
             SendToWindowsServer(payload);
-        }
-
-        public void ForceExecuteTask(string taskId)
-        {
-            var payload = new
-            {
-                command = "UpdateTaskAsCanceled",
-                taskId
-            };
-
-            SendToWindowsServer(payload);
-
-
-            var payload2 = new
-            {
-                command = "AddTask",
-                task = new RdpTask(DateTime.Now, ActionsEnum.LocalComputersAndWhiteList)
-            };
-            SendToWindowsServer(payload2);
         }
 
         public RdpTask GetUpcomingTask()

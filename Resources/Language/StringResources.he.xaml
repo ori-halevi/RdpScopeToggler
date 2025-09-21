@@ -45,7 +45,18 @@
 
     <sys:String x:Key="AccessEnabled_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">הגישה מאופשרת!</sys:String>
     <sys:String x:Key="Disconnect_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">ניתוק מיידי</sys:String>
-    
+
+    <sys:String x:Key="SureToExit_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">האם אתה בטוח שברצונך לסגור את התוכנה?</sys:String>
+
+    <sys:String x:Key="Yes_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">כן</sys:String>
+    <sys:String x:Key="No_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">לא</sys:String>
+
+    <sys:String x:Key="SkipCountdown_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">דלג על ההמתנה</sys:String>
+
+    <sys:String x:Key="FutureDateAtLeastOneMinute_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+        בחר תאריך עתידי לפחות בדקה אחת
+    </sys:String>
+
 
     <sys:String x:Key="EEEEEEEE_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">EEEEEEEEEE</sys:String>
     

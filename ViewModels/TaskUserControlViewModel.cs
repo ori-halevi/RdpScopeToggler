@@ -1,17 +1,10 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Navigation.Regions;
-using RdpScopeCommands;
-using RdpScopeCommands.Stores;
+using RdpScopeToggler.Models;
 using RdpScopeToggler.Services.LoggerService;
-using RdpScopeToggler.Services.NotificationService;
 using RdpScopeToggler.Services.PipeClientService;
-using RdpScopeToggler.Stores;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -49,47 +42,48 @@ namespace RdpScopeToggler.ViewModels
 
         private RdpTask MainTask { get; set; }
 
-        public ICommand DisconnectCommand { get; set; }
+        public ICommand SkipCountdownCommand { get; set; }
 
         #endregion
 
         private CancellationTokenSource _cts;
-        private readonly IRegionManager regionManager;
-        private readonly IRdpController rdpService;
-        private readonly TaskInfoStore taskInfoStore;
-        private readonly INotificationService notificationService;
         private readonly ILoggerService loggerService;
         private readonly IPipeClientService pipeClientService;
         private bool _isCountingDown = false;
 
-        public TaskUserControlViewModel(IRegionManager regionManager, TaskInfoStore taskInfoStore, IRdpController rdpService,
-            INotificationService notificationService, ILoggerService loggerService, IPipeClientService pipeClientService)
+        public TaskUserControlViewModel(ILoggerService loggerService, IPipeClientService pipeClientService)
         {
             this.pipeClientService = pipeClientService;
             this.loggerService = loggerService;
-            this.rdpService = rdpService;
-            this.taskInfoStore = taskInfoStore;
-            this.notificationService = notificationService;
-            this.regionManager = regionManager;
 
-            DisconnectCommand = new DelegateCommand(Disconnect);
+            SkipCountdownCommand = new DelegateCommand(SkipCountdown);
         }
 
-        private void Disconnect()
+        /// <summary>
+        /// Cancel the running timer and send the remove task command and create the end result task
+        /// </summary>
+        private void SkipCountdown()
         {
             if (_cts != null)
             {
-                _cts.Cancel();     // מבטל את המשימה הרצה
-                _cts.Dispose();    // משחרר משאבים
-                _cts = null;       // מוחק את ההתייחסות
+                _cts.Cancel();     // Cancel the running task
+                _cts.Dispose();    // Release resources
+                _cts = null;       // Delete the reference
             }
-            pipeClientService.ForceExecuteTask(MainTask.Id);
-            //regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
+
+            // Send the remove task command to the service
+            pipeClientService.SendRemoveTask(MainTask.Id);
+
+            // Create the end result task
+            RdpTask endResultTask = new (DateTime.Now, MainTask.Action);
+
+            // Send the add task command to the service
+            pipeClientService.SendAddTask(endResultTask);
         }
 
         private async void StartCountingDown()
         {
-            if (_isCountingDown) return; // אם כבר רץ – לא להריץ שוב
+            if (_isCountingDown) return; // If already counting down - don't count down again
             _isCountingDown = true;
 
             try
@@ -98,58 +92,77 @@ namespace RdpScopeToggler.ViewModels
                 _cts?.Dispose();
                 _cts = new CancellationTokenSource();
 
-                var remaining = new TimeSpan(CountDownDay, CountDownHour, CountDownMinute, CountDownSecond);
+                // Calculate the remaining time of the main task
+                TimeSpan timeLeft = MainTask.Date - DateTime.Now;
 
-                while (remaining.TotalSeconds > 0)
+                while (timeLeft.TotalSeconds > 0)
                 {
-                    if (_cts == null)
-                        break;
+                    if (_cts == null) break;
+
                     await Task.Delay(1000, _cts.Token);
-                    remaining = remaining.Subtract(TimeSpan.FromSeconds(1));
+                    timeLeft = timeLeft.Subtract(TimeSpan.FromSeconds(1));
 
-                    CountDownDay = remaining.Days;
-                    CountDownHour = remaining.Hours;
-                    CountDownMinute = remaining.Minutes;
-                    CountDownSecond = remaining.Seconds;
-
-                    // Send notification 5 minutes before closing.
-                    if (remaining.TotalSeconds == 60 * 5)
-                        notificationService.SendPreDisconnectAlert();
+                    // Update the UI    
+                    CountDownDay = timeLeft.Days;
+                    CountDownHour = timeLeft.Hours;
+                    CountDownMinute = timeLeft.Minutes;
+                    CountDownSecond = timeLeft.Seconds;
                 }
             }
             catch (TaskCanceledException)
             {
-                // הספירה בוטלה
+                // Counting down was canceled
             }
             finally
             {
                 if (_cts != null)
                 {
-                    _cts.Dispose();    // משחרר משאבים
-                    _cts = null;       // מוחק את ההתייחסות
+                    _cts.Dispose();    // Release resources
+                    _cts = null;       // Delete the reference
                 }
-                _isCountingDown = false; // שחרור הנעילה
-                //regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
+                _isCountingDown = false; // Reset
             }
         }
 
+        /// <summary>
+        /// Initialize the clock
+        /// </summary>
+        private void InitializeClock()
+        {
+            // Calculate the remaining time of the main task
+            TimeSpan timeLeft = MainTask.Date - DateTime.Now;
+
+            // Initialize the clock
+            CountDownDay = timeLeft.Days;
+            CountDownHour = timeLeft.Hours;
+            CountDownMinute = timeLeft.Minutes;
+            CountDownSecond = timeLeft.Seconds;
+        }
+
+
+        #region Navigation Methods
+
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            if (navigationContext.Parameters.ContainsKey("task"))
-            {
-                MainTask = navigationContext.Parameters.GetValue<RdpTask>("task");
-                TimeSpan Duration = MainTask.Date - DateTime.Now;
-                if (Duration.TotalSeconds <= 0 && MainTask.NextTask != null)
-                {
-                    MainTask = MainTask.NextTask;
-                    Duration = MainTask.Date - DateTime.Now;
-                }
+            var parameters = navigationContext.Parameters;
 
-                CountDownDay = Duration.Days;
-                CountDownHour = Duration.Hours;
-                CountDownMinute = Duration.Minutes;
-                CountDownSecond = Duration.Seconds;
+            if (!parameters.ContainsKey("task"))
+                return;
+
+            // Initialize the Task
+            MainTask = parameters.GetValue<RdpTask>("task");
+
+            if (MainTask == null) return;
+
+            // Update the MainTask to the right task
+            if (MainTask.State == StateEnum.Executed && MainTask.NextTask != null)
+            {
+                MainTask = MainTask.NextTask;
             }
+
+            // Initialize the clock on the GUI
+            InitializeClock();
+
 
             var durationString = $"{CountDownDay} days, {CountDownHour} hours, {CountDownMinute} minutes, {CountDownSecond} seconds";
             loggerService.Info($"RDP accessibility window started. The RDP will be available for: {durationString}");
@@ -160,5 +173,7 @@ namespace RdpScopeToggler.ViewModels
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
         public void OnNavigatedFrom(NavigationContext navigationContext) { }
+
+        #endregion
     }
 }

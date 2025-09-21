@@ -178,7 +178,7 @@
 
 # \- \*\*Primary Application\*\*: RdpScopeToggler.exe
 
-# \- \*\*Notification Service\*\*: RdpScopeTogglerToastListener (auto-installed)
+# \- \*\*Notification Service\*\*: RdpScopeService (auto-installed)
 
 # \- \*\*Configuration\*\*: Settings are stored locally and applied to Windows RDP configuration
 

@@ -4,7 +4,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:prism="http://prismlibrary.com/"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
-        xmlns:local="clr-namespace:RdpScopeToggler.Views"
+        xmlns:views="clr-namespace:RdpScopeToggler.Views"
         WindowStartupLocation="CenterScreen"
 
         prism:ViewModelLocator.AutoWireViewModel="True"
@@ -43,8 +43,11 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
-        <local:TitleBarUserControl Grid.Row="0"/>
+        <!-- Header -->
+        <views:TitleBarUserControl Grid.Row="0"/>
         
+        
+        <!-- Inner content -->
         <Grid Grid.Row="2" Margin="0" VerticalAlignment="Stretch">
             <Border Background="White" BorderBrush="{StaticResource DarkBlueBrush}"
                     CornerRadius="8" BorderThickness="2.5"
@@ -53,6 +56,8 @@
             </Border>
         </Grid>
 
+        
+        <!-- Footer -->
         <Border Grid.Row="4"
                 CornerRadius="7"
                 BorderThickness="2"

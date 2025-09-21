@@ -31,6 +31,9 @@
     <Compile Update="Views\TitleBarUserControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\WaitingForServiceUserControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\WaitingUserControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

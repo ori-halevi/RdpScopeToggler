@@ -6,12 +6,12 @@
 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:materialDesignElevation="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
-             xmlns:converter="clr-namespace:RdpScopeToggler.Converters"
+             xmlns:converters="clr-namespace:RdpScopeToggler.Converters"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
     <UserControl.Resources>
-        <converter:BoolToBrushConverter x:Key="BoolToBrushConverter" />
-        <converter:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
+        <converters:BoolToBrushConverter x:Key="BoolToBrushConverter" />
+        <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
 
         <!-- Colors -->
         <SolidColorBrush x:Key="ActiveBrush" Color="#00E676"/>

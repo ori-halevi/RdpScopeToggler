@@ -3,11 +3,11 @@
 namespace RdpScopeToggler.Views
 {
     /// <summary>
-    /// Interaction logic for TaskUserControl.xaml
+    /// Interaction logic for WaitingForServiceUserControl
     /// </summary>
-    public partial class TaskUserControl : UserControl
+    public partial class WaitingForServiceUserControl : UserControl
     {
-        public TaskUserControl()
+        public WaitingForServiceUserControl()
         {
             InitializeComponent();
         }
