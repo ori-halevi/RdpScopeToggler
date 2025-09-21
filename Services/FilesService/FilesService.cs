@@ -67,6 +67,24 @@ namespace RdpScopeToggler.Services.FilesService
 
         #region Language
 
+        public string GetLanguageFromSettings()
+        {
+            EnsureSettingsFileExists();
+
+            const string pathToSettingsFile = @"C:\ProgramData\RdpScopeToggler\Settings.json";
+
+            // קריאת תוכן הקובץ
+            var json = File.ReadAllText(pathToSettingsFile);
+
+            // המרה לאובייקט
+            var settings = JsonSerializer.Deserialize<Settings>(json);
+
+            if (settings == null || string.IsNullOrWhiteSpace(settings.Language))
+                return "en";
+
+            return settings.Language;
+        }
+
         public void WriteLanguageToSettings(string language)
         {
             const string pathToSettingsFile = @"C:\ProgramData\RdpScopeToggler\Settings.json";
@@ -195,6 +213,33 @@ namespace RdpScopeToggler.Services.FilesService
                 File.WriteAllText(filePath, json);
             }
         }
+
+        private void EnsureSettingsFileExists(string fileName = "Settings.json")
+        {
+            string folderPath = @"C:\ProgramData\RdpScopeToggler";
+            string filePath = Path.Combine(folderPath, fileName);
+
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            if (!File.Exists(filePath))
+            {
+                var defaultSettings = new RdpScopeToggler.Models.Settings
+                {
+                    Language = "en" // או כל ברירת מחדל אחרת שאתה רוצה
+                };
+
+                string json = JsonSerializer.Serialize(defaultSettings, new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+
+                File.WriteAllText(filePath, json);
+            }
+        }
+
         #endregion
     }
 }

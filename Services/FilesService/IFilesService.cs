@@ -12,6 +12,7 @@ namespace RdpScopeToggler.Services.FilesService
         public void AddToAlwaysOnList(string ip, bool isOpen, string name = "Unnamed");
         public void CleanWhiteList();
         public void CleanAlwaysOnList();
+        public string GetLanguageFromSettings();
         public void WriteLanguageToSettings(string language);
     }
 }

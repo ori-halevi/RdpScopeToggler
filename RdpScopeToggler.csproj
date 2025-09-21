@@ -10,6 +10,13 @@
 	<ItemGroup>
 		<None Remove="Assets\cog.ico" />
 		<None Remove="Assets\cog.png" />
+		<None Remove="Assets\Deployment\RdpScopeService\appsettings.Development.json" />
+		<None Remove="Assets\Deployment\RdpScopeService\appsettings.json" />
+		<None Remove="Assets\Deployment\RdpScopeService\DelService.bat" />
+		<None Remove="Assets\Deployment\RdpScopeService\Dependencies\RdpScopeCommands\RdpScopeCommands.deps.json" />
+		<None Remove="Assets\Deployment\RdpScopeService\RdpScopeService.exe" />
+		<None Remove="Assets\Deployment\RdpScopeService\RdpScopeService.pdb" />
+		<None Remove="Assets\Deployment\RdpScopeService\RunService.bat" />
 		<None Remove="Assets\remote-desktop.ico" />
 		<None Remove="Assets\remote-desktop.png" />
 	</ItemGroup>
@@ -36,6 +43,27 @@
 		</Content>
 		<Content Include="Assets\cog.png">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\Deployment\RdpScopeService\appsettings.Development.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\Deployment\RdpScopeService\appsettings.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\Deployment\RdpScopeService\DelService.bat">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\Deployment\RdpScopeService\Dependencies\RdpScopeCommands\RdpScopeCommands.deps.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\Deployment\RdpScopeService\RdpScopeService.exe">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\Deployment\RdpScopeService\RdpScopeService.pdb">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\Deployment\RdpScopeService\RunService.bat">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\remote-desktop.ico">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -67,6 +95,9 @@
 	  <Resource Include="Resources\Templates.xaml" />
 	</ItemGroup>
 	<ItemGroup>
+	  <None Update="Assets\Deployment\RdpScopeService\קוד להרצת השירות .bat">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Assets\Deployment\RdpScopeTogglerToastListener\Assets\remote-desktop.ico">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

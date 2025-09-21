@@ -9,6 +9,8 @@ using RdpScopeToggler.Services.PipeClientService;
 using RdpScopeToggler.ViewModels;
 using RdpScopeToggler.Views;
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -108,12 +110,51 @@ namespace RdpScopeToggler
             #endregion
 
             #region Initialize language
-
-            const string pathToSettingsFile = "C:\\ProgramData\\RdpScopeToggler\\Settings.json";
-            Container.Resolve<ILanguageService>().LoadLanguage(pathToSettingsFile);
+            Container.Resolve<ILanguageService>().LoadLanguage();
 
             #endregion
 
+
+            // Copy files of RdpScopeTogglerService
+            string sourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Deployment");
+            string targetPath = @"C:\ProgramData\RdpScopeToggler";
+
+
+
+            string sourceDelServiceFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Deployment", "RdpScopeService");
+            string targetDelServicePath = @"C:\ProgramData\RdpScopeToggler\RdpScopeService";
+            CopySingleFile(sourceDelServiceFilePath, targetDelServicePath, "DelService.bat");
+
+            string DelServiceFilePath = @"C:\ProgramData\RdpScopeToggler\RdpScopeService\DelService.bat";
+            var processStartInfo1 = new ProcessStartInfo
+            {
+                FileName = DelServiceFilePath,
+                UseShellExecute = true, // חשוב כדי שהמערכת תדע להריץ BAT
+                CreateNoWindow = false, // אם אתה רוצה לראות חלון CMD, תשאיר true כדי להסתיר
+                Verb = "runas" // אם נדרש להריץ כאדמין
+            };
+            if (File.Exists(DelServiceFilePath)) // TODO: Change the algorithm so it will only run after the file exists (asynchronous something)
+                Process.Start(processStartInfo1);
+            else
+                MessageBox.Show("Batch file not found!");
+
+            CopyDirectory(sourcePath, targetPath);
+            string batchFilePath = @"C:\ProgramData\RdpScopeToggler\RdpScopeService\RunService.bat";
+
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = batchFilePath,
+                UseShellExecute = true, // חשוב כדי שהמערכת תדע להריץ BAT
+                CreateNoWindow = false, // אם אתה רוצה לראות חלון CMD, תשאיר true כדי להסתיר
+                Verb = "runas" // אם נדרש להריץ כאדמין
+            };
+            if (File.Exists(batchFilePath)) // TODO: Change the algorithm so it will only run after the file exists (asynchronous something)
+                Process.Start(processStartInfo);
+            else
+                MessageBox.Show("Batch file not found!");
+
+            await Task.Delay(1000);
+            //
             var regionManager = Container.Resolve<IRegionManager>();
             regionManager.RequestNavigate("ContentRegion", "WaitingForServiceUserControl");
 
@@ -130,8 +171,65 @@ namespace RdpScopeToggler
             else
             {
                 // אופציונלי: תראה הודעת שגיאה/תנסה שוב
+                Debug.WriteLine("Couldn't connect to the server.");
+            }
+
+        }
+
+        /// <summary>
+        /// Copy folder recursively while keeping directory structure.
+        /// </summary>
+        private void CopyDirectory(string sourceDir, string destinationDir)
+        {
+            Directory.CreateDirectory(destinationDir);
+
+            foreach (string filePath in Directory.GetFiles(sourceDir))
+            {
+                string fileName = Path.GetFileName(filePath);
+                string destFilePath = Path.Combine(destinationDir, fileName);
+
+                try
+                {
+                    File.Copy(filePath, destFilePath, overwrite: true);
+                }
+                catch (IOException)
+                {
+                    // הקובץ כנראה נעול או בשימוש, מדלגים עליו
+                    // אפשר גם לכתוב ללוג אם רוצים
+                }
+            }
+
+            foreach (string dirPath in Directory.GetDirectories(sourceDir))
+            {
+                string dirName = Path.GetFileName(dirPath);
+                string destDirPath = Path.Combine(destinationDir, dirName);
+                CopyDirectory(dirPath, destDirPath);
             }
         }
+
+        /// <summary>
+        /// Copy a single file from source to destination folder.
+        /// </summary>
+        private void CopySingleFile(string sourceDir, string destinationDir, string fileName)
+        {
+            string sourceFile = Path.Combine(sourceDir, fileName);
+            string destFile = Path.Combine(destinationDir, fileName);
+
+            if (!File.Exists(sourceFile))
+                return; // הקובץ לא קיים במקור – פשוט לא עושים כלום
+
+            Directory.CreateDirectory(destinationDir);
+
+            try
+            {
+                File.Copy(sourceFile, destFile, overwrite: true);
+            }
+            catch (IOException)
+            {
+                // אם הקובץ נעול או בשימוש – אפשר לדלג או לטפל אחרת
+            }
+        }
+
 
         private void ShowMainWindow()
         {
