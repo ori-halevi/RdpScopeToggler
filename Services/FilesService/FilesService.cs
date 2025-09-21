@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace RdpScopeToggler.Services.FilesService
 {
@@ -211,6 +212,9 @@ namespace RdpScopeToggler.Services.FilesService
                 });
 
                 File.WriteAllText(filePath, json);
+
+
+                WriteToList("127.0.0.1", "Localhost", true, "AlwaysOnList.json");
             }
         }
 
