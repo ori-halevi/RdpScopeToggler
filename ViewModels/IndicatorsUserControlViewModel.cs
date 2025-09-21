@@ -1,11 +1,9 @@
 ﻿using Prism.Mvvm;
 using Prism.Navigation.Regions;
 using RdpScopeCommands.Stores;
+using RdpScopeToggler.Models;
 using RdpScopeToggler.Services.PipeClientService;
-using RdpScopeToggler.Stores;
-using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Windows;
 
 namespace RdpScopeToggler.ViewModels
@@ -42,12 +40,6 @@ namespace RdpScopeToggler.ViewModels
             set => SetProperty(ref isAlwaysOnOpen, value);
         }
         #endregion
-        public class ServiceMessage
-        {
-            public RdpTask CurrentTask { get; set; } = new RdpTask();
-            public RdpInfoData CurrentRdpState { get; set; } = new RdpInfoData();
-            public DateTime TimeStemp { get; set; } = DateTime.UtcNow;
-        }
 
         private readonly IPipeClientService pipeClientService;
         private IRegionManager regionManager;
@@ -80,8 +72,8 @@ namespace RdpScopeToggler.ViewModels
                 IsExternalOpen = rdpInfoData.IsOpenForAll;
             });
 
-            Debug.WriteLine($"IsAlwaysOnOpen: {IsAlwaysOnOpen},\nIsInternalOpen: {IsInternalOpen},\nIsWhiteListOpen: {IsWhiteListOpen},\nIsExternalOpen: {IsExternalOpen}");
-            Debug.WriteLine($"IsAlwaysOnOpen: {rdpInfoData.IsOpenForAlwaysOnList},\nIsInternalOpen: {rdpInfoData.IsOpenForLocalComputers},\nIsWhiteListOpen: {rdpInfoData.IsOpenForWhiteList},\nIsExternalOpen: {rdpInfoData.IsOpenForAll}");
+            // Debug.WriteLine($"IsAlwaysOnOpen: {IsAlwaysOnOpen},\nIsInternalOpen: {IsInternalOpen},\nIsWhiteListOpen: {IsWhiteListOpen},\nIsExternalOpen: {IsExternalOpen}");
+            // Debug.WriteLine($"IsAlwaysOnOpen: {rdpInfoData.IsOpenForAlwaysOnList},\nIsInternalOpen: {rdpInfoData.IsOpenForLocalComputers},\nIsWhiteListOpen: {rdpInfoData.IsOpenForWhiteList},\nIsExternalOpen: {rdpInfoData.IsOpenForAll}");
         }
     }
 }

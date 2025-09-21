@@ -46,5 +46,16 @@
     <sys:String x:Key="AccessEnabled_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Access enabled!</sys:String>
     <sys:String x:Key="Disconnect_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Disconnect</sys:String>
 
+    <sys:String x:Key="SureToExit_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Are you sure you want to close the software?</sys:String>
 
+    <sys:String x:Key="Yes_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Yes</sys:String>
+    <sys:String x:Key="No_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">No</sys:String>
+
+    <sys:String x:Key="FutureDateAtLeastOneMinute_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+        Select a future date at least one minute ahead
+    </sys:String>
+
+
+    <sys:String x:Key="SkipCountdown_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Skip the Countdown</sys:String>
+    
 </ResourceDictionary>

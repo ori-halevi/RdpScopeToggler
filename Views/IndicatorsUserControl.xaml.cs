@@ -2,7 +2,6 @@
 using System.Windows.Controls;
 using Prism.Ioc;
 
-
 namespace RdpScopeToggler.Views
 {
     /// <summary>

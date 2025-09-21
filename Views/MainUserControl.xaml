@@ -6,15 +6,11 @@
              mc:Ignorable="d"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:materialDesignElevation="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
-             xmlns:local="clr-namespace:RdpScopeToggler.Views"
+             xmlns:views="clr-namespace:RdpScopeToggler.Views"
              xmlns:converter="clr-namespace:RdpScopeToggler.Converters"
              xmlns:prism="http://prismlibrary.com/"             
              prism:ViewModelLocator.AutoWireViewModel="True">
-
-    <UserControl.Resources>
-        <converter:EnumToBoolConverter x:Key="EnumToBoolConverter" />
-    </UserControl.Resources>
-
+    
     <Border CornerRadius="8">
         <Grid>
             <Grid.RowDefinitions>
@@ -33,7 +29,7 @@
                         VerticalAlignment="Stretch"
                         TabStripPlacement="Top"
                         Background="Transparent">
-                <TabControl.Resources>            
+            <TabControl.Resources>            
                 <!-- TabPanel Style for centering and stretching -->
                 <Style TargetType="TabPanel">
                     <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -160,14 +156,14 @@
             <!-- WhiteList Tab -->
             <TabItem Header="{DynamicResource WhiteList_translator}" Width="115.4">
                 <Border Style="{StaticResource TabContentStyle}">
-                    <local:WhiteListUserControl />
+                    <views:WhiteListUserControl />
                 </Border>
             </TabItem>
 
             <!-- Local Tab -->
             <TabItem Header="{DynamicResource Local_translator}" Width="115.4">
                 <Border Style="{StaticResource TabContentStyle}">
-                    <local:LocalAddressesUserControl />
+                    <views:LocalAddressesUserControl />
                 </Border>
             </TabItem>
 

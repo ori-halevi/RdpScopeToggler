@@ -1,21 +1,19 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Navigation.Regions;
-using RdpScopeToggler.Services.FilesService;
-using RdpScopeToggler.Stores;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
-using RdpScopeToggler.Services.RdpService;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Linq;
-using RdpScopeToggler.Models;
-using RdpScopeToggler.Views;
 using RdpScopeCommands;
 using RdpScopeCommands.Stores;
+using RdpScopeToggler.Models;
+using RdpScopeToggler.Services.FilesService;
+using RdpScopeToggler.Views;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -236,7 +234,7 @@ namespace RdpScopeToggler.ViewModels
 
         bool IsValidIPv4(string ipString)
         {
-            return (Regex.IsMatch(ipString, @"^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.|$)){4}$") && IPAddress.TryParse(ipString, out var address) && address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+            return Regex.IsMatch(ipString, @"^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.|$)){4}$") && IPAddress.TryParse(ipString, out var address) && address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork;
         }
 
 

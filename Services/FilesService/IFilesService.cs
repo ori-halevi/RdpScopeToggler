@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using RdpScopeCommands.Stores;
-using RdpScopeToggler.Stores;
+using RdpScopeToggler.Models;
 
 namespace RdpScopeToggler.Services.FilesService
 {
@@ -12,5 +12,6 @@ namespace RdpScopeToggler.Services.FilesService
         public void AddToAlwaysOnList(string ip, bool isOpen, string name = "Unnamed");
         public void CleanWhiteList();
         public void CleanAlwaysOnList();
+        public void WriteLanguageToSettings(string language);
     }
 }

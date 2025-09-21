@@ -8,19 +8,26 @@ namespace RdpScopeToggler.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (parameter is string paramString && Enum.IsDefined(value.GetType(), value))
-            {
-                var enumValue = Enum.Parse(value.GetType(), paramString);
-                return enumValue.Equals(value);
-            }
-            return false;
+            if (value == null || parameter == null)
+                return false;
+
+            string parameterString = parameter.ToString();
+            if (!Enum.IsDefined(value.GetType(), value))
+                return false;
+
+            var enumValue = Enum.Parse(value.GetType(), parameterString);
+
+            return enumValue.Equals(value);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (parameter is string paramString && bool.TryParse(value?.ToString(), out bool useValue) && useValue)
+            if (value is bool boolValue && boolValue)
             {
-                return Enum.Parse(targetType, paramString);
+                if (parameter == null)
+                    return Binding.DoNothing;
+
+                return Enum.Parse(targetType, parameter.ToString());
             }
             return Binding.DoNothing;
         }

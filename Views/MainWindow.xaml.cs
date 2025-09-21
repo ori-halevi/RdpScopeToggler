@@ -23,12 +23,9 @@ namespace RdpScopeToggler.Views
             public int cyBottomHeight;
         }
 
-        private bool isFirstClose = true;
-
         public MainWindow()
         {
             InitializeComponent();
-            //Loaded += MainWindow_Loaded;
             this.Closing += MainWindow_Closing;
         }
 
@@ -56,23 +53,14 @@ namespace RdpScopeToggler.Views
                 SizeToContent = SizeToContent.Manual;
             }), DispatcherPriority.Loaded);
         }
+
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            // ביטול הסגירה
+            // Cancel the close
             e.Cancel = true;
 
-            // הסתרת החלון במקום סגירה
+            // Hide the window instead of closing
             this.Hide();
-
-            if (isFirstClose)
-            {
-                // הצגת בועת התראה קטנה מה־NotifyIcon
-                App.notifyIcon.BalloonTipTitle = "Rdp Scope Toggler";
-                App.notifyIcon.BalloonTipText = "התוכנה עדיין פועלת ברקע";
-                App.notifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
-                App.notifyIcon.ShowBalloonTip(500); // משך הזמן במילישניות
-                isFirstClose = false;
-            }
         }
     }
 }

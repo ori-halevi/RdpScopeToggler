@@ -2,7 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
-             xmlns:local="clr-namespace:RdpScopeToggler.Views"
+             xmlns:views="clr-namespace:RdpScopeToggler.Views"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
     <UserControl.Resources>
@@ -58,36 +58,36 @@
     </UserControl.Triggers>
 
     <!-- תוכן ראשי -->
-        <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="10">
-            <!-- כרטיס ראשי עם אפקט זכוכית -->
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="10">
+        <!-- כרטיס ראשי עם אפקט זכוכית -->
         <Border x:Name="MainCard"
                     Padding="0"
                     CornerRadius="28"
                     RenderTransformOrigin="0.5,0.5">
 
             <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-                    <!-- אינדיקטורים -->
-                    <Grid Grid.Row="0" HorizontalAlignment="Right"
+                <!-- אינדיקטורים -->
+                <Grid Grid.Row="0" HorizontalAlignment="Right"
                           Margin="0 5 0 0"
                           >
-                        <local:IndicatorsUserControl/>
-                    </Grid>
+                    <views:IndicatorsUserControl/>
+                </Grid>
 
 
-                    <!-- שעון ספירה לאחור -->
+                <!-- שעון ספירה לאחור -->
                 <Border Grid.Row="1"
                             Margin="0 15 0 0"
                             CornerRadius="18">
-                    <local:AnyClockUserControl
+                    <views:AnyClockUserControl
                             DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             CountDownDay="{Binding CountDownDay}"
                             CountDownHour="{Binding CountDownHour}"
@@ -96,17 +96,17 @@
                             IsReadOnly="True" 
                             TimeTitle="{DynamicResource AccessOpenIn_translator}"
                             TimeTitleVisibility="Visible"/>
-                    </Border>
+                </Border>
 
-                    <!-- הודעה -->
-                    <Border Grid.Row="2" 
+                <!-- הודעה -->
+                <Border Grid.Row="2" 
                             CornerRadius="16" 
                             Padding="5"
                             Margin="0,10,0,10">
-                        <Border.Effect>
-                            <DropShadowEffect Color="#08000000" BlurRadius="6" ShadowDepth="1" Opacity="0.15"/>
-                        </Border.Effect>
-                        <TextBlock Text="{Binding Message}"
+                    <Border.Effect>
+                        <DropShadowEffect Color="#08000000" BlurRadius="6" ShadowDepth="1" Opacity="0.15"/>
+                    </Border.Effect>
+                    <TextBlock Text="{Binding Message}"
                                    TextWrapping="Wrap"
                                    FlowDirection="RightToLeft"
                                    HorizontalAlignment="Center"
@@ -115,11 +115,11 @@
                                    FontSize="16"
                                    Style="{StaticResource WaitingTextStyle}"
                                    LineHeight="22"/>
-                    </Border>
+                </Border>
 
 
-                    <!-- אינדיקטור המתנה עם אנימציה -->
-                    <Grid Grid.Row="3" Margin="0,3,0,5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <!-- אינדיקטור המתנה עם אנימציה -->
+                <Grid Grid.Row="3" Margin="0,3,0,5" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
@@ -141,9 +141,9 @@
                              RenderTransformOrigin="0.5,0.5">
                     </Button>
 
-                    </Grid>
-
                 </Grid>
-            </Border>
-        </Grid>
+
+            </Grid>
+        </Border>
+    </Grid>
 </UserControl>
