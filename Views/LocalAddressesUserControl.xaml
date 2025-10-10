@@ -35,7 +35,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- Title -->
-                    <TextBlock Text="{DynamicResource LocalAddresses_translator}"
+                    <TextBlock Text="{DynamicResource TrustedAddresses_translator}"
                        FontSize="24"
                        FontWeight="Bold"
                        Margin="0 0 0 10"

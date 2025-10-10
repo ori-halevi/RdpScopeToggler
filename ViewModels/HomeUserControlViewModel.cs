@@ -148,6 +148,14 @@ namespace RdpScopeToggler.ViewModels
         }
 
 
+        private bool _isMoreOptionsVisible;
+        public bool IsMoreOptionsVisible
+        {
+            get => _isMoreOptionsVisible;
+            set => SetProperty(ref _isMoreOptionsVisible, value);
+        }
+
+
         private ActionsEnum selectedAction;
         public ActionsEnum SelectedAction
         {

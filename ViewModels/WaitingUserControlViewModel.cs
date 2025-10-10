@@ -175,7 +175,7 @@ namespace RdpScopeToggler.ViewModels
 
             string durationText = BuildDurationString(NextTask.Date - MainTask.Date);
 
-            string targetKey = "RemoteSystems_translator";
+            string targetKey = "AllAddresses_translator";
             if (MainTask.Action == ActionsEnum.LocalComputersAndWhiteList)
                 targetKey = "WhiteList_translator";
 

@@ -5,10 +5,9 @@ using System.Windows.Data;
 
 namespace RdpScopeToggler.Converters
 {
-    public class BoolToVisibilityConverter : IValueConverter
+    public class BoolToCollapsedConverter : IValueConverter
     {
         public bool Invert { get; set; } = false;
-        public bool CollapseInsteadOfHide { get; set; } = false;
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -17,10 +16,7 @@ namespace RdpScopeToggler.Converters
             if (Invert)
                 boolValue = !boolValue;
 
-            if (boolValue)
-                return Visibility.Visible;
-
-            return CollapseInsteadOfHide ? Visibility.Collapsed : Visibility.Hidden;
+            return boolValue ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -36,5 +32,4 @@ namespace RdpScopeToggler.Converters
             return false;
         }
     }
-
 }

@@ -38,7 +38,7 @@
 
                 <!-- TabItem Style with improved hover behavior -->
                 <Style TargetType="TabItem">
-                    <Setter Property="Padding" Value="15,8"/>
+                    <Setter Property="Padding" Value="8,8"/>
                     <Setter Property="Margin" Value="0"/>
                     <Setter Property="Background" Value="{StaticResource LightGrayBrush}"/>
                     <Setter Property="BorderBrush" Value="{StaticResource GrayBrush}"/>
@@ -161,7 +161,7 @@
             </TabItem>
 
             <!-- Local Tab -->
-            <TabItem Header="{DynamicResource Local_translator}" Width="115.4">
+            <TabItem Header="{DynamicResource TrustedAlways_translator}" Width="115.4">
                 <Border Style="{StaticResource TabContentStyle}">
                     <views:LocalAddressesUserControl />
                 </Border>

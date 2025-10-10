@@ -19,9 +19,12 @@
     <sys:String x:Key="OpenLogsFolder_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Open logs folder</sys:String>
 
     <sys:String x:Key="RemoteSystems_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Remote systems</sys:String>
+    <sys:String x:Key="AllAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">All addresses</sys:String>
     <sys:String x:Key="WhiteList_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">White list</sys:String>
 
+    <sys:String x:Key="LocalAddressesAndWhiteList_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Local Addresses and White List</sys:String>
     <sys:String x:Key="LocalAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Local Addresses</sys:String>
+    <sys:String x:Key="TrustedAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Always Trusted Addresses</sys:String>
     <sys:String x:Key="WhiteListAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">White List Addresses</sys:String>
 
     <sys:String x:Key="Add_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Add</sys:String>
@@ -30,6 +33,7 @@
 
     <sys:String x:Key="Main_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Main</sys:String>
     <sys:String x:Key="Local_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Local</sys:String>
+    <sys:String x:Key="TrustedAlways_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Trusted Always</sys:String>
 
     <sys:String x:Key="AlwaysOnListAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Always-On List access</sys:String>
     <sys:String x:Key="WhiteListAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">White List access</sys:String>

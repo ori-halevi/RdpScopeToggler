@@ -19,9 +19,12 @@
     <sys:String x:Key="OpenLogsFolder_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">פתח תקיית לוגים</sys:String>
 
     <sys:String x:Key="RemoteSystems_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">מערכות מרוחקות</sys:String>
+    <sys:String x:Key="AllAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">כל הכתובות</sys:String>
     <sys:String x:Key="WhiteList_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">רשימה לבנה</sys:String>
 
+    <sys:String x:Key="LocalAddressesAndWhiteList_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">כתובות מקומיות ורשימה לבנה</sys:String>
     <sys:String x:Key="LocalAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">כתובות מקומיות</sys:String>
+    <sys:String x:Key="TrustedAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">כתובות מורשות תמיד</sys:String>
     <sys:String x:Key="WhiteListAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">כתובות ברשימה לבנה</sys:String>
 
     <sys:String x:Key="Add_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">הוסף</sys:String>
@@ -30,6 +33,7 @@
 
     <sys:String x:Key="Main_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">ראשי</sys:String>
     <sys:String x:Key="Local_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">מקומי</sys:String>
+    <sys:String x:Key="TrustedAlways_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">מורשות תמיד</sys:String>
 
     <sys:String x:Key="AlwaysOnListAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">גישה לכתובות פנימיות שנבחרו</sys:String>
     <sys:String x:Key="WhiteListAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">גישה לכתובות ברשימה לבנה</sys:String>
