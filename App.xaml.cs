@@ -164,7 +164,8 @@ namespace RdpScopeToggler
                 Verb = "runas" // אם נדרש להריץ כאדמין
             };
             if (File.Exists(batchFilePath)) // TODO: Change the algorithm so it will only run after the file exists (asynchronous something)
-                Process.Start(processStartInfo);
+                                            //Process.Start(processStartInfo);
+            { }
             else
                 MessageBox.Show("Batch file not found!");
 
@@ -181,7 +182,7 @@ namespace RdpScopeToggler
                 regionManager.RequestNavigate("ContentRegion", "MainUserControl");
                 regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
 
-                pipeClientService.AskForUpdate();
+                await pipeClientService.AskForUpdate();
             }
             else
             {

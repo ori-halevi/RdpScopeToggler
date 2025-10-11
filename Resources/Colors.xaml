@@ -14,6 +14,8 @@
     <Color x:Key="GrayColor">#93a2b8</Color>
     <Color x:Key="PurpleColor">#9234eb</Color>
 
+    <Color x:Key="MediumGrayColor">#e2e2e2</Color>
+
     <Color x:Key="LightGreenColor">#ebfcf4</Color>
     <Color x:Key="LightRedColor">#fff2f2</Color>
     <Color x:Key="LightBlueColor">#D8EAF8</Color>
@@ -40,6 +42,8 @@
     <SolidColorBrush x:Key="OrangeBrush" Color="{StaticResource OrangeColor}" />
     <SolidColorBrush x:Key="GrayBrush" Color="{StaticResource GrayColor}" />
     <SolidColorBrush x:Key="PurpleBrush" Color="{StaticResource PurpleColor}" />
+
+    <SolidColorBrush x:Key="MediumGrayBrush" Color="{StaticResource MediumGrayColor}" />
 
     <SolidColorBrush x:Key="LightGreenBrush" Color="{StaticResource LightGreenColor}" />
     <SolidColorBrush x:Key="LightRedBrush" Color="{StaticResource LightRedColor}" />

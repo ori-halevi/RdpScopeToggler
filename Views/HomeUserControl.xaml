@@ -40,9 +40,9 @@
 
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
-            <Border Padding="1" BorderThickness="0" BorderBrush="Red">
+            <Border Padding="10 1" BorderThickness="0" BorderBrush="Red">
                 
-                <Grid Margin="0 0 0 5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+                <Grid Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
 
                     <Grid.ColumnDefinitions >
                         <ColumnDefinition Width="Auto" />
@@ -141,13 +141,14 @@
                 <StackPanel Margin="10" >
 
                 <!-- Radio Buttons -->
-                <Grid Margin="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" /> <!-- חצי רוחב -->
-                        <ColumnDefinition Width="*" /> <!-- חצי רוחב -->
-                    </Grid.ColumnDefinitions>
+                    <Grid Margin="0 0 0 5">
+                        
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                    <RadioButton Grid.Column="0"
+                        <RadioButton Grid.Column="0"
                                  Content="{DynamicResource AllAddresses_translator}"
                                  d:Content="All Addresses"
                                  GroupName="ActionsGroup"
@@ -156,9 +157,9 @@
                                  HorizontalAlignment="Stretch"
                                  FontFamily="Bahnschrift"
                                  FontSize="16"
-                                 Margin="5"/>
+                                 Margin="0"/>
 
-                    <RadioButton Grid.Column="1"
+                        <RadioButton Grid.Column="1"
                                  Content="{DynamicResource WhiteList_translator}"
                                  d:Content="White List"
                                  GroupName="ActionsGroup"
@@ -167,37 +168,29 @@
                                  HorizontalAlignment="Stretch"
                                  FontFamily="Bahnschrift"
                                  FontSize="16"
-                                 Margin="5"/>
-                </Grid>
+                                 Margin="0"/>
+                        
+                    </Grid>
+                    
+                    <Grid Margin="0" >
 
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                <!-- Toggle Switch for More Options -->
-                <CheckBox HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Margin="0"
-                            Style="{StaticResource CustomToggleSwitch1}"
-                            IsChecked="{Binding IsMoreOptionsVisible, Mode=TwoWay}"/>
+                        <RadioButton Grid.Column="0"
+                                        Content="{DynamicResource LocalAddresses_translator}"
+                                        d:Content="Local Computers"
+                                        GroupName="ActionsGroup"
+                                        IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=LocalComputers}"
+                                        Style="{StaticResource MaterialDesignRadioButton}"
+                                        HorizontalAlignment="Stretch"
+                                        FontFamily="Bahnschrift"
+                                        FontSize="16"
+                                        Margin="0"/>
 
-                <Grid Margin="0"
-                        Visibility="{Binding IsMoreOptionsVisible, Mode=TwoWay, Converter={StaticResource BoolToCollapsedConverter}}">
-
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <RadioButton Grid.Column="0"
-                                    Content="{DynamicResource LocalAddresses_translator}"
-                                    d:Content="Local Computers"
-                                    GroupName="ActionsGroup"
-                                    IsChecked="{Binding SelectedAction, Mode=TwoWay, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=LocalComputers}"
-                                    Style="{StaticResource MaterialDesignRadioButton}"
-                                    HorizontalAlignment="Stretch"
-                                    FontFamily="Bahnschrift"
-                                    FontSize="16"
-                                    Margin="5"/>
-
-                    <RadioButton Grid.Column="1"
+                        <RadioButton Grid.Column="1"
                                     Content="{DynamicResource LocalAddressesAndWhiteList_translator}"
                                     d:Content="Local Computers and White List"
                                     GroupName="ActionsGroup"
@@ -205,9 +198,10 @@
                                     Style="{StaticResource WrappedRadioButton}"
                                     HorizontalAlignment="Stretch"
                                     FontFamily="Bahnschrift"
-                                    FontSize="16"
-                                    Margin="5"/>
-                </Grid>
+                                    FontSize="13"
+                                    Margin="0"/>
+                        
+                    </Grid>
 
                 </StackPanel>
 

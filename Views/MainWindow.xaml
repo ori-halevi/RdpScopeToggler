@@ -10,7 +10,7 @@
         prism:ViewModelLocator.AutoWireViewModel="True"
         
         Title="{Binding Title}"
-        Height="531" Width="355"
+        Height="535" Width="355"
         ResizeMode="NoResize"
         
         Icon="pack://siteoforigin:,,,/Assets/remote-desktop.ico"
