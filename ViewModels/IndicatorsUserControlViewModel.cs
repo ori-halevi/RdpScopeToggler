@@ -1,8 +1,8 @@
 ﻿using Prism.Mvvm;
 using Prism.Navigation.Regions;
-using RdpScopeCommands.Stores;
 using RdpScopeToggler.Models;
 using RdpScopeToggler.Services.PipeClientService;
+using RdpScopeToggler.Stores;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

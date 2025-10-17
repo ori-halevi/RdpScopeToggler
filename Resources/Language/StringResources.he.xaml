@@ -64,7 +64,15 @@
     <sys:String x:Key="OpenWindow_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">פתח חלון</sys:String>
     <sys:String x:Key="Exit_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">יציאה</sys:String>
 
-    
+    <sys:String x:Key="DoNotCloseTheApplication_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">לא לסגור את התוכנה</sys:String>
+
+    <sys:String x:Key="StoppingAndDeletingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">עוצר ומסיר את השירות הקיים...</sys:String>
+    <sys:String x:Key="ExtractingServiceFiles_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">מחלץ את קבצי השירות...</sys:String>
+    <sys:String x:Key="InstallingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">מתקין את השירות...</sys:String>
+    <sys:String x:Key="StartingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">מפעיל את השירות...</sys:String>
+    <sys:String x:Key="WaitingForService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">ממתין לשירות...</sys:String>
+
+
     <sys:String x:Key="EEEEEEEE_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">EEEEEEEEEE</sys:String>
     
 </ResourceDictionary>

@@ -64,4 +64,12 @@
     <sys:String x:Key="OpenWindow_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Open window</sys:String>
     <sys:String x:Key="Exit_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Exit</sys:String>
 
+    <sys:String x:Key="DoNotCloseTheApplication_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Do not close the application</sys:String>
+    
+    <sys:String x:Key="StoppingAndDeletingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Stopping and deleting existing service...</sys:String>
+    <sys:String x:Key="ExtractingServiceFiles_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Extracting service files...</sys:String>
+    <sys:String x:Key="InstallingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Installing service...</sys:String>
+    <sys:String x:Key="StartingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Starting service...</sys:String>
+    <sys:String x:Key="WaitingForService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Waiting for service...</sys:String>
+
 </ResourceDictionary>

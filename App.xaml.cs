@@ -1,21 +1,22 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Prism.Container.Unity;
 using Prism.Ioc;
 using Prism.Navigation.Regions;
-using RdpScopeCommands;
 using RdpScopeToggler.Managers;
 using RdpScopeToggler.Services.FilesService;
 using RdpScopeToggler.Services.LanguageService;
 using RdpScopeToggler.Services.LoggerService;
 using RdpScopeToggler.Services.PipeClientService;
+using RdpScopeToggler.Services.ServiceExtractor;
+using RdpScopeToggler.Services.ServiceInstallationManager;
 using RdpScopeToggler.Services.UpdateCheckerService;
+using RdpScopeToggler.Services.WindowsServiceManager;
 using RdpScopeToggler.ViewModels;
 using RdpScopeToggler.Views;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,6 +29,8 @@ namespace RdpScopeToggler
     /// </summary>
     public partial class App
     {
+        private CancellationTokenSource _cts;
+
         public static System.Windows.Forms.NotifyIcon notifyIcon;
         protected override Window CreateShell()
         {
@@ -69,8 +72,10 @@ namespace RdpScopeToggler
 
             containerRegistry.RegisterInstance(serviceProvider.GetRequiredService<IHttpClientFactory>());
 
+            containerRegistry.RegisterSingleton<IServiceInstallationManager, ServiceInstallationManager>();
+            containerRegistry.RegisterSingleton<IWindowsServiceManager, WindowsServiceManager>();
+            containerRegistry.RegisterSingleton<IServiceExtractor, ServiceExtractor>();
             containerRegistry.RegisterSingleton<ILanguageService, LanguageService>();
-            containerRegistry.RegisterSingleton<IRdpController, RdpController>();
             containerRegistry.RegisterSingleton<IFilesService, FilesService>();
             containerRegistry.RegisterSingleton<IPipeClientService, PipeClientService>();
             containerRegistry.RegisterSingleton<IndicatorsUserControlViewModel>();
@@ -132,52 +137,37 @@ namespace RdpScopeToggler
 
             #endregion
 
-            // Copy files of RdpScopeTogglerService
-            string sourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Deployment");
-            string targetPath = @"C:\ProgramData\RdpScopeToggler";
-
-            string sourceDelServiceFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Deployment", "RdpScopeService");
-            string targetDelServicePath = @"C:\ProgramData\RdpScopeToggler\RdpScopeService";
-            CopySingleFile(sourceDelServiceFilePath, targetDelServicePath, "DelService.bat");
-
-            string DelServiceFilePath = @"C:\ProgramData\RdpScopeToggler\RdpScopeService\DelService.bat";
-            var processStartInfo1 = new ProcessStartInfo
-            {
-                FileName = DelServiceFilePath,
-                UseShellExecute = true, // חשוב כדי שהמערכת תדע להריץ BAT
-                CreateNoWindow = false, // אם אתה רוצה לראות חלון CMD, תשאיר true כדי להסתיר
-                Verb = "runas" // אם נדרש להריץ כאדמין
-            };
-            if (File.Exists(DelServiceFilePath)) // TODO: Change the algorithm so it will only run after the file exists (asynchronous something)
-                Process.Start(processStartInfo1);
-            else
-                MessageBox.Show("Batch file not found!");
-
-            CopyDirectory(sourcePath, targetPath);
-            string batchFilePath = @"C:\ProgramData\RdpScopeToggler\RdpScopeService\RunService.bat";
-
-            var processStartInfo = new ProcessStartInfo
-            {
-                FileName = batchFilePath,
-                UseShellExecute = true, // חשוב כדי שהמערכת תדע להריץ BAT
-                CreateNoWindow = false, // אם אתה רוצה לראות חלון CMD, תשאיר true כדי להסתיר
-                Verb = "runas" // אם נדרש להריץ כאדמין
-            };
-            if (File.Exists(batchFilePath)) // TODO: Change the algorithm so it will only run after the file exists (asynchronous something)
-                                            //Process.Start(processStartInfo);
-            { }
-            else
-                MessageBox.Show("Batch file not found!");
-
-            await Task.Delay(1000);
-            //
             var regionManager = Container.Resolve<IRegionManager>();
             regionManager.RequestNavigate("ContentRegion", "WaitingForServiceUserControl");
 
+            var serviceInstaller = Container.Resolve<IServiceInstallationManager>();
+
+            bool isDebug = false;
+            if (!isDebug)
+            {
+                try
+                {
+                    await serviceInstaller.InitializeServiceAsync();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        ex.Message,
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error
+                    );
+                }
+            }
+
+
+            await Task.Delay(1000);
+
             var pipeClientService = Container.Resolve<IPipeClientService>();
             Container.Resolve<NavigationManager>();
+            _cts = pipeClientService.Cts;
 
-            if (await pipeClientService.ConnectAsync(CancellationToken.None))
+            if (await pipeClientService.ConnectAsync(_cts.Token))
             {
                 regionManager.RequestNavigate("ContentRegion", "MainUserControl");
                 regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
@@ -192,58 +182,10 @@ namespace RdpScopeToggler
 
         }
 
-        /// <summary>
-        /// Copy folder recursively while keeping directory structure.
-        /// </summary>
-        private void CopyDirectory(string sourceDir, string destinationDir)
+        protected override void OnExit(ExitEventArgs e)
         {
-            Directory.CreateDirectory(destinationDir);
-
-            foreach (string filePath in Directory.GetFiles(sourceDir))
-            {
-                string fileName = Path.GetFileName(filePath);
-                string destFilePath = Path.Combine(destinationDir, fileName);
-
-                try
-                {
-                    File.Copy(filePath, destFilePath, overwrite: true);
-                }
-                catch (IOException)
-                {
-                    // הקובץ כנראה נעול או בשימוש, מדלגים עליו
-                    // אפשר גם לכתוב ללוג אם רוצים
-                }
-            }
-
-            foreach (string dirPath in Directory.GetDirectories(sourceDir))
-            {
-                string dirName = Path.GetFileName(dirPath);
-                string destDirPath = Path.Combine(destinationDir, dirName);
-                CopyDirectory(dirPath, destDirPath);
-            }
-        }
-
-        /// <summary>
-        /// Copy a single file from source to destination folder.
-        /// </summary>
-        private void CopySingleFile(string sourceDir, string destinationDir, string fileName)
-        {
-            string sourceFile = Path.Combine(sourceDir, fileName);
-            string destFile = Path.Combine(destinationDir, fileName);
-
-            if (!File.Exists(sourceFile))
-                return; // הקובץ לא קיים במקור – פשוט לא עושים כלום
-
-            Directory.CreateDirectory(destinationDir);
-
-            try
-            {
-                File.Copy(sourceFile, destFile, overwrite: true);
-            }
-            catch (IOException)
-            {
-                // אם הקובץ נעול או בשימוש – אפשר לדלג או לטפל אחרת
-            }
+            base.OnExit(e);
+            _cts.Cancel();
         }
 
 

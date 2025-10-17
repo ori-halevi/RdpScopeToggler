@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using RdpScopeCommands.Stores;
-using RdpScopeToggler.Models;
+﻿using RdpScopeToggler.Stores;
+using System.Collections.Generic;
 
 namespace RdpScopeToggler.Services.FilesService
 {

@@ -1,10 +1,10 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Navigation.Regions;
-using RdpScopeCommands;
-using RdpScopeCommands.Stores;
 using RdpScopeToggler.Models;
 using RdpScopeToggler.Services.FilesService;
+using RdpScopeToggler.Services.PipeClientService;
+using RdpScopeToggler.Stores;
 using RdpScopeToggler.Views;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,6 +14,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RdpScopeToggler.ViewModels
 {
@@ -65,13 +66,14 @@ namespace RdpScopeToggler.ViewModels
         public DelegateCommand NavigateToHomeCommand { get; }
 
         private readonly IFilesService filesService;
-        private readonly IRdpController rdpService;
 
-        public LocalAddressesUserControlViewModel(IRegionManager regionManager, IFilesService filesService, IRdpController rdpService)
+        private readonly IPipeClientService pipeClientService;
+
+        public LocalAddressesUserControlViewModel(IRegionManager regionManager, IFilesService filesService, IPipeClientService pipeClientService)
         {
             isLoading = false;
+            this.pipeClientService = pipeClientService;
             this.filesService = filesService;
-            this.rdpService = rdpService;
 
             List<Client> alwaysOnList = filesService.GetAlwaysOnList();
 
@@ -99,6 +101,8 @@ namespace RdpScopeToggler.ViewModels
             RemoveItemCommand = new DelegateCommand<AlwaysOnListEntry>(RemoveItem);
 
             SaveCommand = new DelegateCommand(Save);
+
+            pipeClientService.AlwaysTrustedListReceived += UpdateAlwaysTrustedList;
         }
 
 
@@ -182,41 +186,29 @@ namespace RdpScopeToggler.ViewModels
                 dialog.Show();
         }
 
-        private void Save()
+        private async void Save()
         {
-            filesService.CleanAlwaysOnList();
             bool valid = true;
+            var clients = new List<Client>();
             foreach (var client in AlwaysOnListItems)
             {
-                if (client.Address == "" && client.Name == "") continue;
+                if (client.Address.Trim() == "" && client.Name.Trim() == "") continue;
                 if (!IsValidIPv4(client.Address))
                 {
+                    Debug.WriteLine(client.Name + " " + client.Address);
                     ShowWarrning(client.Address);
                     valid = false;
                     continue;
                 }
-                filesService.AddToAlwaysOnList(client.Address, client.IsOpen, client.Name);
+                clients.Add(new Client { Address = client.Address, Name = client.Name, IsOpen = client.IsOpen });
             }
             if (!valid) return;
 
+            await pipeClientService.SendUpdateAlwaysTrustedList(clients);
+            await pipeClientService.AskAlwaysTrustedListUpdate();
 
-            List<Client> alwaysOnList = filesService.GetAlwaysOnList();
-            AlwaysOnListItems.Clear();
-            foreach (var ip in alwaysOnList)
-            {
-                AlwaysOnListEntry client = new();
-                client.Address = ip.Address;
-                client.Name = ip.Name;
-                client.IsOpen = ip.IsOpen;
-                AlwaysOnListItems.Add(client);
-            }
-            // Subscribe to collection changes
-            foreach (var item in AlwaysOnListItems)
-            {
-                item.PropertyChanged += AlwaysOnEntry_PropertyChanged;
-            }
 
-            if (rdpService.LastAction == ActionsEnum.LocalComputersAndWhiteList)
+            /*if (rdpService.LastAction == ActionsEnum.LocalComputersAndWhiteList)
             {
                 rdpService.OpenRdpForLocalComputersAndForWhiteList();
             }
@@ -227,10 +219,33 @@ namespace RdpScopeToggler.ViewModels
             else
             {
                 rdpService.CloseRdpForAll();
-            }
-
-            IsNotSaved = false;
+            }*/
         }
+
+        private void UpdateAlwaysTrustedList(List<Client> list)
+        {
+            Debug.WriteLine("UpdateAlwaysTrustedList");
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                AlwaysOnListItems.Clear();
+                foreach (var ip in list)
+                {
+                    AlwaysOnListEntry client = new();
+                    client.Address = ip.Address;
+                    client.Name = ip.Name;
+                    client.IsOpen = ip.IsOpen;
+                    AlwaysOnListItems.Add(client);
+                }
+                // Subscribe to collection changes
+                foreach (var item in AlwaysOnListItems)
+                {
+                    item.PropertyChanged += AlwaysOnEntry_PropertyChanged;
+                }
+
+                IsNotSaved = false;
+            });
+        }
+
 
         bool IsValidIPv4(string ipString)
         {
