@@ -95,9 +95,6 @@ namespace RdpScopeToggler
         {
             base.OnInitialized();
 
-            var updateChecker = Container.Resolve<IUpdateCheckerService>();
-            await updateChecker.CheckForUpdatesAsync();
-
             #region Initialize language
 
             ILanguageService languageService = Container.Resolve<ILanguageService>();
