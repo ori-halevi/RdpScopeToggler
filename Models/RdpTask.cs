@@ -1,4 +1,4 @@
-﻿using RdpScopeToggler.Stores;
+﻿using RdpScopeToggler.Enums;
 using System;
 
 namespace RdpScopeToggler.Models

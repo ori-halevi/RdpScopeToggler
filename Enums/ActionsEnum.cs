@@ -1,4 +1,4 @@
-﻿namespace RdpScopeToggler.Stores
+﻿namespace RdpScopeToggler.Enums
 {
     public enum ActionsEnum
     {

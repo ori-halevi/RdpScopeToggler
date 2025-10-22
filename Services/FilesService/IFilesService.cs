@@ -1,4 +1,5 @@
-﻿using RdpScopeToggler.Stores;
+﻿using RdpScopeToggler.Enums;
+using RdpScopeToggler.Stores;
 using System.Collections.Generic;
 
 namespace RdpScopeToggler.Services.FilesService
@@ -13,5 +14,8 @@ namespace RdpScopeToggler.Services.FilesService
         public void CleanAlwaysOnList();
         public string GetLanguageFromSettings();
         public void WriteLanguageToSettings(string language);
+
+        ActionsEnum GetDefaultStateFromSettings();
+        void WriteDefaultStateToSettings(ActionsEnum defaultState);
     }
 }

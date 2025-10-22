@@ -6,6 +6,8 @@
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:views="clr-namespace:RdpScopeToggler.Views"
         WindowStartupLocation="CenterScreen"
+        
+        FontFamily="Bahnschrift"
 
         prism:ViewModelLocator.AutoWireViewModel="True"
         

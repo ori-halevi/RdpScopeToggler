@@ -138,11 +138,15 @@ namespace RdpScopeToggler.Services.PipeClientService
         private async Task TryReconnectLoop()
         {
             // ⚠️ Ensure navigation runs on the UI thread
-            Application.Current.Dispatcher.Invoke(() =>
+            var app = Application.Current;
+            if (app?.Dispatcher != null && app.Dispatcher.HasShutdownStarted == false)
             {
-                _regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
-                _regionManager.RequestNavigate("ContentRegion", "WaitingForServiceUserControl");
-            });
+                app.Dispatcher.Invoke(() =>
+                {
+                    _regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
+                    _regionManager.RequestNavigate("ContentRegion", "WaitingForServiceUserControl");
+                });
+            }
 
             while (!_isConnected)
             {
@@ -166,11 +170,14 @@ namespace RdpScopeToggler.Services.PipeClientService
                         Debug.WriteLine("Reconnected to service.");
 
                         // ⚠️ Ensure navigation runs on the UI thread
-                        Application.Current.Dispatcher.Invoke(() =>
+                        if (app?.Dispatcher != null && app.Dispatcher.HasShutdownStarted == false)
                         {
-                            _regionManager.RequestNavigate("ContentRegion", "MainUserControl");
-                            _regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
-                        });
+                            app.Dispatcher.Invoke(() =>
+                            {
+                                _regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
+                                _regionManager.RequestNavigate("ContentRegion", "WaitingForServiceUserControl");
+                            });
+                        }
 
                         await AskForUpdate();
                         break;

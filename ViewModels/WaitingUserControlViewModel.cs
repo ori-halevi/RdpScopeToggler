@@ -1,11 +1,11 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Navigation.Regions;
+using RdpScopeToggler.Enums;
 using RdpScopeToggler.Helpers;
 using RdpScopeToggler.Models;
 using RdpScopeToggler.Services.LoggerService;
 using RdpScopeToggler.Services.PipeClientService;
-using RdpScopeToggler.Stores;
 using System;
 using System.Collections.Generic;
 using System.Threading;

@@ -1,7 +1,10 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Navigation.Regions;
+using RdpScopeToggler.Enums;
 using RdpScopeToggler.Services.LanguageService;
+using RdpScopeToggler.Services.SettingsService;
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -12,6 +15,7 @@ namespace RdpScopeToggler.ViewModels
     public class SettingsUserControlViewModel : BindableBase, INavigationAware
     {
         public ObservableCollection<string> LanguagesOptions { get; }
+        public ObservableCollection<ActionsEnum> StateOptions { get; }
 
         private string selectedLanguage;
         public string SelectedLanguage
@@ -34,14 +38,29 @@ namespace RdpScopeToggler.ViewModels
             }
         }
 
+        private ActionsEnum selectedState;
+        public ActionsEnum SelectedState
+        {
+            get => selectedState;
+            set
+            {
+                if (SetProperty(ref selectedState, value))
+                {
+                    settingsService.SetState(value);
+                }
+            }
+        }
+
         public ICommand CloseCommand { get; }
         public ICommand OpenLogsFolderCommand { get; }
 
         private readonly IRegionManager regionManager;
         private readonly ILanguageService languageService;
+        private readonly ISettingsService settingsService;
 
-        public SettingsUserControlViewModel(IRegionManager regionManager, ILanguageService languageService)
+        public SettingsUserControlViewModel(IRegionManager regionManager, ILanguageService languageService, ISettingsService settingsService)
         {
+            this.settingsService = settingsService;
             this.regionManager = regionManager;
             this.languageService = languageService;
 
@@ -51,7 +70,26 @@ namespace RdpScopeToggler.ViewModels
                 "עברית"
             };
 
-            SelectedLanguage = languageService.SelectedLanguage;
+            StateOptions = new ObservableCollection<ActionsEnum>
+            {
+                ActionsEnum.RemoteSystems,
+                ActionsEnum.WhiteList,
+                ActionsEnum.LocalComputersAndWhiteList,
+                ActionsEnum.LocalComputers,
+                ActionsEnum.CloseRdp
+            };
+
+            var l = languageService.SelectedLanguage;
+            if (l == "עברית" || l == "he")
+            {
+                SelectedLanguage = "עברית";
+            }
+            else
+            {
+                SelectedLanguage = "English";
+            }
+
+            SelectedState = settingsService.GetState();
 
             CloseCommand = new DelegateCommand(() =>
             {

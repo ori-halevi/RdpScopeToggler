@@ -1,9 +1,13 @@
-﻿using RdpScopeToggler.Models;
+﻿using RdpScopeToggler.Enums;
+using RdpScopeToggler.Models;
 using RdpScopeToggler.Stores;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RdpScopeToggler.Services.FilesService
 {
@@ -31,7 +35,8 @@ namespace RdpScopeToggler.Services.FilesService
             List<string> whiteList = new List<string>();
             string updatedJson = JsonSerializer.Serialize(whiteList, new JsonSerializerOptions
             {
-                WriteIndented = true
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter() }
             });
             File.WriteAllText(filePath, updatedJson);
         }
@@ -58,7 +63,8 @@ namespace RdpScopeToggler.Services.FilesService
             List<string> whiteList = new List<string>();
             string updatedJson = JsonSerializer.Serialize(whiteList, new JsonSerializerOptions
             {
-                WriteIndented = true
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter() }
             });
             File.WriteAllText(filePath, updatedJson);
         }
@@ -69,47 +75,128 @@ namespace RdpScopeToggler.Services.FilesService
 
         public string GetLanguageFromSettings()
         {
-            EnsureSettingsFileExists();
+            try
+            {
+                EnsureSettingsFileExists();
 
-            const string pathToSettingsFile = @"C:\ProgramData\RdpScopeToggler\Settings.json";
+                const string pathToSettingsFile = @"C:\ProgramData\RdpScopeToggler\Settings.json";
+                var json = File.ReadAllText(pathToSettingsFile);
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Converters = { new JsonStringEnumConverter() }
+                };
 
-            // קריאת תוכן הקובץ
-            var json = File.ReadAllText(pathToSettingsFile);
+                var settings = JsonSerializer.Deserialize<Settings>(json, options);
 
-            // המרה לאובייקט
-            var settings = JsonSerializer.Deserialize<Settings>(json);
-
-            if (settings == null || string.IsNullOrWhiteSpace(settings.Language))
+                return string.IsNullOrWhiteSpace(settings?.Language) ? "en" : settings.Language;
+            }
+            catch (Exception)
+            {
+                // ייתכן לוג או טיפול אחר
                 return "en";
-
-            return settings.Language;
+            }
         }
+
 
         public void WriteLanguageToSettings(string language)
         {
             const string pathToSettingsFile = @"C:\ProgramData\RdpScopeToggler\Settings.json";
 
             Settings settings;
-
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
             // אם הקובץ קיים – נקרא אותו, כדי לא לאבד נתונים נוספים
             if (File.Exists(pathToSettingsFile))
             {
                 var json = File.ReadAllText(pathToSettingsFile);
-                settings = JsonSerializer.Deserialize<Settings>(json) ?? new Settings();
+
+
+
+                settings = JsonSerializer.Deserialize<Settings>(json, options) ?? new Settings();
             }
             else
             {
                 settings = new Settings();
             }
 
+
             // עדכון השפה
             settings.Language = language;
 
-            // כתיבה חזרה לקובץ (עם עיצוב יפה לקריאה)
-            var options = new JsonSerializerOptions { WriteIndented = true };
             var updatedJson = JsonSerializer.Serialize(settings, options);
 
             File.WriteAllText(pathToSettingsFile, updatedJson);
+        }
+
+        #endregion
+
+        #region DefaultState
+
+        public ActionsEnum GetDefaultStateFromSettings()
+        {
+            EnsureSettingsFileExists();
+
+            const string pathToSettingsFile = @"C:\ProgramData\RdpScopeToggler\Settings.json";
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+            try
+            {
+                var json = File.ReadAllText(pathToSettingsFile);
+                var settings = JsonSerializer.Deserialize<Settings>(json, options);
+
+                if (settings == null)
+                    return ActionsEnum.CloseRdp; // ברירת מחדל אם יש שגיאה
+
+                return settings.DefaultState;
+            }
+            catch
+            {
+                return ActionsEnum.CloseRdp; // במקרה של בעיה בקריאה
+            }
+        }
+
+        public void WriteDefaultStateToSettings(ActionsEnum defaultState)
+        {
+            const string pathToSettingsFile = @"C:\ProgramData\RdpScopeToggler\Settings.json";
+
+            Settings settings;
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+            try
+            {
+                // אם הקובץ קיים – נקרא אותו כדי לא לאבד נתונים אחרים
+                if (File.Exists(pathToSettingsFile))
+                {
+                    var json = File.ReadAllText(pathToSettingsFile);
+                    settings = JsonSerializer.Deserialize<Settings>(json, options) ?? new Settings();
+                }
+                else
+                {
+                    settings = new Settings();
+                }
+
+                // עדכון המצב
+                settings.DefaultState = defaultState;
+
+                var updatedJson = JsonSerializer.Serialize(settings, options);
+
+                File.WriteAllText(pathToSettingsFile, updatedJson);
+            }
+            catch (Exception ex)
+            {
+                // אופציונלי: אפשר להוסיף לוג או הודעת שגיאה למשתמש
+                Debug.WriteLine($"Failed to write default state: {ex.Message}");
+            }
         }
 
         #endregion
@@ -150,7 +237,8 @@ namespace RdpScopeToggler.Services.FilesService
 
                 string updatedJson = JsonSerializer.Serialize(list, new JsonSerializerOptions
                 {
-                    WriteIndented = true
+                    WriteIndented = true,
+                    Converters = { new JsonStringEnumConverter() }
                 });
 
                 File.WriteAllText(filePath, updatedJson);
@@ -161,7 +249,8 @@ namespace RdpScopeToggler.Services.FilesService
 
                 string updatedJson = JsonSerializer.Serialize(list, new JsonSerializerOptions
                 {
-                    WriteIndented = true
+                    WriteIndented = true,
+                    Converters = { new JsonStringEnumConverter() }
                 });
 
                 File.WriteAllText(filePath, updatedJson);
@@ -207,7 +296,8 @@ namespace RdpScopeToggler.Services.FilesService
 
                 string json = JsonSerializer.Serialize(defaultList, new JsonSerializerOptions
                 {
-                    WriteIndented = true
+                    WriteIndented = true,
+                    Converters = { new JsonStringEnumConverter() }
                 });
 
                 File.WriteAllText(filePath, json);
@@ -231,12 +321,14 @@ namespace RdpScopeToggler.Services.FilesService
             {
                 var defaultSettings = new RdpScopeToggler.Models.Settings
                 {
-                    Language = "en" // או כל ברירת מחדל אחרת שאתה רוצה
+                    Language = "en",
+                    DefaultState = Enums.ActionsEnum.CloseRdp
                 };
 
                 string json = JsonSerializer.Serialize(defaultSettings, new JsonSerializerOptions
                 {
-                    WriteIndented = true
+                    WriteIndented = true,
+                    Converters = { new JsonStringEnumConverter() }
                 });
 
                 File.WriteAllText(filePath, json);

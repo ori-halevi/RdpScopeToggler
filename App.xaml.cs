@@ -8,6 +8,7 @@ using RdpScopeToggler.Services.LoggerService;
 using RdpScopeToggler.Services.PipeClientService;
 using RdpScopeToggler.Services.ServiceExtractor;
 using RdpScopeToggler.Services.ServiceInstallationManager;
+using RdpScopeToggler.Services.SettingsService;
 using RdpScopeToggler.Services.UpdateCheckerService;
 using RdpScopeToggler.Services.WindowsServiceManager;
 using RdpScopeToggler.ViewModels;
@@ -72,6 +73,7 @@ namespace RdpScopeToggler
 
             containerRegistry.RegisterInstance(serviceProvider.GetRequiredService<IHttpClientFactory>());
 
+            containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
             containerRegistry.RegisterSingleton<IServiceInstallationManager, ServiceInstallationManager>();
             containerRegistry.RegisterSingleton<IWindowsServiceManager, WindowsServiceManager>();
             containerRegistry.RegisterSingleton<IServiceExtractor, ServiceExtractor>();
