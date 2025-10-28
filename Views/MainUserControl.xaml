@@ -29,143 +29,144 @@
                         VerticalAlignment="Stretch"
                         TabStripPlacement="Top"
                         Background="Transparent">
-            <TabControl.Resources>            
-                <!-- TabPanel Style for centering and stretching -->
-                <Style TargetType="TabPanel">
-                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                    <Setter Property="IsItemsHost" Value="True"/>
-                </Style>
+                
+                <TabControl.Resources>            
+                    <!-- TabPanel Style for centering and stretching -->
+                    <Style TargetType="TabPanel">
+                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                        <Setter Property="IsItemsHost" Value="True"/>
+                    </Style>
 
-                <!-- TabItem Style with improved hover behavior -->
-                <Style TargetType="TabItem">
-                    <Setter Property="Padding" Value="15,8"/>
-                    <Setter Property="Margin" Value="0"/>
-                    <Setter Property="Background" Value="{StaticResource LightGrayBrush}"/>
-                    <Setter Property="BorderBrush" Value="{StaticResource GrayBrush}"/>
-                    <Setter Property="BorderThickness" Value="1,1,1,0"/>
-                    <Setter Property="FontWeight" Value="SemiBold"/>
-                    <Setter Property="FontSize" Value="14"/>
-                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="TabItem">
-                                <Border x:Name="HeaderBorder"
-                                        Background="{TemplateBinding Background}"
-                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                        BorderThickness="{TemplateBinding BorderThickness}"
-                                        CornerRadius="8,8,0,0"
-                                        Padding="{TemplateBinding Padding}"
-                                        Margin="{TemplateBinding Margin}">
-                                    <Border.Effect>
-                                        <DropShadowEffect Color="Black"
-                                                          Direction="270"
-                                                          ShadowDepth="1"
-                                                          BlurRadius="3"
-                                                          Opacity="0.1"/>
-                                    </Border.Effect>
-                                    <ContentPresenter x:Name="ContentSite"
-                                                      VerticalAlignment="Center"
-                                                      HorizontalAlignment="Center"
-                                                      ContentSource="Header"
-                                                      RecognizesAccessKey="True"/>
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <!-- Non-selected state -->
-                                    <Trigger Property="IsSelected" Value="False">
-                                        <Setter TargetName="HeaderBorder" Property="Background">
-                                            <Setter.Value>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                    <GradientStop Color="{StaticResource DarkBlueColor}" Offset="0"/>
-                                                    <GradientStop Color="{StaticResource BlueColor}" Offset="1"/>
-                                                </LinearGradientBrush>
-                                            </Setter.Value>
-                                        </Setter>
-                                        <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="White"/>
-                                        <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{StaticResource DarkBlueBrush}"/>
-                                    </Trigger>
+                    <!-- TabItem Style with improved hover behavior -->
+                    <Style TargetType="TabItem">
+                        <Setter Property="Padding" Value="8,8"/>
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="Background" Value="{StaticResource LightGrayBrush}"/>
+                        <Setter Property="BorderBrush" Value="{StaticResource GrayBrush}"/>
+                        <Setter Property="BorderThickness" Value="1,1,1,0"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Border x:Name="HeaderBorder"
+                                            Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="8,8,0,0"
+                                            Padding="{TemplateBinding Padding}"
+                                            Margin="{TemplateBinding Margin}">
+                                        <Border.Effect>
+                                            <DropShadowEffect Color="Black"
+                                                              Direction="270"
+                                                              ShadowDepth="1"
+                                                              BlurRadius="3"
+                                                              Opacity="0.1"/>
+                                        </Border.Effect>
+                                        <ContentPresenter x:Name="ContentSite"
+                                                          VerticalAlignment="Center"
+                                                          HorizontalAlignment="Center"
+                                                          ContentSource="Header"
+                                                          RecognizesAccessKey="True"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <!-- Non-selected state -->
+                                        <Trigger Property="IsSelected" Value="False">
+                                            <Setter TargetName="HeaderBorder" Property="Background">
+                                                <Setter.Value>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientStop Color="{StaticResource DarkBlueColor}" Offset="0"/>
+                                                        <GradientStop Color="{StaticResource BlueColor}" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="White"/>
+                                            <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{StaticResource DarkBlueBrush}"/>
+                                        </Trigger>
                                     
-                                    <!-- Selected state -->
-                                    <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="HeaderBorder" Property="Margin" Value="0,-2,0,0"/>
-                                        <Setter Property="Panel.ZIndex" Value="1"/>
-                                    </Trigger>
+                                        <!-- Selected state -->
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="HeaderBorder" Property="Margin" Value="0,-2,0,0"/>
+                                            <Setter Property="Panel.ZIndex" Value="1"/>
+                                        </Trigger>
 
 
-                                    <!-- Hover state for non-selected tabs only -->
-                                    <MultiTrigger>
-                                        <MultiTrigger.Conditions>
-                                            <Condition Property="IsSelected" Value="False"/>
-                                            <Condition SourceName="HeaderBorder" Property="IsMouseOver" Value="True"/>
-                                        </MultiTrigger.Conditions>
-                                        <Setter TargetName="HeaderBorder" Property="Background">
-                                            <Setter.Value>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                    <GradientStop Color="{StaticResource LightBlueColor}" Offset="0"/>
-                                                    <GradientStop Color="{StaticResource LightBlueColor}" Offset="1"/>
-                                                </LinearGradientBrush>
-                                            </Setter.Value>
-                                        </Setter>
-                                        <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{StaticResource BlueBrush}"/>
-                                    </MultiTrigger>
+                                        <!-- Hover state for non-selected tabs only -->
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="False"/>
+                                                <Condition SourceName="HeaderBorder" Property="IsMouseOver" Value="True"/>
+                                            </MultiTrigger.Conditions>
+                                            <Setter TargetName="HeaderBorder" Property="Background">
+                                                <Setter.Value>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientStop Color="{StaticResource LightBlueColor}" Offset="0"/>
+                                                        <GradientStop Color="{StaticResource LightBlueColor}" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{StaticResource BlueBrush}"/>
+                                        </MultiTrigger>
 
-                                    <!-- Disabled state -->
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="{StaticResource GrayBrush}"/>
-                                        <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource LightGrayBrush}"/>
-                                        <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{StaticResource GrayBrush}"/>
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
+                                        <!-- Disabled state -->
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="{StaticResource GrayBrush}"/>
+                                            <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource LightGrayBrush}"/>
+                                            <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{StaticResource GrayBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
 
-                <!-- Tab Content Style -->
-                <Style x:Key="TabContentStyle" TargetType="Border">
-                        <Setter Property="CornerRadius" Value="0 0 8 8" />
-                        <Setter Property="Background">
-                        <Setter.Value>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                <GradientStop Color="{StaticResource LightGrayColor}" Offset="0"/>
-                                <GradientStop Color="{StaticResource LightGrayColor}" Offset="0.5"/>
-                                <GradientStop Color="{StaticResource LightBlueColor}" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="Margin" Value="0"/>
-                </Style>
+                    <!-- Tab Content Style -->
+                    <Style x:Key="TabContentStyle" TargetType="Border">
+                            <Setter Property="CornerRadius" Value="0 0 8 8" />
+                            <Setter Property="Background">
+                            <Setter.Value>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="White" Offset="0"/>
+                                    <GradientStop Color="{StaticResource LightGrayColor}" Offset="0.5"/>
+                                    <GradientStop Color="{StaticResource LightBlueColor}" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Margin" Value="0"/>
+                    </Style>
 
-                <!-- Text Style for Help Content -->
-                <Style x:Key="ContentTextStyle" TargetType="TextBlock">
-                    <Setter Property="FontSize" Value="16"/>
-                    <Setter Property="FontWeight" Value="Medium"/>
-                    <Setter Property="Foreground" Value="{StaticResource DarkGrayBrush}"/>
-                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="TextAlignment" Value="Center"/>
-                </Style>
-            </TabControl.Resources>
+                    <!-- Text Style for Help Content -->
+                    <Style x:Key="ContentTextStyle" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="16"/>
+                        <Setter Property="FontWeight" Value="Medium"/>
+                        <Setter Property="Foreground" Value="{StaticResource DarkGrayBrush}"/>
+                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="TextAlignment" Value="Center"/>
+                    </Style>
+                </TabControl.Resources>
 
-            <!-- Main Tab -->
-            <TabItem Header="{DynamicResource Main_translator}" Width="115.4">
-                <Border Style="{StaticResource TabContentStyle}">
-                    <ContentControl prism:RegionManager.RegionName="ActionsRegion" />
-                </Border>
-            </TabItem>
+                <!-- Main Tab -->
+                <TabItem Header="{DynamicResource Main_translator}" Width="115.4">
+                    <Border Style="{StaticResource TabContentStyle}">
+                        <ContentControl prism:RegionManager.RegionName="ActionsRegion" />
+                    </Border>
+                </TabItem>
 
-            <!-- WhiteList Tab -->
-            <TabItem Header="{DynamicResource WhiteList_translator}" Width="115.4">
-                <Border Style="{StaticResource TabContentStyle}">
-                    <views:WhiteListUserControl />
-                </Border>
-            </TabItem>
+                <!-- WhiteList Tab -->
+                <TabItem Header="{DynamicResource WhiteList_translator}" Width="115.4">
+                    <Border Style="{StaticResource TabContentStyle}">
+                        <views:WhiteListUserControl />
+                    </Border>
+                </TabItem>
 
-            <!-- Local Tab -->
-            <TabItem Header="{DynamicResource Local_translator}" Width="115.4">
-                <Border Style="{StaticResource TabContentStyle}">
-                    <views:LocalAddressesUserControl />
-                </Border>
-            </TabItem>
+                <!-- Local Tab -->
+                <TabItem Header="{DynamicResource TrustedAlways_translator}" Width="115.4">
+                    <Border Style="{StaticResource TabContentStyle}">
+                        <views:LocalAddressesUserControl />
+                    </Border>
+                </TabItem>
 
             </TabControl>
 

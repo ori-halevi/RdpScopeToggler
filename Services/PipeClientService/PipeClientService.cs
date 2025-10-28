@@ -1,7 +1,8 @@
 ﻿using Prism.Navigation.Regions;
-using RdpScopeCommands.Stores;
 using RdpScopeToggler.Models;
+using RdpScopeToggler.Stores;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
@@ -10,31 +11,37 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RdpScopeToggler.Services.PipeClientService
 {
     public class PipeClientService : IPipeClientService
     {
         private readonly string _pipeName;
-        private NamedPipeClientStream _client;
-        private StreamReader _reader;
-        private StreamWriter _writer;
+        private NamedPipeClientStream? _client;
+        private StreamReader? _reader;
+        private StreamWriter? _writer;
         private bool _isListening = false;
-        private CancellationTokenSource? _cts;
-        private IRegionManager regionManager;
+        private IRegionManager _regionManager;
         private bool _isConnected = false;
         private readonly object _lock = new();
 
-        public event Action<ServiceMessage> MessageReceived;
-        public event Action? Connected;
-        public event Action? Disconnected;
+        public CancellationTokenSource Cts { get; set; } = new();
+
+        public event Action<ServiceMessage>? MessageReceived;
+        public event Action<List<Client>>? WhiteListReceived;
+        public event Action<List<Client>>? AlwaysTrustedListReceived;
+
         public bool IsConnected => _client?.IsConnected ?? false;
 
         public PipeClientService(IRegionManager regionManager)
         {
             _pipeName = "RdpScopePipe";
-            this.regionManager = regionManager;
+            _regionManager = regionManager;
+
+            Cts = new CancellationTokenSource();
         }
+
         public async Task<bool> ConnectAsync(CancellationToken cancellationToken = default)
         {
             if (_isListening || _isConnected)
@@ -49,11 +56,9 @@ namespace RdpScopeToggler.Services.PipeClientService
                     _reader = new StreamReader(_client, Encoding.UTF8);
                     _writer = new StreamWriter(_client, Encoding.UTF8) { AutoFlush = true };
 
-                    Connected?.Invoke();
                     _isConnected = true;
-                    _isListening = true;
 
-                    // ListenLoop will wait until the connection will be closed, not call ConnectAsync again
+                    // Start listening loop asynchronously
                     _ = Task.Run(() => ListenLoop(cancellationToken), cancellationToken);
 
                     return true;
@@ -64,9 +69,14 @@ namespace RdpScopeToggler.Services.PipeClientService
                 }
 
                 try { await Task.Delay(2000, cancellationToken); }
-                catch (TaskCanceledException) { return false; }
+                catch (TaskCanceledException)
+                {
+                    Debug.WriteLine("Pipe connect cancelled.");
+                    break;
+                }
             }
 
+            Cleanup();
             return false;
         }
 
@@ -74,42 +84,121 @@ namespace RdpScopeToggler.Services.PipeClientService
         {
             try
             {
-                while (!cancellationToken.IsCancellationRequested && _client != null && _client.IsConnected)
+                while (!cancellationToken.IsCancellationRequested && _client != null && _isConnected)
                 {
+                    if (!_client.IsConnected)
+                    {
+                        Debug.WriteLine("Pipe not connected, exiting ListenLoop");
+                        break;
+                    }
+
+                    string? line = null;
                     try
                     {
-                        string? line = await _reader.ReadLineAsync();
-                        if (line == null) break;
+                        _isListening = true;
+                        line = await _reader!.ReadLineAsync(cancellationToken);
+                        if (line == null) throw new IOException("Pipe closed by server");
 
-                        var messageAsJson = JsonSerializer.Deserialize<ServiceMessage>(line, new JsonSerializerOptions
+                        var message = JsonSerializer.Deserialize<ServiceMessage>(line, new JsonSerializerOptions
                         {
                             WriteIndented = true,
                             Converters = { new JsonStringEnumConverter() }
                         });
 
-                        MessageReceived?.Invoke(messageAsJson);
-                        Debug.WriteLine($"Pipe message received: {line}");
+                        // Fire events if message exists
+                        MessageReceived?.Invoke(message);
+                        if (message?.WhiteList != null) WhiteListReceived?.Invoke(message.WhiteList);
+                        if (message?.AlwaysTrustedList != null) AlwaysTrustedListReceived?.Invoke(message.AlwaysTrustedList);
+
+                        if (message?.Error != null)
+                            Debug.WriteLine($"Pipe error received: {message.Error}");
                     }
-                    catch (Exception ex) when (ex is TimeoutException || ex is IOException)
+                    catch (ObjectDisposedException)
                     {
-                        Debug.WriteLine($"Pipe read error: {ex.Message}");
+                        Debug.WriteLine("Pipe disposed, handling disconnection immediately");
+                        break; // exit loop to cleanup and reconnect
+                    }
+                    catch (IOException)
+                    {
+                        Debug.WriteLine("Pipe I/O error, handling disconnection immediately");
+                        break; // exit loop to cleanup and reconnect
                     }
                 }
             }
             finally
             {
-                Disconnected?.Invoke();
+                // 1. Cleanup resources
                 Cleanup();
+
+                // 2. Start reconnect loop until the service is back
+                await TryReconnectLoop();
+            }
+        }
+
+        private async Task TryReconnectLoop()
+        {
+            // ⚠️ Ensure navigation runs on the UI thread
+            var app = Application.Current;
+            if (app?.Dispatcher != null && app.Dispatcher.HasShutdownStarted == false)
+            {
+                app.Dispatcher.Invoke(() =>
+                {
+                    _regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
+                    _regionManager.RequestNavigate("ContentRegion", "WaitingForServiceUserControl");
+                });
+            }
+
+            while (!_isConnected)
+            {
+                try
+                {
+
+                    Debug.WriteLine("Attempting to reconnect to service...");
+
+                    Cts = new CancellationTokenSource();
+                    if (await ConnectAsync(Cts.Token))
+                    {
+                    }
+                    else
+                    {
+                        // אופציונלי: תראה הודעת שגיאה/תנסה שוב
+                        Debug.WriteLine("Couldn't connect to the server.");
+                    }
+
+                    if (_isConnected)
+                    {
+                        Debug.WriteLine("Reconnected to service.");
+
+                        // ⚠️ Ensure navigation runs on the UI thread
+                        if (app?.Dispatcher != null && app.Dispatcher.HasShutdownStarted == false)
+                        {
+                            app.Dispatcher.Invoke(() =>
+                            {
+                                _regionManager.RequestNavigate("ActionsRegion", "HomeUserControl");
+                                _regionManager.RequestNavigate("ContentRegion", "WaitingForServiceUserControl");
+                            });
+                        }
+
+                        await AskForUpdate();
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Reconnect attempt failed: {ex.Message}");
+                }
             }
         }
 
 
-
         private void Cleanup()
         {
-            _reader?.Dispose();
-            _writer?.Dispose();
-            _client?.Dispose();
+            try { _reader?.Dispose(); }
+            catch (Exception ex) { Debug.WriteLine($"Error disposing pipe reader: {ex.Message}"); }
+            try { _writer?.Dispose(); }
+            catch (Exception ex) { Debug.WriteLine($"Error disposing pipe writer: {ex.Message}"); }
+            try { _client?.Dispose(); }
+            catch (Exception ex) { Debug.WriteLine($"Error disposing pipe client: {ex.Message}"); }
             _reader = null;
             _writer = null;
             _client = null;
@@ -117,105 +206,130 @@ namespace RdpScopeToggler.Services.PipeClientService
             _isListening = false;
         }
 
-
-
-
-
-
-
-
-
-        public Task AskForUpdate()
-        {
-            var message = new
-            {
-                command = "Update"
-            };
-            SendToWindowsServer(message);
-            return Task.CompletedTask;
-        }
         public async Task SendAsync(string message, CancellationToken cancellationToken = default)
         {
             if (!IsConnected) return;
 
             try
             {
-                await _writer.WriteLineAsync(message); // שולח עם \n
+                await _writer!.WriteLineAsync(message);
                 await _writer.FlushAsync();
+            }
+            catch (ObjectDisposedException)
+            {
+                _isConnected = false;
+            }
+            catch (IOException)
+            {
+                _isConnected = false;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"PipeClientService SendAsync error: {ex.Message}");
+                Debug.WriteLine($"SendAsync error: {ex.Message}");
             }
         }
 
         public void SendAddTask(RdpTask taskToAdd)
         {
-            var payload = new
-            {
-                command = "AddTask",
-                task = taskToAdd
-            };
-
-            SendToWindowsServer(payload);
+            var payload = new { command = "AddTask", task = taskToAdd };
+            _ = SafeFireAndForget(SendToWindowsServer(payload));
         }
 
         public void SendRemoveTask(string taskId)
         {
-            var payload = new
-            {
-                command = "UpdateTaskAsCanceled",
-                taskId
-            };
-
-            SendToWindowsServer(payload);
+            var payload = new { command = "UpdateTaskAsCanceled", taskId };
+            _ = SafeFireAndForget(SendToWindowsServer(payload));
         }
 
-        public RdpTask GetUpcomingTask()
+        // ⚠️ IMPORTANT: Do NOT dispose the main _client here! Open a new pipe if needed for synchronous call
+        public async Task<RdpTask?> GetUpcomingTaskAsync()
         {
-            var payload = new
-            {
-                command = "GetUpcomingTask"
-            };
-
+            var payload = new { command = "GetUpcomingTask" };
             string json = JsonSerializer.Serialize(payload);
 
-            using (_client)
+            try
             {
-                _client.Connect(3000);
+                using var tempPipe = new NamedPipeClientStream(".", _pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+                await tempPipe.ConnectAsync(2000);
+                using var writer = new StreamWriter(tempPipe) { AutoFlush = true };
+                using var reader = new StreamReader(tempPipe, Encoding.UTF8);
 
-                // שליחה
-                byte[] buffer = Encoding.UTF8.GetBytes(json);
-                _client.Write(buffer, 0, buffer.Length);
-                _client.Flush();
+                await writer.WriteLineAsync(json);
+                string? responseJson = await reader.ReadLineAsync();
+                if (string.IsNullOrWhiteSpace(responseJson)) return null;
 
-                // קריאה תשובה
-                using (var reader = new StreamReader(_client, Encoding.UTF8, false, 1024, true))
+                return JsonSerializer.Deserialize<RdpTask>(responseJson, new JsonSerializerOptions
                 {
-                    string responseJson = reader.ReadLine(); // עד סוף שורה
-                    if (string.IsNullOrWhiteSpace(responseJson))
-                        return null;
-
-                    var options = new JsonSerializerOptions
-                    {
-                        Converters = { new JsonStringEnumConverter() }
-                    };
-                    return JsonSerializer.Deserialize<RdpTask>(responseJson, options);
-                }
+                    Converters = { new JsonStringEnumConverter() }
+                });
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"GetUpcomingTaskAsync failed: {ex.Message}");
+                return null;
             }
         }
 
+
+        public Task AskForUpdate() =>
+            SafeFireAndForget(SendToWindowsServer(new { command = "Update" }));
+
+        public Task SendUpdateAlwaysTrustedList(List<Client> clients) =>
+            SafeFireAndForget(SendToWindowsServer(new { command = "UpdateAlwaysTrustedList", alwaysTrustedList = clients }));
+
+        public Task SendUpdateWhiteList(List<Client> clients) =>
+            SafeFireAndForget(SendToWindowsServer(new { command = "UpdateWhiteList", whiteList = clients }));
+
+        public Task AskWhiteListUpdate() =>
+            SafeFireAndForget(SendToWindowsServer(new { command = "GetWhiteList" }));
+
+        public Task AskAlwaysTrustedListUpdate() =>
+            SafeFireAndForget(SendToWindowsServer(new { command = "GetAlwaysTrustedList" }));
 
         private async Task SendToWindowsServer(object payload)
         {
-            if (!_isConnected || _writer == null)
-                await ConnectAsync();
-
-            lock (_lock) // מונע כתיבה בו זמנית ממספר threads
+            try
             {
+                if (!_isConnected || _writer == null)
+                    await ConnectAsync();
+
+                if (_writer == null) return;
+
                 string json = JsonSerializer.Serialize(payload);
-                _writer.WriteLine(json);
+
+                lock (_lock)
+                {
+                    try
+                    {
+                        _writer.WriteLine(json);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        Debug.WriteLine("Pipe closed while sending message");
+                        _isConnected = false;
+                    }
+                }
             }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SendToWindowsServer failed: {ex.Message}");
+            }
+        }
+
+        // Helper to safely run fire-and-forget tasks
+        private Task SafeFireAndForget(Task task)
+        {
+            return Task.Run(async () =>
+            {
+                try
+                {
+                    await task;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Unobserved task exception: {ex.Message}");
+                }
+            });
         }
     }
 }

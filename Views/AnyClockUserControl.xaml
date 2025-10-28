@@ -29,11 +29,9 @@
     <Grid>
         <Border BorderThickness="0" BorderBrush="#dee2e6" CornerRadius="8" Margin="10" >
             <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,0.9">
-                    <GradientStop Color="Transparent" Offset="1" />
-                    <GradientStop Color="#e9ecef" Offset="0.55" />
-                    <GradientStop Color="#e9ecef" Offset="0.85" />
-                    <GradientStop Color="Transparent" Offset="0" />
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0.5">
+                    <GradientStop Color="#EAEDF0" Offset="1" />
+                    <GradientStop Color="#F3F6F9" Offset="0" />
                 </LinearGradientBrush>
             </Border.Background>
             <StackPanel>

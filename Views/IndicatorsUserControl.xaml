@@ -10,6 +10,7 @@
              prism:ViewModelLocator.AutoWireViewModel="True">
 
     <UserControl.Resources>
+        <converters:IndicatorBrushConverter x:Key="IndicatorBrushConverter" />
         <converters:BoolToBrushConverter x:Key="BoolToBrushConverter" />
         <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
 
@@ -24,8 +25,8 @@
 
         <!-- Glow Effect Template -->
         <Style x:Key="GlowEllipseStyle" TargetType="Ellipse">
-            <Setter Property="Width" Value="22" />
-            <Setter Property="Height" Value="22" />
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="28" />
             <Setter Property="StrokeThickness" Value="0" />
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="RenderTransform">
@@ -67,8 +68,8 @@
 
         <!-- Icon Style -->
         <Style x:Key="IconStyle" TargetType="materialDesign:PackIcon">
-            <Setter Property="Width" Value="15"/>
-            <Setter Property="Height" Value="15"/>
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
             <Setter Property="Margin" Value="0 0 0 0"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -79,17 +80,10 @@
 
     <Border
             CornerRadius="18"
-            Padding="7 5"
-            BorderBrush="{DynamicResource GrayBrush}" BorderThickness="1"
-            materialDesignElevation:ShadowAssist.ShadowDepth="Depth3">
-        <Border.Background>
-            <LinearGradientBrush StartPoint="1,0" EndPoint="1,1">
-                <GradientStop Color="{DynamicResource GrayColor}" Offset="1" />
-                <GradientStop Color="{DynamicResource LightGrayColor}" Offset="0.01" />
-                <GradientStop Color="{DynamicResource LightGrayColor}" Offset="0.99" />
-                <GradientStop Color="{DynamicResource GrayColor}" Offset="0" />
-            </LinearGradientBrush>
-        </Border.Background>
+            Padding="0"
+            BorderBrush="{DynamicResource GrayBrush}" BorderThickness="0"
+            materialDesignElevation:ShadowAssist.ShadowDepth="Depth3"
+            Background="White">
 
         <StackPanel Orientation="Horizontal" 
                     HorizontalAlignment="Stretch" 
@@ -98,78 +92,85 @@
             <!-- External Addresses Indicator -->
             <Grid ToolTip="{DynamicResource ExternalAddressesToolTip_translator}" Margin="3">
                 <Ellipse Style="{StaticResource GlowEllipseStyle}"
-                         Fill="{DynamicResource ExternalBrush}"
-                         Tag="{Binding IsExternalOpen}"
-                         >
+                        Fill="{Binding IsExternalOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=LightRed|Outer}">
                     <Ellipse.Effect>
-                        <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="0.5" Color="{DynamicResource RedColor}" />
+                        <DropShadowEffect BlurRadius="10"
+                              ShadowDepth="0"
+                              Opacity="{Binding IsExternalOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=Red}"
+                              Color="{DynamicResource RedColor}" />
                     </Ellipse.Effect>
                 </Ellipse>
-                <Border BorderBrush="{DynamicResource RedBrush}" BorderThickness="1" CornerRadius="100">
-                    <materialDesign:PackIcon Kind="Earth" Style="{StaticResource IconStyle}" Foreground="{DynamicResource RedBrush}" />
+                <Border BorderBrush="{Binding IsExternalOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=Red|Outer}"
+                    BorderThickness="1"
+                    CornerRadius="100">
+                    <materialDesign:PackIcon Kind="Earth"
+                                 Style="{StaticResource IconStyle}"
+                                 Foreground="{Binding IsExternalOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=Red|Inner}" />
                 </Border>
-                <Grid.Opacity>
-                    <Binding Path="IsExternalOpen"
-                     Converter="{StaticResource BoolToOpacityConverter}"
-                     diag:PresentationTraceSources.TraceLevel="High" />
-                </Grid.Opacity>
-
-
             </Grid>
+
 
             <!-- Local Addresses Indicator -->
             <Grid ToolTip="{DynamicResource LocalAddressesToolTip_translator}" Margin="3">
                 <Ellipse Style="{StaticResource GlowEllipseStyle}"
-                         Fill="{StaticResource InternalBrush}"
-                         Tag="{Binding IsInternalOpen}"
-                         >
+                        Fill="{Binding IsInternalOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=LightOrange|Outer}">
                     <Ellipse.Effect>
-                        <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="0.5" Color="{DynamicResource OrangeColor}" />
+                        <DropShadowEffect BlurRadius="10"
+                              ShadowDepth="0"
+                              Opacity="{Binding IsInternalOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=Orange}"
+                              Color="{DynamicResource OrangeColor}" />
                     </Ellipse.Effect>
                 </Ellipse>
-                <Border BorderBrush="{DynamicResource OrangeBrush}" BorderThickness="1" CornerRadius="100">
-                    <materialDesign:PackIcon Kind="Lan" Style="{StaticResource IconStyle}"  Foreground="{DynamicResource OrangeBrush}"/>
+                <Border BorderBrush="{Binding IsInternalOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=Orange|Outer}"
+                    BorderThickness="1"
+                    CornerRadius="100">
+                    <materialDesign:PackIcon Kind="Lan"
+                                 Style="{StaticResource IconStyle}"
+                                 Foreground="{Binding IsInternalOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=Orange|Inner}" />
                 </Border>
-                <Grid.Opacity>
-                    <Binding Path="IsInternalOpen" Converter="{StaticResource BoolToOpacityConverter}" />
-                </Grid.Opacity>
             </Grid>
-
+            
+            
             <!-- White List Addresses Indicator -->
             <Grid ToolTip="{DynamicResource WhiteListAddressesToolTip_translator}" Margin="3">
                 <Ellipse Style="{StaticResource GlowEllipseStyle}"
-                         Fill="{StaticResource WhiteListBrush}"
-                         Tag="{Binding IsWhiteListOpen}"
-                         >
+                        Fill="{Binding IsWhiteListOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=LightBlue|Outer}">
                     <Ellipse.Effect>
-                        <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="0.5" Color="{DynamicResource BlueColor}" />
+                        <DropShadowEffect BlurRadius="10"
+                              ShadowDepth="0"
+                              Opacity="{Binding IsWhiteListOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=Blue}"
+                              Color="{DynamicResource BlueColor}" />
                     </Ellipse.Effect>
                 </Ellipse>
-                <Border BorderBrush="{DynamicResource BlueBrush}" BorderThickness="1" CornerRadius="100">
-                    <materialDesign:PackIcon Kind="Shield" Style="{StaticResource IconStyle}" Foreground="{DynamicResource BlueBrush}" />
+                <Border BorderBrush="{Binding IsWhiteListOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=Blue|Outer}"
+                    BorderThickness="1"
+                    CornerRadius="100">
+                    <materialDesign:PackIcon Kind="Shield"
+                                 Style="{StaticResource IconStyle}"
+                                 Foreground="{Binding IsWhiteListOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=Blue|Inner}" />
                 </Border>
-                <Grid.Opacity>
-                    <Binding Path="IsWhiteListOpen" Converter="{StaticResource BoolToOpacityConverter}" />
-                </Grid.Opacity>
             </Grid>
 
             <!-- AlwaysOn Addresses Indicator -->
-            <Grid ToolTip="{DynamicResource AlwaysOnListAddressesToolTip_translator}" Margin="3">
+            <Grid ToolTip="{DynamicResource TrustedAlwaysListAddressesToolTip_translator}" Margin="3">
                 <Ellipse Style="{StaticResource GlowEllipseStyle}"
-                         Fill="{StaticResource AlwaysOnBrush}"
-                         Tag="{Binding IsAlwaysOnOpen}"
-                         >
+                        Fill="{Binding IsAlwaysOnOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=LightPurple|Outer}">
                     <Ellipse.Effect>
-                        <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="0.5" Color="{DynamicResource PurpleColor}" />
+                        <DropShadowEffect BlurRadius="10"
+                              ShadowDepth="0"
+                              Opacity="{Binding IsAlwaysOnOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=Purple}"
+                              Color="{DynamicResource PurpleColor}" />
                     </Ellipse.Effect>
                 </Ellipse>
-                <Border BorderBrush="{DynamicResource PurpleBrush}" BorderThickness="1" CornerRadius="100">
-                    <materialDesign:PackIcon Kind="Power" Style="{StaticResource IconStyle}" Foreground="{DynamicResource PurpleBrush}" />
+                <Border BorderBrush="{Binding IsAlwaysOnOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=Purple|Outer}"
+                    BorderThickness="1"
+                    CornerRadius="100">
+                    <materialDesign:PackIcon Kind="Power"
+                                 Style="{StaticResource IconStyle}"
+                                 Foreground="{Binding IsAlwaysOnOpen, Converter={StaticResource IndicatorBrushConverter}, ConverterParameter=Purple|Inner}" />
                 </Border>
-                <Grid.Opacity>
-                    <Binding Path="IsAlwaysOnOpen" Converter="{StaticResource BoolToOpacityConverter}" />
-                </Grid.Opacity>
             </Grid>
+
 
         </StackPanel>
     </Border>

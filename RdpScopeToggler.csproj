@@ -6,19 +6,13 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ApplicationIcon>Assets\remote-desktop.ico</ApplicationIcon>
-		<Version>1.2.1</Version>
+		<Version>2.0.0</Version>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="Assets\cog.ico" />
 		<None Remove="Assets\cog.png" />
-		<None Remove="Assets\Deployment\RdpScopeService\appsettings.Development.json" />
 		<None Remove="Assets\Deployment\RdpScopeService\appsettings.json" />
-		<None Remove="Assets\Deployment\RdpScopeService\DelService.bat" />
-		<None Remove="Assets\Deployment\RdpScopeService\Dependencies\RdpScopeCommands\RdpScopeCommands.deps.json" />
-		<None Remove="Assets\Deployment\RdpScopeService\RdpScopeCommands.pdb" />
 		<None Remove="Assets\Deployment\RdpScopeService\RdpScopeService.exe" />
-		<None Remove="Assets\Deployment\RdpScopeService\RdpScopeService.pdb" />
-		<None Remove="Assets\Deployment\RdpScopeService\RunService.bat" />
 		<None Remove="Assets\remote-desktop.ico" />
 		<None Remove="Assets\remote-desktop.png" />
 	</ItemGroup>
@@ -46,30 +40,12 @@
 		<Content Include="Assets\cog.png">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Assets\Deployment\RdpScopeService\appsettings.Development.json">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Deployment\RdpScopeService\appsettings.json">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Deployment\RdpScopeService\DelService.bat">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Deployment\RdpScopeService\Dependencies\RdpScopeCommands\RdpScopeCommands.deps.json">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Deployment\RdpScopeService\RdpScopeCommands.pdb">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Deployment\RdpScopeService\RdpScopeService.exe">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Deployment\RdpScopeService\RdpScopeService.pdb">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Deployment\RdpScopeService\RunService.bat">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
+		<EmbeddedResource Include="Assets\Deployment\RdpScopeService\appsettings.json">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\Deployment\RdpScopeService\RdpScopeService.exe">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
 		<Content Include="Assets\remote-desktop.ico">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
@@ -82,6 +58,7 @@
 		<PackageReference Include="MaterialDesignColors" Version="1.2.6" />
 		<PackageReference Include="MaterialDesignThemes" Version="3.1.3" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.9" />
+		<PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
 		<PackageReference Include="Prism.Unity" Version="9.0.537" />
 		<PackageReference Include="Roslynator.Analyzers" Version="4.13.1">
@@ -91,17 +68,18 @@
 		<PackageReference Include="vocaluxe.dependencies.netfwtypelib" Version="1.0.1" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Reference Include="RdpScopeCommands">
-	    <HintPath>..\RdpScopeCommands\bin\Debug\net8.0\RdpScopeCommands.dll</HintPath>
-	  </Reference>
-	</ItemGroup>
-	<ItemGroup>
 	  <Resource Include="Resources\Buttons.xaml" />
 	  <Resource Include="Resources\Colors.xaml" />
 	  <Resource Include="Resources\Styles.xaml" />
 	  <Resource Include="Resources\Templates.xaml" />
 	</ItemGroup>
 	<ItemGroup>
+	  <None Update="Assets\Deployment\RdpScopeService\DelService.bat">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\Deployment\RdpScopeService\RunService.bat">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Assets\Deployment\RdpScopeService\קוד להרצת השירות .bat">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </None>

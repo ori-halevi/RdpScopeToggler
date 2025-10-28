@@ -1,7 +1,7 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Navigation.Regions;
-using RdpScopeCommands.Stores;
+using RdpScopeToggler.Enums;
 using RdpScopeToggler.Helpers;
 using RdpScopeToggler.Models;
 using RdpScopeToggler.Services.LoggerService;
@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace RdpScopeToggler.ViewModels
@@ -175,7 +174,7 @@ namespace RdpScopeToggler.ViewModels
 
             string durationText = BuildDurationString(NextTask.Date - MainTask.Date);
 
-            string targetKey = "RemoteSystems_translator";
+            string targetKey = "AllAddresses_translator";
             if (MainTask.Action == ActionsEnum.LocalComputersAndWhiteList)
                 targetKey = "WhiteList_translator";
 

@@ -1,11 +1,12 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Navigation.Regions;
-using RdpScopeCommands.Stores;
+using RdpScopeToggler.Enums;
 using RdpScopeToggler.Helpers;
 using RdpScopeToggler.Models;
 using RdpScopeToggler.Services.LoggerService;
 using RdpScopeToggler.Services.PipeClientService;
+using RdpScopeToggler.Services.SettingsService;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -148,6 +149,14 @@ namespace RdpScopeToggler.ViewModels
         }
 
 
+        private bool _isMoreOptionsVisible;
+        public bool IsMoreOptionsVisible
+        {
+            get => _isMoreOptionsVisible;
+            set => SetProperty(ref _isMoreOptionsVisible, value);
+        }
+
+
         private ActionsEnum selectedAction;
         public ActionsEnum SelectedAction
         {
@@ -170,9 +179,12 @@ namespace RdpScopeToggler.ViewModels
         private IRegionManager regionManager;
         private readonly ILoggerService loggerService;
         private readonly IPipeClientService pipeClientService;
+        private readonly ISettingsService settingsService;
 
-        public HomeUserControlViewModel(IRegionManager regionManager, ILoggerService loggerService, IPipeClientService pipeClientService)
+        public HomeUserControlViewModel(IRegionManager regionManager, ILoggerService loggerService,
+            IPipeClientService pipeClientService, ISettingsService settingsService)
         {
+            this.settingsService = settingsService;
             this.pipeClientService = pipeClientService;
             this.loggerService = loggerService;
             this.regionManager = regionManager;
@@ -210,6 +222,7 @@ namespace RdpScopeToggler.ViewModels
         {
             RdpTask task = new();
             task.Action = SelectedAction;
+            task.NextTask = new RdpTask(DateTime.Now, settingsService.GetState());
 
             if (IsDateTimeEnabled)
             {
@@ -217,7 +230,7 @@ namespace RdpScopeToggler.ViewModels
                 if (IsDateTimeEnabled && SelectedDateTime < DateTime.Now.AddMinutes(1)) return;
                 task.Date = SelectedDateTime;
                 DateTime closeRdpDate = SelectedDateTime.Add(Duration);
-                task.NextTask = new RdpTask(closeRdpDate, ActionsEnum.CloseRdp);
+                task.NextTask.Date = closeRdpDate;
                 pipeClientService.SendAddTask(task);
                 return;
             }
@@ -225,7 +238,7 @@ namespace RdpScopeToggler.ViewModels
             DateTime now = DateTime.Now;
             DateTime closeRdpDate1 = now.Add(Duration);
             task.Date = now;
-            task.NextTask = new RdpTask(closeRdpDate1, ActionsEnum.CloseRdp);
+            task.NextTask.Date = closeRdpDate1;
             pipeClientService.SendAddTask(task);
         }
 

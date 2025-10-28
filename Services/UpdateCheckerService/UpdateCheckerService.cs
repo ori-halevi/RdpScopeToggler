@@ -1,8 +1,9 @@
-﻿using System.Net.Http;
+﻿using Microsoft.Toolkit.Uwp.Notifications; // NuGet
+using System;
+using System.Net.Http;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Toolkit.Uwp.Notifications; // NuGet
 
 namespace RdpScopeToggler.Services.UpdateCheckerService
 {
@@ -29,14 +30,15 @@ namespace RdpScopeToggler.Services.UpdateCheckerService
             var json = await response.Content.ReadAsStringAsync();
             using var doc = JsonDocument.Parse(json);
             var latestVersionRaw = doc.RootElement.GetProperty("tag_name").GetString(); // "v.1.1.0"
-            var latestVersion = latestVersionRaw?.TrimStart('v', 'V', '.'); // "1.1.0"
+            var latestVersionString = latestVersionRaw?.TrimStart('v', 'V', '.'); // "1.1.0"
+            var currentVersion = Assembly.GetExecutingAssembly().GetName().Version; // Version(1.2.0.0)
 
-            var currentVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3); // "1.2.0"
-
-            if (!string.IsNullOrEmpty(latestVersion) && latestVersion != currentVersion)
+            if (Version.TryParse(latestVersionString, out var latestVersion) &&
+                latestVersion > currentVersion)
             {
-                ShowUpdateNotification(latestVersion);
+                ShowUpdateNotification(latestVersion.ToString());
             }
+
 
         }
 

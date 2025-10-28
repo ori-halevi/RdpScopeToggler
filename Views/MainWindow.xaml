@@ -6,11 +6,13 @@
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:views="clr-namespace:RdpScopeToggler.Views"
         WindowStartupLocation="CenterScreen"
+        
+        FontFamily="Bahnschrift"
 
         prism:ViewModelLocator.AutoWireViewModel="True"
         
         Title="{Binding Title}"
-        Height="531" Width="355"
+        Height="535" Width="355"
         ResizeMode="NoResize"
         
         Icon="pack://siteoforigin:,,,/Assets/remote-desktop.ico"

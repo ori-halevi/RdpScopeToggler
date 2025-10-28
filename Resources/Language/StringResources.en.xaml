@@ -19,9 +19,15 @@
     <sys:String x:Key="OpenLogsFolder_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Open logs folder</sys:String>
 
     <sys:String x:Key="RemoteSystems_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Remote systems</sys:String>
+    <sys:String x:Key="LocalComputersAndWhiteList_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Local Computers And White List</sys:String>
+    <sys:String x:Key="LocalComputers_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Local Computers</sys:String>
+    <sys:String x:Key="CloseRdp_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Close RDP</sys:String>
+    <sys:String x:Key="AllAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">All addresses</sys:String>
     <sys:String x:Key="WhiteList_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">White list</sys:String>
 
+    <sys:String x:Key="LocalAddressesAndWhiteList_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Local Addresses and White List</sys:String>
     <sys:String x:Key="LocalAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Local Addresses</sys:String>
+    <sys:String x:Key="TrustedAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Always Trusted Addresses</sys:String>
     <sys:String x:Key="WhiteListAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">White List Addresses</sys:String>
 
     <sys:String x:Key="Add_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Add</sys:String>
@@ -30,11 +36,13 @@
 
     <sys:String x:Key="Main_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Main</sys:String>
     <sys:String x:Key="Local_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Local</sys:String>
+    <sys:String x:Key="TrustedAlways_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Trusted Always</sys:String>
 
-    <sys:String x:Key="AlwaysOnListAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Always-On List access</sys:String>
-    <sys:String x:Key="WhiteListAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">White List access</sys:String>
-    <sys:String x:Key="ExternalAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">All external addresses access</sys:String>
-    <sys:String x:Key="LocalAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">All local addresses access</sys:String>
+    <sys:String x:Key="AlwaysOnListAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Access for Always-Trusted list</sys:String>
+    <sys:String x:Key="TrustedAlwaysListAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Access for Always-Trusted addresses</sys:String>
+    <sys:String x:Key="WhiteListAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Access for Whitelisted addresses</sys:String>
+    <sys:String x:Key="ExternalAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Access for external addresses</sys:String>
+    <sys:String x:Key="LocalAddressesToolTip_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Access for local addresses</sys:String>
 
     <sys:String x:Key="TheConnectionWillCloseIn_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">The connection will close in:</sys:String>
     <sys:String x:Key="Days_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Days</sys:String>
@@ -59,5 +67,15 @@
 
     <sys:String x:Key="OpenWindow_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Open window</sys:String>
     <sys:String x:Key="Exit_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Exit</sys:String>
+
+    <sys:String x:Key="DoNotCloseTheApplication_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Do not close the application</sys:String>
+    
+    <sys:String x:Key="StoppingAndDeletingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Stopping and deleting existing service...</sys:String>
+    <sys:String x:Key="ExtractingServiceFiles_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Extracting service files...</sys:String>
+    <sys:String x:Key="InstallingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Installing service...</sys:String>
+    <sys:String x:Key="StartingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Starting service...</sys:String>
+    <sys:String x:Key="WaitingForService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Waiting for service...</sys:String>
+
+    <sys:String x:Key="DefaultAccessState_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Default Access State:</sys:String>
 
 </ResourceDictionary>
