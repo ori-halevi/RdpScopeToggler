@@ -1,7 +1,7 @@
-﻿using System;
+﻿using RdpScopeToggler.Helpers;
+using System;
 using System.Globalization;
 using System.Windows.Data;
-using System.Windows;
 
 namespace RdpScopeToggler.Converters
 {
@@ -12,7 +12,7 @@ namespace RdpScopeToggler.Converters
             if (value is Enum enumValue)
             {
                 string key = enumValue.ToString() + "_translator";
-                var translated = Application.Current.TryFindResource(key) as string;
+                var translated = TranslationHelper.Translate(key);
                 return translated ?? enumValue.ToString();
             }
             return value?.ToString() ?? string.Empty;
@@ -24,7 +24,7 @@ namespace RdpScopeToggler.Converters
             foreach (var field in Enum.GetValues(typeof(RdpScopeToggler.Enums.ActionsEnum)))
             {
                 string key = field + "_translator";
-                var translated = Application.Current.TryFindResource(key) as string;
+                var translated = TranslationHelper.Translate(key);
                 if (translated == (string)value)
                     return field;
             }

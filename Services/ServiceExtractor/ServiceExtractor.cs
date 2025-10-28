@@ -37,6 +37,13 @@ namespace RdpScopeToggler.Services.ServiceExtractor
             using Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)
                 ?? throw new FileNotFoundException($"Embedded resource '{resourceName}' not found.");
 
+            // Ensure the directory exists
+            string? directory = Path.GetDirectoryName(targetPath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
             // Delete the old file if it exists
             if (File.Exists(targetPath))
             {
@@ -54,5 +61,6 @@ namespace RdpScopeToggler.Services.ServiceExtractor
             await using FileStream file = File.Create(targetPath);
             await stream.CopyToAsync(file, cancellationToken);
         }
+
     }
 }

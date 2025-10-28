@@ -301,9 +301,6 @@ namespace RdpScopeToggler.Services.FilesService
                 });
 
                 File.WriteAllText(filePath, json);
-
-
-                WriteToList("127.0.0.1", "Localhost", true, "AlwaysOnList.json");
             }
         }
 
