@@ -16,7 +16,7 @@
 
 # \### Smart Access Control
 
-# \- \*\*Local Address List\*\*: Define addresses that should always have access (marked as "Local" but supports both local and remote addresses)
+# \- \*\*Trusted Address List\*\*: Define addresses that should always have access.
 
 # \- \*\*Whitelist Management\*\*: Flexible whitelist system with enable/disable functionality
 
@@ -34,21 +34,11 @@
 
 # 1\. \*\*📋 Whitelist Status\*\* - Shows current whitelist state
 
-# 2\. \*\*🌐 General List Status\*\* - Displays general access rules status  
+# 2\. \*\*🌐 Trusted Address List Status\*\* - Displays Trusted Address access rules status  
 
 # 3\. \*\*🔓 Open to All\*\* - Indicates when RDP is open to all addresses (no filtering)
 
-# 4\. \*\*🏠 Local Only\*\* - Shows when access is restricted to local addresses only
-
-# 
-
-# \### Automated Notifications
-
-# \- \*\*Toast Listener Service\*\*: On first run, installs `RdpScopeTogglerToastListener`
-
-# \- \*\*Pre-Disconnection Alerts\*\*: Receives notifications before scheduled disconnections
-
-# \- \*\*Always Scheduled\*\*: Every operation requires a scheduled disconnection time for security
+# 4\. \*\*🏠 Local\*\* - Shows when access is open for local addresses
 
 # 
 
@@ -118,21 +108,17 @@
 
 # \- Administrator privileges (required for RDP configuration)
 
-# \- .NET Framework 4.7.2 or higher
-
 # 
 
 # \## 🚦 How to Use
 
 # 
 
-# \### Setting Up Access Lists
+# \### Setting Up Access Lists (There may be unexpected behavior if the lists are empty.)
 
 # 
 
-# 1\. \*\*Local Address List\*\*: Add addresses that should always have RDP access
-
-# &nbsp;  - Despite the "Local" name, you can add both local and remote IP addresses
+# 1\. \*\*Trusted Address List\*\*: Add addresses that should always have RDP access
 
 # &nbsp;  - These addresses bypass time restrictions
 
@@ -168,7 +154,7 @@
 
 # \- \*\*Administrator Rights\*\*: The application requires admin privileges to modify RDP settings
 
-# \- \*\*Automatic Notifications\*\*: The toast listener ensures you're always aware of upcoming disconnections
+# \- \*\*Important\*\*: There may be unexpected behavior if the lists are empty so fill them with some addresses.
 
 # 
 
@@ -178,7 +164,7 @@
 
 # \- \*\*Primary Application\*\*: RdpScopeToggler.exe
 
-# \- \*\*Notification Service\*\*: RdpScopeService (auto-installed)
+# \- \*\*Actions Service\*\*: RdpScopeService (auto-installed)
 
 # \- \*\*Configuration\*\*: Settings are stored locally and applied to Windows RDP configuration
 
