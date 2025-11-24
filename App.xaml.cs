@@ -14,10 +14,7 @@ using RdpScopeToggler.Services.WindowsServiceManager;
 using RdpScopeToggler.ViewModels;
 using RdpScopeToggler.Views;
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -144,22 +141,11 @@ namespace RdpScopeToggler
 
             var serviceInstaller = Container.Resolve<IServiceInstallationManager>();
 
+            // While debugging, don't try to install the service or to run it.
             bool isDebug = false;
             if (!isDebug)
             {
-                try
-                {
-                    await serviceInstaller.InitializeServiceAsync();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(
-                        ex.Message,
-                        "Error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error
-                    );
-                }
+                 await serviceInstaller.InitializeServiceAsync();
             }
 
 
@@ -178,8 +164,7 @@ namespace RdpScopeToggler
             }
             else
             {
-                // אופציונלי: תראה הודעת שגיאה/תנסה שוב
-                Debug.WriteLine("Couldn't connect to the server.");
+                throw new Exception("Couldn't connect to the RdpScopeService server.");
             }
 
         }

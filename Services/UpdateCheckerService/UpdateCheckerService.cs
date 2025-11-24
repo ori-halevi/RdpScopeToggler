@@ -1,5 +1,6 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications; // NuGet
 using System;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Reflection;
 using System.Text.Json;
@@ -20,23 +21,30 @@ namespace RdpScopeToggler.Services.UpdateCheckerService
 
         public async Task CheckForUpdatesAsync()
         {
-            var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("request"); // GitHub API דורש User-Agent
-
-            var response = await client.GetAsync(RepoApiUrl);
-            if (!response.IsSuccessStatusCode)
-                return;
-
-            var json = await response.Content.ReadAsStringAsync();
-            using var doc = JsonDocument.Parse(json);
-            var latestVersionRaw = doc.RootElement.GetProperty("tag_name").GetString(); // "v.1.1.0"
-            var latestVersionString = latestVersionRaw?.TrimStart('v', 'V', '.'); // "1.1.0"
-            var currentVersion = Assembly.GetExecutingAssembly().GetName().Version; // Version(1.2.0.0)
-
-            if (Version.TryParse(latestVersionString, out var latestVersion) &&
-                latestVersion > currentVersion)
+            try
             {
-                ShowUpdateNotification(latestVersion.ToString());
+                var client = _httpClientFactory.CreateClient();
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("request"); // GitHub API דורש User-Agent
+
+                var response = await client.GetAsync(RepoApiUrl);
+                if (!response.IsSuccessStatusCode)
+                    return;
+
+                var json = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                var latestVersionRaw = doc.RootElement.GetProperty("tag_name").GetString(); // "v.1.1.0"
+                var latestVersionString = latestVersionRaw?.TrimStart('v', 'V', '.'); // "1.1.0"
+                var currentVersion = Assembly.GetExecutingAssembly().GetName().Version; // Version(1.2.0.0)
+
+                if (Version.TryParse(latestVersionString, out var latestVersion) &&
+                    latestVersion > currentVersion)
+                {
+                    ShowUpdateNotification(latestVersion.ToString());
+                }
+            }
+            catch
+            {
+                Debug.WriteLine("Could not search for better version");
             }
 
 

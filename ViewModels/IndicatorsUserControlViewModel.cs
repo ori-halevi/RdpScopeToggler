@@ -48,12 +48,9 @@ namespace RdpScopeToggler.ViewModels
         #endregion
 
         private readonly IPipeClientService pipeClientService;
-        private IRegionManager regionManager;
-        public IndicatorsUserControlViewModel(IRegionManager regionManager, IPipeClientService pipeClientService)
+        public IndicatorsUserControlViewModel(IPipeClientService pipeClientService)
         {
             Debug.WriteLine($"[VM CREATED] Hash={this.GetHashCode()}");
-
-            this.regionManager = regionManager;
 
             this.pipeClientService = pipeClientService;
             this.pipeClientService.MessageReceived += OnMessageReceived;
@@ -77,9 +74,6 @@ namespace RdpScopeToggler.ViewModels
                 HandleBlink(nameof(IsWhiteListOpen), rdpInfoData?.IsOpenForWhiteList);
                 HandleBlink(nameof(IsExternalOpen), rdpInfoData?.IsOpenForAll);
             });
-
-            // Debug.WriteLine($"IsAlwaysOnOpen: {IsAlwaysOnOpen},\nIsInternalOpen: {IsInternalOpen},\nIsWhiteListOpen: {IsWhiteListOpen},\nIsExternalOpen: {IsExternalOpen}");
-            // Debug.WriteLine($"IsAlwaysOnOpen: {rdpInfoData.IsOpenForAlwaysOnList},\nIsInternalOpen: {rdpInfoData.IsOpenForLocalComputers},\nIsWhiteListOpen: {rdpInfoData.IsOpenForWhiteList},\nIsExternalOpen: {rdpInfoData.IsOpenForAll}");
         }
 
         private void HandleBlink(string indicatorName, bool? value)
