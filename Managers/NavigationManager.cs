@@ -22,6 +22,12 @@ namespace RdpScopeToggler.Managers
             if (currentTask == null)
                 return;
 
+            // Pipe messages arrive on a background thread. During app shutdown
+            // Application.Current may be null or the Dispatcher may be shutting down.
+            var app = Application.Current;
+            if (app?.Dispatcher == null || app.Dispatcher.HasShutdownStarted)
+                return;
+
             var parameters = new NavigationParameters
             {
                 { "task", currentTask }
@@ -29,28 +35,28 @@ namespace RdpScopeToggler.Managers
 
             if (currentTask.State == StateEnum.Executed && currentTask.NextTask != null && currentTask.NextTask.State == StateEnum.Executed)
             {
-                Application.Current.Dispatcher.Invoke(() =>
+                app.Dispatcher.Invoke(() =>
                 {
                     regionManager.RequestNavigate("ActionsRegion", "HomeUserControl", parameters);
                 });
             }
             else if (currentTask.State == StateEnum.Executed && currentTask.NextTask != null && currentTask.NextTask.State == StateEnum.InQueue)
             {
-                Application.Current.Dispatcher.Invoke(() =>
+                app.Dispatcher.Invoke(() =>
                 {
                     regionManager.RequestNavigate("ActionsRegion", "TaskUserControl", parameters);
                 });
             }
             else if (currentTask.State == StateEnum.InQueue && currentTask.NextTask != null && currentTask.NextTask.State == StateEnum.InQueue)
             {
-                Application.Current.Dispatcher.Invoke(() =>
+                app.Dispatcher.Invoke(() =>
                 {
                     regionManager.RequestNavigate("ActionsRegion", "WaitingUserControl", parameters);
                 });
             }
             else
             {
-                Application.Current.Dispatcher.Invoke(() =>
+                app.Dispatcher.Invoke(() =>
                 {
                     regionManager.RequestNavigate("ActionsRegion", "HomeUserControl", parameters);
                 });

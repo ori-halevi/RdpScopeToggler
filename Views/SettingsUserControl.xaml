@@ -117,6 +117,14 @@
                         Content="{DynamicResource OpenLogsFolder_translator}"
                         Command="{Binding OpenLogsFolderCommand}"
                         />
+
+                    <!--  Refresh RdpScopeService -->
+                    <Button 
+                        Style="{DynamicResource SimpleButton}"
+                        Content="{DynamicResource RefreshService_translator}"
+                        ToolTip="{DynamicResource RefreshServiceToolTip_translator}"
+                        Command="{Binding RefreshRdpScopeServiceCommand}"
+                        />
                 </StackPanel>
 
             </StackPanel>

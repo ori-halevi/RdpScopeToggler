@@ -49,6 +49,7 @@ namespace RdpScopeToggler.ViewModels
 
         private readonly IFilesService filesService;
         private readonly IPipeClientService pipeClientService;
+
         public WhiteListUserControlViewModel(IRegionManager regionManager, IFilesService filesService, IPipeClientService pipeClientService)
         {
             this.pipeClientService = pipeClientService;
@@ -81,7 +82,8 @@ namespace RdpScopeToggler.ViewModels
             {
                 regionManager.RequestNavigate("ContentRegion", "MainUserControl");
             });
-
+            
+            WhiteListItems.CollectionChanged += WhiteListItems_CollectionChanged;
             pipeClientService.WhiteListReceived += UpdateWhiteList;
         }
 

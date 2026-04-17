@@ -27,6 +27,8 @@ namespace RdpScopeToggler.Views
                 DialogIcon.Visibility = Visibility.Visible;
             }
 
+            Button defaultButton = null;
+
             foreach (var btnConfig in options.Buttons)
             {
                 var button = new Button
@@ -38,6 +40,12 @@ namespace RdpScopeToggler.Views
                     MinWidth = 80
                 };
 
+                if (!string.IsNullOrEmpty(btnConfig.StyleKey)
+                    && Application.Current.TryFindResource(btnConfig.StyleKey) is Style style)
+                {
+                    button.Style = style;
+                }
+
                 button.Click += (s, e) =>
                 {
                     _buttonClicked = true;
@@ -46,7 +54,15 @@ namespace RdpScopeToggler.Views
                 };
 
                 ButtonsPanel.Children.Add(button);
+
+                if (btnConfig.IsDefault)
+                    defaultButton = button;
             }
+
+            // Focus the default button so Space — which only activates the focused button —
+            // also triggers it. Enter already works via IsDefault regardless of focus.
+            if (defaultButton != null)
+                Loaded += (_, _) => defaultButton.Focus();
 
             this.Closing += (sender, e) =>
             {

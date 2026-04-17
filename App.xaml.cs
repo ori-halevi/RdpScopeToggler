@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Prism.Ioc;
 using Prism.Navigation.Regions;
+using RdpScopeToggler.Helpers;
 using RdpScopeToggler.Managers;
+using RdpScopeToggler.Models;
 using RdpScopeToggler.Services.FilesService;
 using RdpScopeToggler.Services.LanguageService;
 using RdpScopeToggler.Services.LoggerService;
@@ -14,7 +16,10 @@ using RdpScopeToggler.Services.WindowsServiceManager;
 using RdpScopeToggler.ViewModels;
 using RdpScopeToggler.Views;
 using System;
+using System.IO;
 using System.Net.Http;
+using System.Security.Principal;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,6 +33,10 @@ namespace RdpScopeToggler
     public partial class App
     {
         private CancellationTokenSource _cts;
+        private Mutex _singleInstanceMutex;
+        private EventWaitHandle _showWindowEvent;
+        private Thread _showWindowListenerThread;
+        private volatile bool _showWindowListenerRunning;
 
         public static System.Windows.Forms.NotifyIcon notifyIcon;
         protected override Window CreateShell()
@@ -37,6 +46,29 @@ namespace RdpScopeToggler
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            var userSid = WindowsIdentity.GetCurrent().User?.Value ?? Environment.UserName;
+            var mutexName = $"Local\\RdpScopeToggler_{userSid}";
+            var showWindowEventName = $"Local\\RdpScopeToggler_ShowWindow_{userSid}";
+            _singleInstanceMutex = new Mutex(initiallyOwned: true, mutexName, out bool createdNew);
+
+            if (!createdNew)
+            {
+                // Primary instance already running — try to bring its window to the
+                // foreground. Only fall back to the "already running" dialog if signalling
+                // the primary instance fails.
+                if (!TryActivateRunningInstance(showWindowEventName))
+                {
+                    ShowAlreadyRunningDialog();
+                }
+                Shutdown();
+                return;
+            }
+
+            _showWindowEvent = new EventWaitHandle(false, EventResetMode.AutoReset, showWindowEventName);
+            _showWindowListenerRunning = true;
+            _showWindowListenerThread = new Thread(ShowWindowListenerLoop) { IsBackground = true };
+            _showWindowListenerThread.Start();
+
             base.OnStartup(e);
 
             #region Exception handling
@@ -131,8 +163,11 @@ namespace RdpScopeToggler
                     });
                 });
 
-            // מחברים את החלון ל־TrayIconManager
-            trayIconManager.AttachWindow(MainWindow);
+            MainWindow.Closing += (sender, e) =>
+            {
+                e.Cancel = true;
+                ShowCloseOrBackgroundDialog(trayIconManager);
+            };
 
             #endregion
 
@@ -146,6 +181,10 @@ namespace RdpScopeToggler
             if (!isDebug)
             {
                  await serviceInstaller.InitializeServiceAsync();
+            }
+            else
+            {
+                trayIconManager.ShowDebugModeReminder();
             }
 
 
@@ -171,10 +210,173 @@ namespace RdpScopeToggler
 
         protected override void OnExit(ExitEventArgs e)
         {
+            // Shut down the pipe client BEFORE base.OnExit. This clears event subscribers so
+            // any in-flight pipe message won't reach UI-bound handlers (NavigationManager,
+            // IndicatorsUserControlViewModel, etc.) after Application.Current starts tearing
+            // down — which was causing intermittent NullReferenceException on exit.
+            try
+            {
+                var pipe = Container.Resolve<IPipeClientService>();
+                pipe.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                // Container may already be disposed, or resolution may fail during teardown.
+                System.Diagnostics.Debug.WriteLine($"PipeClient shutdown error: {ex.Message}");
+            }
+
+            try
+            {
+                _showWindowListenerRunning = false;
+                _showWindowEvent?.Set();
+                _showWindowEvent?.Dispose();
+            }
+            catch { }
+
+            try
+            {
+                _singleInstanceMutex?.ReleaseMutex();
+                _singleInstanceMutex?.Dispose();
+            }
+            catch { }
+
             base.OnExit(e);
-            _cts.Cancel();
         }
 
+        private static bool TryActivateRunningInstance(string eventName)
+        {
+            try
+            {
+                using var ev = EventWaitHandle.OpenExisting(eventName);
+                ev.Set();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void ShowWindowListenerLoop()
+        {
+            while (_showWindowListenerRunning)
+            {
+                try
+                {
+                    if (!_showWindowEvent.WaitOne())
+                        continue;
+
+                    if (!_showWindowListenerRunning)
+                        break;
+
+                    Current?.Dispatcher.Invoke(ShowMainWindow);
+                }
+                catch
+                {
+                    break;
+                }
+            }
+        }
+
+        private void ShowCloseOrBackgroundDialog(TrayIconManager trayIconManager)
+        {
+            var dialog = new GenericDialogWindow(new GenericDialogOptions
+            {
+                Title = TranslationHelper.Translate("CloseAppTitle_translator"),
+                Message = TranslationHelper.Translate("CloseOrBackgroundQuestion_translator"),
+                Topmost = true,
+                Buttons =
+                {
+                    new DialogButtonConfig
+                    {
+                        Text = TranslationHelper.Translate("RunInBackground_translator"),
+                        IsDefault = true,
+                        OnClick = () =>
+                        {
+                            MainWindow?.Hide();
+                            trayIconManager.ShowStillRunningWarning();
+                        }
+                    },
+                    new DialogButtonConfig
+                    {
+                        Text = TranslationHelper.Translate("CloseCompletely_translator"),
+                        StyleKey = "DisconnectButton",
+                        OnClick = () =>
+                        {
+                            trayIconManager.Dispose();
+                            Current.Shutdown();
+                        }
+                    },
+                    new DialogButtonConfig
+                    {
+                        Text = TranslationHelper.Translate("Cancel_translator"),
+                        IsCancel = true,
+                        StyleKey = "SimpleButton"
+                    }
+                }
+            });
+
+            if (MainWindow != null && MainWindow.IsVisible)
+                dialog.Owner = MainWindow;
+
+            dialog.ShowDialog();
+        }
+
+
+        private void ShowAlreadyRunningDialog()
+        {
+            LoadLanguageDictionaryEarly();
+
+            var dialog = new GenericDialogWindow(new GenericDialogOptions
+            {
+                Title = TranslationHelper.Translate("AppAlreadyRunningTitle_translator"),
+                Message = TranslationHelper.Translate("AppAlreadyRunning_translator"),
+                Topmost = true,
+                IsModal = true,
+                Buttons =
+                {
+                    new DialogButtonConfig
+                    {
+                        Text = TranslationHelper.Translate("Close_translator"),
+                        IsDefault = true,
+                        IsCancel = true,
+                    }
+                }
+            });
+            dialog.ShowDialog();
+        }
+
+        // LanguageService.LoadLanguage() normally runs later, in OnInitialized — but the
+        // second-instance path exits before that, so merge the language dictionary here
+        // so TranslationHelper.Translate() can resolve keys for this dialog.
+        private static void LoadLanguageDictionaryEarly()
+        {
+            var language = "en";
+            try
+            {
+                var settingsPath = @"C:\ProgramData\RdpScopeToggler\Settings.json";
+                if (File.Exists(settingsPath))
+                {
+                    using var doc = JsonDocument.Parse(File.ReadAllText(settingsPath));
+                    if (doc.RootElement.TryGetProperty("Language", out var langProp))
+                    {
+                        var value = langProp.GetString();
+                        if (!string.IsNullOrWhiteSpace(value))
+                            language = value;
+                    }
+                }
+            }
+            catch { }
+
+            try
+            {
+                Current.Resources.MergedDictionaries.Add(new ResourceDictionary
+                {
+                    Source = new Uri($"Resources/Language/StringResources.{language}.xaml", UriKind.Relative)
+                });
+            }
+            catch { }
+        }
 
         private void ShowMainWindow()
         {
@@ -182,6 +384,8 @@ namespace RdpScopeToggler
                 return;
 
             MainWindow.Show();
+            if (MainWindow.WindowState == WindowState.Minimized)
+                MainWindow.WindowState = WindowState.Normal;
             MainWindow.Activate();
         }
 

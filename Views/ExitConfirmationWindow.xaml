@@ -17,7 +17,7 @@
         <TextBlock Text="{DynamicResource SureToExit_translator}"
                    FontSize="16" FontWeight="Bold" Margin="0 0 0 20"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
-            <Button Width="80" Margin="10 0"
+            <Button x:Name="YesButton" Width="80" Margin="10 0"
                     Click="Yes_Click"
                     Content="{DynamicResource Yes_translator}"
                     IsDefault="True" />

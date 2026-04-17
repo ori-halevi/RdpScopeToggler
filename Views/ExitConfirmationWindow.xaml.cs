@@ -12,6 +12,7 @@ namespace RdpScopeToggler.Views
         public ExitConfirmationWindow()
         {
             InitializeComponent();
+            Loaded += (_, _) => YesButton.Focus();
         }
 
         private void Yes_Click(object sender, RoutedEventArgs e)

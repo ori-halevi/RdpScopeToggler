@@ -10,6 +10,11 @@ namespace RdpScopeToggler.Models
         public Action? OnClick { get; set; }
         public bool IsDefault { get; set; } = false;
         public bool IsCancel { get; set; } = false;
+
+        // Optional resource key of a Style (from Application.Current.Resources) to apply to
+        // the button. Lets callers pick the existing app styles (ConnectButton, SimpleButton,
+        // DisconnectButton, …) per-button without teaching the dialog about any of them.
+        public string? StyleKey { get; set; }
     }
 
     public class GenericDialogOptions

@@ -3,6 +3,8 @@ using Prism.Mvvm;
 using Prism.Navigation.Regions;
 using RdpScopeToggler.Enums;
 using RdpScopeToggler.Services.LanguageService;
+using RdpScopeToggler.Services.LoggerService;
+using RdpScopeToggler.Services.ServiceInstallationManager;
 using RdpScopeToggler.Services.SettingsService;
 using System;
 using System.Collections.ObjectModel;
@@ -51,18 +53,30 @@ namespace RdpScopeToggler.ViewModels
             }
         }
 
+        private bool isRefreshingService;
+        public bool IsRefreshingService
+        {
+            get => isRefreshingService;
+            set => SetProperty(ref isRefreshingService, value);
+        }
+
         public ICommand CloseCommand { get; }
         public ICommand OpenLogsFolderCommand { get; }
+        public ICommand RefreshRdpScopeServiceCommand { get; }
 
         private readonly IRegionManager regionManager;
+        private readonly IServiceInstallationManager serviceInstallationManager;
         private readonly ILanguageService languageService;
         private readonly ISettingsService settingsService;
+        private readonly ILoggerService loggerService;
 
-        public SettingsUserControlViewModel(IRegionManager regionManager, ILanguageService languageService, ISettingsService settingsService)
+        public SettingsUserControlViewModel(IRegionManager regionManager, ILanguageService languageService, ISettingsService settingsService, IServiceInstallationManager serviceInstallationManager, ILoggerService loggerService)
         {
-            this.settingsService = settingsService;
             this.regionManager = regionManager;
+            this.serviceInstallationManager = serviceInstallationManager;
+            this.settingsService = settingsService;
             this.languageService = languageService;
+            this.loggerService = loggerService;
 
             LanguagesOptions = new ObservableCollection<string>
             {
@@ -113,6 +127,29 @@ namespace RdpScopeToggler.ViewModels
                     throw new DirectoryNotFoundException("Logger folder was not found.");
                 }
             });
+
+            // async lambda -> async void at runtime: any uncaught exception would crash
+            // the app via the sync context, so wrap even the logger call defensively.
+            RefreshRdpScopeServiceCommand = new DelegateCommand(
+                async () =>
+                {
+                    IsRefreshingService = true;
+                    try
+                    {
+                        await serviceInstallationManager.RefreshServiceAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        try { loggerService.Error("RefreshRdpScopeServiceCommand failed.", ex); }
+                        catch { /* swallow: logger must never crash an async-void command */ }
+                    }
+                    finally
+                    {
+                        IsRefreshingService = false;
+                    }
+                },
+                () => !IsRefreshingService)
+                .ObservesProperty(() => IsRefreshingService);
 
         }
 

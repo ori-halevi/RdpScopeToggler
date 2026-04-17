@@ -64,7 +64,7 @@ namespace RdpScopeToggler.Services.ServiceInstallationManager
                     await RunStepAsync(TranslationHelper.Translate("StartingService_translator"),
                         () => _serviceManager.StartServiceAsync());
                 }
-                
+
                 StepStarted?.Invoke(TranslationHelper.Translate("WaitingForService_translator"));
             }
             catch (Exception ex)
@@ -79,7 +79,117 @@ namespace RdpScopeToggler.Services.ServiceInstallationManager
             await action();
         }
 
+        public async Task RefreshServiceAsync()
+        {
+            try
+            {
+                StepStarted?.Invoke(TranslationHelper.Translate("RefreshingService_translator"));
 
+                bool installed = await _serviceManager.IsServiceInstalledAsync();
+                bool upToDate = IsServiceUpToDate();
+
+                // Full reinstall path: binary missing, stale, or service not registered.
+                // ExtractAsync deletes the on-disk .exe, which fails if the service process
+                // still holds it — so we stop & delete first.
+                if (!installed || !upToDate)
+                {
+                    await FullReinstallAsync();
+
+                    bool started = await WaitForServiceStateAsync(expectedRunning: true, timeoutMs: 10000);
+                    if (!started)
+                        throw new InvalidOperationException("Service failed to start after refresh.");
+
+                    StepStarted?.Invoke(TranslationHelper.Translate("WaitingForService_translator"));
+                    return;
+                }
+
+                // Clean restart path: binary is current, service is registered.
+                if (await _serviceManager.IsServiceRunningAsync())
+                {
+                    await RunStepAsync(
+                        TranslationHelper.Translate("StoppingService_translator"),
+                        () => _serviceManager.StopServiceAsync());
+
+                    bool stopped = await WaitForServiceStateAsync(expectedRunning: false, timeoutMs: 10000);
+
+                    // Stop timed out — fall back to hard reset (delete + re-extract + reinstall).
+                    if (!stopped)
+                    {
+                        await FullReinstallAsync();
+
+                        bool restarted = await WaitForServiceStateAsync(expectedRunning: true, timeoutMs: 10000);
+                        if (!restarted)
+                            throw new InvalidOperationException("Service failed to start after refresh.");
+
+                        StepStarted?.Invoke(TranslationHelper.Translate("WaitingForService_translator"));
+                        return;
+                    }
+                }
+
+                await RunStepAsync(
+                    TranslationHelper.Translate("StartingService_translator"),
+                    () => _serviceManager.StartServiceAsync());
+
+                bool finalStarted = await WaitForServiceStateAsync(expectedRunning: true, timeoutMs: 10000);
+                if (!finalStarted)
+                    throw new InvalidOperationException("Service failed to start after refresh.");
+
+                StepStarted?.Invoke(TranslationHelper.Translate("WaitingForService_translator"));
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to refresh service: {ex.Message}", ex);
+            }
+        }
+
+        private async Task FullReinstallAsync()
+        {
+            await RunStepAsync(
+                TranslationHelper.Translate("StoppingAndDeletingService_translator"),
+                () => _serviceManager.StopAndDeleteServiceAsync());
+
+            await RunStepAsync(
+                TranslationHelper.Translate("ExtractingServiceFiles_translator"),
+                () => _serviceExtractor.ExtractAsync(GetServiceFolder()));
+
+            await RunStepAsync(
+                TranslationHelper.Translate("InstallingService_translator"),
+                () => _serviceManager.InstallServiceAsync(GetServiceExePath()));
+
+            await RunStepAsync(
+                TranslationHelper.Translate("StartingService_translator"),
+                () => _serviceManager.StartServiceAsync());
+        }
+
+
+
+        private async Task<bool> WaitForServiceStateAsync(bool expectedRunning, int timeoutMs)
+        {
+            const int pollInterval = 500;
+            int waited = 0;
+
+            while (waited < timeoutMs)
+            {
+                bool isRunning = await _serviceManager.IsServiceRunningAsync();
+                if (isRunning == expectedRunning)
+                    return true;
+
+                await Task.Delay(pollInterval);
+                waited += pollInterval;
+            }
+
+            return false;
+        }
+
+        private string GetServiceFolder()
+        {
+            return Path.Combine("C:", "ProgramData", "RdpScopeToggler", "RdpScopeService");
+        }
+
+        private string GetServiceExePath()
+        {
+            return Path.Combine(GetServiceFolder(), "RdpScopeService.exe");
+        }
 
         private bool IsServiceUpToDate()
         {

@@ -34,6 +34,13 @@ namespace RdpScopeToggler.Services.PipeClientService
 
         Task AskWhiteListUpdate();
         Task AskAlwaysTrustedListUpdate();
+
+        /// <summary>
+        /// Graceful shutdown: clears all event subscribers so in-flight messages don't reach
+        /// UI-bound handlers once Application.Current is on its way out, cancels the listen loop,
+        /// and disposes pipe resources. Must be called from App.OnExit before base.OnExit.
+        /// </summary>
+        void Shutdown();
     }
 }
 

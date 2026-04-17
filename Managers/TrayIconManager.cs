@@ -58,14 +58,13 @@ namespace RdpScopeToggler.Managers
             notifyIcon.ShowBalloonTip(500); // משך הזמן במילישניות
         }
 
-        public void AttachWindow(Window window)
+        public void ShowDebugModeReminder()
         {
-            window.Closing += (sender, e) =>
-            {
-                ShowStillRunningWarning(); // הצגת הבועה
-            };
+            notifyIcon.BalloonTipTitle = "Rdp Scope Toggler — Debug Mode";
+            notifyIcon.BalloonTipText = "האפליקציה רצה במצב debug (isDebug = true). השירות לא מותקן אוטומטית.";
+            notifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Warning;
+            notifyIcon.ShowBalloonTip(3000);
         }
-
 
         public void Dispose()
         {

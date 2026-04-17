@@ -35,5 +35,11 @@ namespace RdpScopeToggler.Services.WindowsServiceManager
         /// </summary>
         /// <param name="cancellationToken">Token for cancellation support.</param>
         Task StartServiceAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Stops the installed service.
+        /// </summary>
+        /// <param name="cancellationToken">Token for cancellation support.</param>
+        Task StopServiceAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -54,6 +54,32 @@ namespace RdpScopeToggler.ViewModels
 
             this.pipeClientService = pipeClientService;
             this.pipeClientService.MessageReceived += OnMessageReceived;
+
+            // Blink timers are DispatcherTimers that keep a reference to this VM. If the VM
+            // is ever discarded (currently it's a singleton, but defensively we guard anyway)
+            // without stopping its timers, the dictionary leaks the timer + the closure that
+            // captures `this`. On app exit, also stop the timers explicitly rather than
+            // relying on the dispatcher teardown to clean them up.
+            var app = Application.Current;
+            if (app != null)
+            {
+                app.Exit += OnApplicationExit;
+            }
+        }
+
+        private void OnApplicationExit(object sender, ExitEventArgs e)
+        {
+            StopAllBlinkTimers();
+        }
+
+        private void StopAllBlinkTimers()
+        {
+            foreach (var kvp in _blinkTimers)
+            {
+                try { kvp.Value.Stop(); }
+                catch (Exception ex) { Debug.WriteLine($"Error stopping blink timer '{kvp.Key}': {ex.Message}"); }
+            }
+            _blinkTimers.Clear();
         }
 
         private void OnMessageReceived(ServiceMessage message)
@@ -67,7 +93,14 @@ namespace RdpScopeToggler.ViewModels
         private void UpdateIndicators(RdpInfoData rdpInfoData)
         {
             Debug.WriteLine($"Update Indicators...");
-            Application.Current.Dispatcher.Invoke(() =>
+
+            // Pipe messages arrive on a background thread. During app shutdown
+            // Application.Current may be null or the Dispatcher may be shutting down.
+            var app = Application.Current;
+            if (app?.Dispatcher == null || app.Dispatcher.HasShutdownStarted)
+                return;
+
+            app.Dispatcher.Invoke(() =>
             {
                 HandleBlink(nameof(IsAlwaysOnOpen), rdpInfoData?.IsOpenForAlwaysOnList);
                 HandleBlink(nameof(IsInternalOpen), rdpInfoData?.IsOpenForLocalComputers);
@@ -123,7 +156,11 @@ namespace RdpScopeToggler.ViewModels
 
         private void SetIndicatorValue(string name, bool value)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            var app = Application.Current;
+            if (app?.Dispatcher == null || app.Dispatcher.HasShutdownStarted)
+                return;
+
+            app.Dispatcher.Invoke(() =>
             {
                 switch (name)
                 {

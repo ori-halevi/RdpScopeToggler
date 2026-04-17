@@ -17,11 +17,12 @@
 
     <sys:String x:Key="Settings_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Settings</sys:String>
     <sys:String x:Key="OpenLogsFolder_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Open logs folder</sys:String>
+    <sys:String x:Key="RefreshService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Refresh service</sys:String>
 
     <sys:String x:Key="RemoteSystems_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Remote systems</sys:String>
     <sys:String x:Key="LocalComputersAndWhiteList_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Local Computers And White List</sys:String>
     <sys:String x:Key="LocalComputers_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Local Computers</sys:String>
-    <sys:String x:Key="CloseRdp_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Close RDP</sys:String>
+    <sys:String x:Key="CloseRdp_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Close (except Always-Trusted)</sys:String>
     <sys:String x:Key="AllAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">All addresses</sys:String>
     <sys:String x:Key="WhiteList_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">White list</sys:String>
 
@@ -31,7 +32,7 @@
     <sys:String x:Key="WhiteListAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">White List Addresses</sys:String>
 
     <sys:String x:Key="Add_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Add</sys:String>
-    <sys:String x:Key="SacnLocalAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Sacn local addresses</sys:String>
+    <sys:String x:Key="SacnLocalAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Scan local addresses</sys:String>
     <sys:String x:Key="SacnningForLocalAddresses_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Scanning for local Addresses...</sys:String>
 
     <sys:String x:Key="Main_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Main</sys:String>
@@ -71,11 +72,21 @@
     <sys:String x:Key="DoNotCloseTheApplication_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Do not close the application</sys:String>
     
     <sys:String x:Key="StoppingAndDeletingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Stopping and deleting existing service...</sys:String>
+    <sys:String x:Key="StoppingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Stopping service...</sys:String>
     <sys:String x:Key="ExtractingServiceFiles_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Extracting service files...</sys:String>
     <sys:String x:Key="InstallingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Installing service...</sys:String>
     <sys:String x:Key="StartingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Starting service...</sys:String>
+    <sys:String x:Key="RefreshingService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Refreshing service...</sys:String>
     <sys:String x:Key="WaitingForService_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Waiting for service...</sys:String>
 
     <sys:String x:Key="DefaultAccessState_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Default Access State:</sys:String>
+
+    <sys:String x:Key="AppAlreadyRunningTitle_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Application already running</sys:String>
+    <sys:String x:Key="AppAlreadyRunning_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">The application is already running for this user. Only one instance is allowed.</sys:String>
+
+    <sys:String x:Key="CloseAppTitle_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Close application</sys:String>
+    <sys:String x:Key="CloseOrBackgroundQuestion_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Close the application completely, or keep it running in the background?</sys:String>
+    <sys:String x:Key="CloseCompletely_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Close completely</sys:String>
+    <sys:String x:Key="RunInBackground_translator" xmlns:sys="clr-namespace:System;assembly=mscorlib">Run in background</sys:String>
 
 </ResourceDictionary>

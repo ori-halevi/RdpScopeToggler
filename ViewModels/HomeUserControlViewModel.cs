@@ -194,8 +194,7 @@ namespace RdpScopeToggler.ViewModels
             CountDownMinute = 1;
             CountDownSecond = 0;
             var now = DateTime.Now;
-            now.AddMinutes(2);
-            SelectedDateTime = now;
+            SelectedDateTime = now.AddMinutes(2);
             SelectedDate = now.Date;
             SelectedTime = DateTime.Now.AddMinutes(2);
 
@@ -245,8 +244,7 @@ namespace RdpScopeToggler.ViewModels
         private void UpdateDate()
         {
             var now = DateTime.Now;
-            now.AddMinutes(2);
-            SelectedDateTime = now;
+            SelectedDateTime = now.AddMinutes(2);
             SelectedDate = now.Date;
             SelectedTime = DateTime.Now.AddMinutes(2);
         }

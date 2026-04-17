@@ -26,7 +26,6 @@ namespace RdpScopeToggler.Views
         public MainWindow()
         {
             InitializeComponent();
-            this.Closing += MainWindow_Closing;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -52,15 +51,6 @@ namespace RdpScopeToggler.Views
             {
                 SizeToContent = SizeToContent.Manual;
             }), DispatcherPriority.Loaded);
-        }
-
-        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            // Cancel the close
-            e.Cancel = true;
-
-            // Hide the window instead of closing
-            this.Hide();
         }
     }
 }

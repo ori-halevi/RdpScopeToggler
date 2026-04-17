@@ -13,12 +13,13 @@ namespace RdpScopeToggler.Services.WindowsServiceManager
 
         private async Task RunScCommandAsync(string args, CancellationToken cancellationToken = default)
         {
+            // Verb="runas" is ignored when UseShellExecute=false. The Toggler already runs
+            // elevated (app.manifest), so sc.exe inherits admin rights.
             var process = Process.Start(new ProcessStartInfo
             {
                 FileName = "sc.exe",
                 Arguments = args,
                 UseShellExecute = false,
-                Verb = "runas",
                 CreateNoWindow = true
             });
 
@@ -77,6 +78,19 @@ namespace RdpScopeToggler.Services.WindowsServiceManager
         {
             await RunScCommandAsync($"start {ServiceName}", cancellationToken);
         }
+
+        public async Task StopServiceAsync(CancellationToken cancellationToken = default)
+        {
+            if (!await IsServiceInstalledAsync(cancellationToken))
+                return;
+
+            if (!await IsServiceRunningAsync(cancellationToken))
+                return;
+
+            await RunScCommandAsync($"stop {ServiceName}", cancellationToken);
+
+            // Short wait for the service to stop.
+            await Task.Delay(1500, cancellationToken);
+        }
     }
 }
-

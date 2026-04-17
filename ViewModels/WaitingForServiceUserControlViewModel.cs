@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using RdpScopeToggler.Helpers;
 using RdpScopeToggler.Services.ServiceInstallationManager;
 
 namespace RdpScopeToggler.ViewModels
@@ -14,7 +15,7 @@ namespace RdpScopeToggler.ViewModels
 
         public WaitingForServiceUserControlViewModel(IServiceInstallationManager serviceInstallationManager)
         {
-            Text = "Waiting for service...";
+            Text = TranslationHelper.Translate("WaitingForService_translator");
             serviceInstallationManager.StepStarted += (args) => Text = args;
         }
     }
